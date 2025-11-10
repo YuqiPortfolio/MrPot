@@ -29,6 +29,10 @@ public class ProcessingContext {
     private Map<String, List<String>> outline = new LinkedHashMap<>();
     private double changeRatio;
 
+    // Language
+    private String indexText;
+    private String indexLanguage = "en";
+
     // template selection
     private PromptTemplate template;
     private String systemPrompt;
