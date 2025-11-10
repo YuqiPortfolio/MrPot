@@ -2,15 +2,17 @@ package com.example.datalake.mrpot.processor;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.util.CodeFenceUtils;
-import org.languagetool.JLanguageTool;
-import org.languagetool.language.AmericanEnglish;
-import org.languagetool.language.Chinese;
-import org.languagetool.rules.RuleMatch;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.text.Normalizer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,19 +20,13 @@ import java.util.regex.Pattern;
 public class UnifiedCleanCorrectProcessor implements TextProcessor{
     @Override public String name() { return "unified-clean-correct"; }
 
-    // LanguageTool (NOT thread-safe) → one instance per thread
-    private final ThreadLocal<JLanguageTool> enTl =
-            ThreadLocal.withInitial(() -> new JLanguageTool(new AmericanEnglish()));
-    private final ThreadLocal<JLanguageTool> zhTl =
-            ThreadLocal.withInitial(() -> new JLanguageTool(new Chinese()));
-
     // Sentence splitting / regex rules
     private static final Pattern SENT_SPLIT = Pattern.compile("[\\n；;。.!?]+\\s*");
     private static final Pattern CN_EXCESS_SPACES = Pattern.compile("(?<=\\p{IsHan})\\s+(?=\\p{IsHan})");
     private static final Pattern CN_WORD_SPACE = Pattern.compile("(?<=\\p{IsHan})\\s+(?=[A-Za-z0-9])|(?<=[A-Za-z0-9])\\s+(?=\\p{IsHan})");
     private static final Pattern CN_REPEAT_CHAR = Pattern.compile("([\\p{IsHan}！？。；，、])\\1{1,}");
     private static final Pattern SENTENCE_START_I = Pattern.compile("(?m)(^|[\\n\\.!?]\\s*)i\\b");
-    private static final Pattern URL_OR_EMAIL = Pattern.compile("(https?://\\S+)|([\\w._%+-]+@[\\w.-]+\\.[A-Za-z]{2,6})");
+    private static final Pattern MISSPELL_TEH = Pattern.compile("\\bteh\\b", Pattern.CASE_INSENSITIVE);
 
     @Override
     public Mono<ProcessingContext> process(ProcessingContext ctx) {
@@ -60,11 +56,10 @@ public class UnifiedCleanCorrectProcessor implements TextProcessor{
             // 2) Light rule-based fixes (no semantic rewrites)
             t = applyLightRules(t);
 
-            // 3) Conservative LanguageTool corrections (EN/ZH only, with constraints)
-            String guess = fastLangGuess(t); // "zh" or "en"
-            int before = t.length();
-            t = applyLanguageToolConservatively(t, "zh".equals(guess) ? zhTl.get() : enTl.get());
-            totalApplied += Math.max(0, before - t.length()); // rough metric
+            // 3) Extremely fast bespoke corrections (skip heavyweight LanguageTool)
+            CorrectionResult quickFix = applyQuickCorrections(t);
+            t = quickFix.text();
+            totalApplied += quickFix.replacements();
 
             // 4) Logical classification (sentences → TASKS / CONSTRAINTS / OUTPUT / CONTEXT)
             classifyToOutline(t, outline);
@@ -92,7 +87,7 @@ public class UnifiedCleanCorrectProcessor implements TextProcessor{
         ctx.setOutline(outline);
         ctx.setChangeRatio(changeRatio);
 
-        return Mono.just(ctx.addStep(name(), "ltApplied~" + totalApplied + ", ratio=" + String.format("%.3f", changeRatio)));
+        return Mono.just(ctx.addStep(name(), "quickFixes=" + totalApplied + ", ratio=" + String.format("%.3f", changeRatio)));
     }
 
     // ========= Implementation details =========
@@ -136,77 +131,37 @@ public class UnifiedCleanCorrectProcessor implements TextProcessor{
         return t;
     }
 
-    // Conservative LanguageTool pass: accept only "low-risk" categories + small edits; skip URLs/emails/numeric-heavy spans
-    private static String applyLanguageToolConservatively(String text, JLanguageTool tool) {
-        try {
-            List<RuleMatch> matches = tool.check(text);
-            if (matches.isEmpty()) return text;
-
-            StringBuilder sb = new StringBuilder(text);
-            int applied = 0;
-
-            // Replace from the end to avoid index shifts
-            for (int i = matches.size() - 1; i >= 0; i--) {
-                RuleMatch m = matches.get(i);
-                if (!isSafeRule(m)) continue;
-                List<String> suggs = m.getSuggestedReplacements();
-                if (suggs == null || suggs.isEmpty()) continue;
-
-                String orig = text.substring(m.getFromPos(), m.getToPos());
-                String repl = suggs.get(0);
-
-                if (!isSafeReplacement(orig, repl)) continue;
-                if (!smallEdit(orig, repl, 2)) continue;                   // allow only tiny changes
-                if (URL_OR_EMAIL.matcher(orig).find()) continue;           // never touch URLs/emails
-                if (URL_OR_EMAIL.matcher(repl).find()) continue;
-
-                sb.replace(m.getFromPos(), m.getToPos(), repl);
-                applied++;
-                if (applied > 80) break; // safety cap
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            // Fail-safe: return original text if LT throws
-            return text;
+    // Ultra-fast deterministic corrections for a few common typos
+    private static CorrectionResult applyQuickCorrections(String text) {
+        if (text == null || text.isEmpty()) {
+            return new CorrectionResult("", 0);
         }
+
+        StringBuilder sb = new StringBuilder();
+        Matcher m = MISSPELL_TEH.matcher(text);
+        int replacements = 0;
+        while (m.find()) {
+            replacements++;
+            String replacement = matchCase(m.group());
+            m.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        m.appendTail(sb);
+
+        return new CorrectionResult(sb.toString(), replacements);
     }
 
-    // Allowed rules: spelling / casing / punctuation / basic grammar; exclude stylistic or large rewrites
-    private static boolean isSafeRule(RuleMatch m) {
-        String id  = String.valueOf(m.getRule().getId()).toUpperCase(Locale.ROOT);
-        String cat = String.valueOf(m.getRule().getCategory().getId()).toUpperCase(Locale.ROOT);
-        return containsAny(cat, "TYP", "SPELL", "PUNC", "GRAMMAR", "CAS", "WHITESPACE")
-                || containsAny(id, "MORFOLOGIK", "UPPERCASE_SENT_START", "COMMA_PARENTHESIS_WHITESPACE");
-    }
-    private static boolean containsAny(String s, String... keys) {
-        for (String k : keys) if (s.contains(k)) return true;
-        return false;
-    }
-    private static boolean isSafeReplacement(String a, String b) {
-        if (Math.abs(a.length() - b.length()) > Math.max(2, a.length()/2)) return false;
-        if (b.codePoints().anyMatch(cp -> Character.isISOControl(cp) && cp!='\n' && cp!='\t')) return false;
-        if (digitRatio(a) > 0.5 || digitRatio(b) > 0.5) return false;
-        return true;
-    }
-    private static double digitRatio(String s){
-        if (s.isEmpty()) return 0;
-        long d = s.chars().filter(Character::isDigit).count();
-        return d * 1.0 / s.length();
-    }
-    // Lightweight edit distance check (<= k counts as a "small edit")
-    private static boolean smallEdit(String a, String b, int k) {
-        int n=a.length(), m=b.length();
-        int[][] dp = new int[Math.min(n,64)+1][Math.min(m,64)+1];
-        for(int i=0;i<=n;i++) dp[i][0]=i; for(int j=0;j<=m;j++) dp[0][j]=j;
-        for(int i=1;i<=n;i++){
-            for(int j=1;j<=m;j++){
-                int cost=(a.charAt(i-1)==b.charAt(j-1))?0:1;
-                dp[i][j]=Math.min(Math.min(dp[i-1][j]+1, dp[i][j-1]+1), dp[i-1][j-1]+cost);
-                if (dp[i][j] > k && i>j+k && j>i+k) return false;
-            }
+    private static String matchCase(String original) {
+        String replacement = "the";
+        if (original.equals(original.toUpperCase(Locale.ROOT))) {
+            return replacement.toUpperCase(Locale.ROOT);
         }
-        return dp[n][m] <= k;
+        if (!original.isEmpty() && Character.isUpperCase(original.charAt(0))) {
+            return Character.toUpperCase(replacement.charAt(0)) + replacement.substring(1);
+        }
+        return replacement;
     }
+
+    private record CorrectionResult(String text, int replacements) {}
 
     // Sentence classification → Outline buckets
     private static void classifyToOutline(String t, Map<String,List<String>> outline){
@@ -280,15 +235,4 @@ public class UnifiedCleanCorrectProcessor implements TextProcessor{
         return merged;
     }
 
-    // Rough language guess (only distinguishes zh / en; used to choose LT language)
-    private static String fastLangGuess(String s){
-        int han=0, esp=0;
-        for (int i=0;i<s.length();i++){
-            char c=s.charAt(i);
-            if (Character.UnicodeScript.of(c)==Character.UnicodeScript.HAN) han++;
-            if (c=='ñ'||c=='Ñ'||"¡¿".indexOf(c)>=0) esp++;
-        }
-        if (han>2) return "zh";
-        return "en";
-    }
 }

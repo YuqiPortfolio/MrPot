@@ -107,21 +107,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.languagetool</groupId>
-            <artifactId>languagetool-core</artifactId>
-            <version>6.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.languagetool</groupId>
-            <artifactId>language-en</artifactId>
-            <version>6.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.languagetool</groupId>
-            <artifactId>language-zh</artifactId>
-            <version>6.4</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.pemistahl</groupId>
             <artifactId>lingua</artifactId>
             <version>1.2.2</version>

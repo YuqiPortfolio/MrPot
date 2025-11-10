@@ -79,6 +79,18 @@ public class LanguageDetectorProcessorTest {
     }
 
     @Test
+    void chinese_name_translates_to_expected_english_tokens() {
+        LanguageDetectorProcessor p = new LanguageDetectorProcessor(detector);
+        ProcessingContext ctx = new ProcessingContext().setRawInput("郭育奇高盛");
+
+        ProcessingContext out = p.process(ctx).block();
+        assertNotNull(out);
+        assertEquals("zh", out.getLanguage().getIsoCode(), "Detection should still report Chinese");
+        assertTrue(out.getIndexText().contains("yuqi guo"), "Index text should surface 'Yuqi Guo'");
+        assertTrue(out.getIndexText().contains("goldman sachs"), "Index text should surface 'Goldman Sachs'");
+    }
+
+    @Test
     void empty_input_und() {
         LanguageDetectorProcessor p = new LanguageDetectorProcessor(detector);
         ProcessingContext ctx = new ProcessingContext().setRawInput("   \n\t ");

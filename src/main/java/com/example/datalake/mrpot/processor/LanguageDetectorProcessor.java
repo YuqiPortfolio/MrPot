@@ -12,6 +12,7 @@ import com.ibm.icu.text.Transliterator;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 /**
  * Detect language (Lingua) on NON-CODE text and produce an English-normalized
@@ -108,11 +109,23 @@ public class LanguageDetectorProcessor implements TextProcessor {
 
     /** Build ASCII-only, lowercase, symbol-stripped index text from non-code sample. */
     private static String toAsciiIndex(String sample) {
-        String ascii = TO_ASCII.transliterate(sample);
+        String translated = applyCustomTranslations(sample);
+        String ascii = TO_ASCII.transliterate(translated);
         // keep letters/digits/space only, collapse spaces, lowercase
         ascii = ascii.replaceAll("[^A-Za-z0-9\\s]", " ");
         ascii = ascii.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ").trim();
         return ascii;
+    }
+
+    private static String applyCustomTranslations(String sample) {
+        if (sample == null || sample.isEmpty()) {
+            return "";
+        }
+        String result = sample;
+        for (ReplacementRule rule : CUSTOM_TRANSLATIONS) {
+            result = rule.apply(result);
+        }
+        return result;
     }
 
     private static String toEnglishName(com.github.pemistahl.lingua.api.Language lang) {
@@ -145,5 +158,24 @@ public class LanguageDetectorProcessor implements TextProcessor {
             if (han > 2) return true;
         }
         return false;
+    }
+
+    private static final List<ReplacementRule> CUSTOM_TRANSLATIONS = List.of(
+            ReplacementRule.literal("郭育奇高盛", "Yuqi Guo, Goldman Sachs"),
+            ReplacementRule.literal("郭育奇，", "Yuqi Guo, "),
+            ReplacementRule.literal("郭育奇、", "Yuqi Guo, "),
+            ReplacementRule.literal("郭育奇。", "Yuqi Guo."),
+            ReplacementRule.literal("郭育奇", "Yuqi Guo"),
+            ReplacementRule.literal("高盛", "Goldman Sachs")
+    );
+
+    private record ReplacementRule(Pattern pattern, String replacement) {
+        static ReplacementRule literal(String literal, String replacement) {
+            return new ReplacementRule(Pattern.compile(Pattern.quote(literal)), replacement);
+        }
+
+        String apply(String input) {
+            return pattern.matcher(input).replaceAll(replacement);
+        }
     }
 }
