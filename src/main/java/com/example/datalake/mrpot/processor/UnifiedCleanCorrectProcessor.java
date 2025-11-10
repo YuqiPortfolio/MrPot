@@ -1,0 +1,294 @@
+package com.example.datalake.mrpot.processor;
+
+import com.example.datalake.mrpot.model.ProcessingContext;
+import com.example.datalake.mrpot.util.CodeFenceUtils;
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.AmericanEnglish;
+import org.languagetool.language.Chinese;
+import org.languagetool.rules.RuleMatch;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.text.Normalizer;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Component
+public class UnifiedCleanCorrectProcessor implements TextProcessor{
+    @Override public String name() { return "unified-clean-correct"; }
+
+    // LanguageTool (NOT thread-safe) → one instance per thread
+    private final ThreadLocal<JLanguageTool> enTl =
+            ThreadLocal.withInitial(() -> new JLanguageTool(new AmericanEnglish()));
+    private final ThreadLocal<JLanguageTool> zhTl =
+            ThreadLocal.withInitial(() -> new JLanguageTool(new Chinese()));
+
+    // Sentence splitting / regex rules
+    private static final Pattern SENT_SPLIT = Pattern.compile("[\\n；;。.!?]+\\s*");
+    private static final Pattern CN_EXCESS_SPACES = Pattern.compile("(?<=\\p{IsHan})\\s+(?=\\p{IsHan})");
+    private static final Pattern CN_WORD_SPACE = Pattern.compile("(?<=\\p{IsHan})\\s+(?=[A-Za-z0-9])|(?<=[A-Za-z0-9])\\s+(?=\\p{IsHan})");
+    private static final Pattern CN_REPEAT_CHAR = Pattern.compile("([\\p{IsHan}！？。；，、])\\1{1,}");
+    private static final Pattern SENTENCE_START_I = Pattern.compile("(?m)(^|[\\n\\.!?]\\s*)i\\b");
+    private static final Pattern URL_OR_EMAIL = Pattern.compile("(https?://\\S+)|([\\w._%+-]+@[\\w.-]+\\.[A-Za-z]{2,6})");
+
+    @Override
+    public Mono<ProcessingContext> process(ProcessingContext ctx) {
+        String raw = ctx.getRawInput();
+        if (raw == null) raw = "";
+
+        // 0) Code-fence–aware segmentation
+        List<CodeFenceUtils.Segment> segs = CodeFenceUtils.split(raw);
+        List<CodeFenceUtils.Segment> out = new ArrayList<>(segs.size());
+
+        // Outline buckets
+        Map<String, List<String>> outline = new LinkedHashMap<>();
+        outline.put("TASKS", new ArrayList<>());
+        outline.put("CONSTRAINTS", new ArrayList<>());
+        outline.put("CONTEXT", new ArrayList<>());
+        outline.put("OUTPUT", new ArrayList<>());
+
+        int totalApplied = 0;
+
+        for (CodeFenceUtils.Segment seg : segs) {
+            if (seg.isCode) { out.add(seg); continue; }
+            String t = seg.text;
+
+            // 1) Normalization (NFKC / strip zero-width & control / unify quotes & dashes / stabilize punctuation / whitespace normalization)
+            t = normalizeText(t);
+
+            // 2) Light rule-based fixes (no semantic rewrites)
+            t = applyLightRules(t);
+
+            // 3) Conservative LanguageTool corrections (EN/ZH only, with constraints)
+            String guess = fastLangGuess(t); // "zh" or "en"
+            int before = t.length();
+            t = applyLanguageToolConservatively(t, "zh".equals(guess) ? zhTl.get() : enTl.get());
+            totalApplied += Math.max(0, before - t.length()); // rough metric
+
+            // 4) Logical classification (sentences → TASKS / CONSTRAINTS / OUTPUT / CONTEXT)
+            classifyToOutline(t, outline);
+
+            out.add(new CodeFenceUtils.Segment(t, false));
+        }
+
+        // 5) Cross-segment de-dup & condensation + collapse blank lines
+        String joined = CodeFenceUtils.join(out);
+        String condensed = dedupAndCondense(joined);
+
+        // 5.1) Post-format short plain text (merge lines like "hello\n\nworld" → "Hello world")
+        condensed = postFormatShortPlainText(condensed);
+
+        // 6) Length control (leave room for templates/system prompts)
+        int limit = Math.max(2000, Math.min(ctx.getCharLimit(), 8000));
+        if (condensed.length() > limit) {
+            condensed = condensed.substring(0, limit - 50) + "\n[Content condensed to enforce length limit]";
+        }
+
+        // 7) Write back into context
+        double changeRatio = raw.isEmpty() ? 0.0 : Math.abs(condensed.length() - raw.length()) / (double) raw.length();
+        ctx.setNormalized(condensed);
+        ctx.setCorrected(condensed);
+        ctx.setOutline(outline);
+        ctx.setChangeRatio(changeRatio);
+
+        return Mono.just(ctx.addStep(name(), "ltApplied~" + totalApplied + ", ratio=" + String.format("%.3f", changeRatio)));
+    }
+
+    // ========= Implementation details =========
+
+    // Normalization: try to be "lossless" and avoid semantic changes
+    private static String normalizeText(String s) {
+        if (s == null || s.isEmpty()) return "";
+        s = Normalizer.normalize(s, Normalizer.Form.NFKC);
+        s = s.replace("\uFEFF","").replace("\u200B","").replace("\u200C","")
+                .replace("\u200D","").replace("\u200E","").replace("\u200F","");
+        s = s.replaceAll("[\\p{Cntrl}&&[^\n\t]]", ""); // keep \n and \t
+        s = s.replaceAll("[“”]", "\"").replaceAll("[‘’]", "'")
+                .replace("—","-").replace("–","-");
+        s = s.replaceAll("\\?{2,}", "?")
+                .replaceAll("!{2,}", "!")
+                .replaceAll("。{2,}", "。")
+                .replaceAll("\\.{3,}", ".")
+                .replaceAll("，{2,}", "，")
+                .replaceAll(",{2,}", ",");
+        s = s.replace("\r\n","\n").replace('\r','\n');
+        s = s.replaceAll("[ \\t]{2,}", " ").trim();
+        return s;
+    }
+
+    // Light rules: spacing for Chinese/Latin, compress repeated Chinese punctuation, lowercase "i" at sentence start → "I"
+    private static String applyLightRules(String t) {
+        // At sentence start, convert "i" → "I"
+        Matcher si = SENTENCE_START_I.matcher(t);
+        StringBuffer sbI = new StringBuffer();
+        while (si.find()) {
+            String g = si.group();
+            si.appendReplacement(sbI, Matcher.quoteReplacement(g.replace("i", "I")));
+        }
+        si.appendTail(sbI);
+        t = sbI.toString();
+
+        // Fix Chinese spacing & compress repeated punctuation/characters
+        t = CN_EXCESS_SPACES.matcher(t).replaceAll("");
+        t = CN_WORD_SPACE.matcher(t).replaceAll("");
+        t = CN_REPEAT_CHAR.matcher(t).replaceAll("$1");
+        return t;
+    }
+
+    // Conservative LanguageTool pass: accept only "low-risk" categories + small edits; skip URLs/emails/numeric-heavy spans
+    private static String applyLanguageToolConservatively(String text, JLanguageTool tool) {
+        try {
+            List<RuleMatch> matches = tool.check(text);
+            if (matches.isEmpty()) return text;
+
+            StringBuilder sb = new StringBuilder(text);
+            int applied = 0;
+
+            // Replace from the end to avoid index shifts
+            for (int i = matches.size() - 1; i >= 0; i--) {
+                RuleMatch m = matches.get(i);
+                if (!isSafeRule(m)) continue;
+                List<String> suggs = m.getSuggestedReplacements();
+                if (suggs == null || suggs.isEmpty()) continue;
+
+                String orig = text.substring(m.getFromPos(), m.getToPos());
+                String repl = suggs.get(0);
+
+                if (!isSafeReplacement(orig, repl)) continue;
+                if (!smallEdit(orig, repl, 2)) continue;                   // allow only tiny changes
+                if (URL_OR_EMAIL.matcher(orig).find()) continue;           // never touch URLs/emails
+                if (URL_OR_EMAIL.matcher(repl).find()) continue;
+
+                sb.replace(m.getFromPos(), m.getToPos(), repl);
+                applied++;
+                if (applied > 80) break; // safety cap
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            // Fail-safe: return original text if LT throws
+            return text;
+        }
+    }
+
+    // Allowed rules: spelling / casing / punctuation / basic grammar; exclude stylistic or large rewrites
+    private static boolean isSafeRule(RuleMatch m) {
+        String id  = String.valueOf(m.getRule().getId()).toUpperCase(Locale.ROOT);
+        String cat = String.valueOf(m.getRule().getCategory().getId()).toUpperCase(Locale.ROOT);
+        return containsAny(cat, "TYP", "SPELL", "PUNC", "GRAMMAR", "CAS", "WHITESPACE")
+                || containsAny(id, "MORFOLOGIK", "UPPERCASE_SENT_START", "COMMA_PARENTHESIS_WHITESPACE");
+    }
+    private static boolean containsAny(String s, String... keys) {
+        for (String k : keys) if (s.contains(k)) return true;
+        return false;
+    }
+    private static boolean isSafeReplacement(String a, String b) {
+        if (Math.abs(a.length() - b.length()) > Math.max(2, a.length()/2)) return false;
+        if (b.codePoints().anyMatch(cp -> Character.isISOControl(cp) && cp!='\n' && cp!='\t')) return false;
+        if (digitRatio(a) > 0.5 || digitRatio(b) > 0.5) return false;
+        return true;
+    }
+    private static double digitRatio(String s){
+        if (s.isEmpty()) return 0;
+        long d = s.chars().filter(Character::isDigit).count();
+        return d * 1.0 / s.length();
+    }
+    // Lightweight edit distance check (<= k counts as a "small edit")
+    private static boolean smallEdit(String a, String b, int k) {
+        int n=a.length(), m=b.length();
+        int[][] dp = new int[Math.min(n,64)+1][Math.min(m,64)+1];
+        for(int i=0;i<=n;i++) dp[i][0]=i; for(int j=0;j<=m;j++) dp[0][j]=j;
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                int cost=(a.charAt(i-1)==b.charAt(j-1))?0:1;
+                dp[i][j]=Math.min(Math.min(dp[i-1][j]+1, dp[i][j-1]+1), dp[i-1][j-1]+cost);
+                if (dp[i][j] > k && i>j+k && j>i+k) return false;
+            }
+        }
+        return dp[n][m] <= k;
+    }
+
+    // Sentence classification → Outline buckets
+    private static void classifyToOutline(String t, Map<String,List<String>> outline){
+        String[] parts = SENT_SPLIT.split(t.trim());
+        for (String p : parts) {
+            if (p == null) continue;
+            String s = p.trim();
+            if (s.isEmpty()) continue;
+            String lower = s.toLowerCase(Locale.ROOT);
+
+            if (lower.matches("^(please|help|write|实现|编写|生成|比较|分析|给我|需要)\\b.*")) {
+                outline.get("TASKS").add(s);
+            } else if (lower.matches(".*(must|should|不要|必须|仅|禁止|不可|不能|不允许).*")) {
+                outline.get("CONSTRAINTS").add(s);
+            } else if (lower.matches(".*(output|格式|schema|返回|字段|以.*格式|结构化).*")) {
+                outline.get("OUTPUT").add(s);
+            } else {
+                outline.get("CONTEXT").add(s);
+            }
+        }
+    }
+
+    // De-duplication & condensation across lines
+    private static String dedupAndCondense(String joined){
+        String[] lines = joined.split("\\n");
+        Set<String> seen = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        int blanks=0;
+        for (String line : lines) {
+            String l = line.trim();
+            if (l.isEmpty()) { if (++blanks<=1) sb.append('\n'); continue; }
+            blanks=0;
+            String key = l.toLowerCase(Locale.ROOT);
+            if (seen.contains(key)) continue;
+            seen.add(key);
+            // De-bounce consecutive duplicated words
+            l = l.replaceAll("\\b(\\w{2,})\\s+\\1\\b", "$1");
+            sb.append(l).append('\n');
+        }
+        return sb.toString().replaceAll("\\n{3,}", "\n\n").trim();
+    }
+
+    // Post-format short plain text into a nice single line like "Hello world"
+    private static String postFormatShortPlainText(String s) {
+        if (s.isEmpty()) return s;
+        if (s.contains("```")) return s; // never touch code
+        String[] rawLines = s.split("\\n");
+        List<String> lines = new ArrayList<>();
+        for (String rl : rawLines) {
+            String t = rl.trim();
+            if (!t.isEmpty()) lines.add(t);
+        }
+        if (lines.isEmpty() || lines.size() > 4) return s;
+
+        // If any line has punctuation other than spaces, don't change
+        for (String ln : lines) {
+            if (ln.matches(".*[\\p{Punct}，。！？；、：‘’“”`~@#%^&*()\\[\\]{}<>/\\\\].*")) {
+                return s;
+            }
+        }
+
+        // Merge lines with single spaces
+        String merged = String.join(" ", lines).replaceAll("\\s{2,}", " ").trim();
+        if (merged.isEmpty()) return s;
+
+        // Capitalize first letter of the first word
+        char first = merged.charAt(0);
+        if (Character.isLetter(first)) {
+            merged = Character.toUpperCase(first) + merged.substring(1);
+        }
+        return merged;
+    }
+
+    // Rough language guess (only distinguishes zh / en; used to choose LT language)
+    private static String fastLangGuess(String s){
+        int han=0, esp=0;
+        for (int i=0;i<s.length();i++){
+            char c=s.charAt(i);
+            if (Character.UnicodeScript.of(c)==Character.UnicodeScript.HAN) han++;
+            if (c=='ñ'||c=='Ñ'||"¡¿".indexOf(c)>=0) esp++;
+        }
+        if (han>2) return "zh";
+        return "en";
+    }
+}
