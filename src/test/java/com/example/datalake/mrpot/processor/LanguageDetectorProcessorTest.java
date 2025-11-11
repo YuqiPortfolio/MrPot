@@ -97,6 +97,23 @@ public class LanguageDetectorProcessorTest {
     }
 
     @Test
+    void pure_chinese_sentences_emit_dictionary_keywords() {
+        LanguageDetectorProcessor p = new LanguageDetectorProcessor(detector);
+        ProcessingContext ctx = new ProcessingContext().setRawInput("请提供详细的步骤并解释原因和影响。");
+
+        ProcessingContext out = p.process(ctx).block();
+        assertNotNull(out);
+        assertEquals("zh", out.getLanguage().getIsoCode(), "Should detect Chinese");
+        String index = out.getIndexText().toLowerCase(Locale.ROOT);
+        assertFalse(index.isBlank(), "Dictionary translation should provide keywords");
+        assertTrue(index.contains("please provide"), "Should include dictionary phrase 'please provide'");
+        assertTrue(index.contains("detailed"), "Should include translated adjective");
+        assertTrue(index.contains("steps"), "Should include translated noun 'steps'");
+        assertTrue(index.contains("reason"), "Should include translated noun 'reason'");
+        assertTrue(index.contains("impact"), "Should include translated noun 'impact'");
+    }
+
+    @Test
     void empty_input_und() {
         LanguageDetectorProcessor p = new LanguageDetectorProcessor(detector);
         ProcessingContext ctx = new ProcessingContext().setRawInput("   \n\t ");

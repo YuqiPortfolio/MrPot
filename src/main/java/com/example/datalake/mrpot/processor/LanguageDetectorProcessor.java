@@ -37,6 +37,7 @@ public class LanguageDetectorProcessor implements TextProcessor {
     private static final Pattern ENGLISH_KEYWORD_PATTERN =
             Pattern.compile("(?i)[A-Za-z][A-Za-z0-9]*?(?:[\\s'-]+[A-Za-z][A-Za-z0-9]*)*");
     private static final Pattern ASCII_LETTER = Pattern.compile("[a-zA-Z]");
+    private static final Pattern HAN_SEQUENCE = Pattern.compile("[\\p{IsHan}]{1,}");
     private static final Set<String> STOPWORDS = Set.of(
             "a", "an", "and", "are", "as", "at", "be", "but", "by", "for",
             "from", "in", "is", "it", "of", "on", "or", "the", "to", "with"
@@ -131,6 +132,12 @@ public class LanguageDetectorProcessor implements TextProcessor {
             collector.addPhrase(keyword);
         }
         collector.scan(translation.text());
+
+        DictionaryTranslation dictionary = applyDictionaryTranslations(sample);
+        for (String keyword : dictionary.keywords()) {
+            collector.addPhrase(keyword);
+        }
+        collector.scan(dictionary.text());
         return collector.join();
     }
 
@@ -146,6 +153,26 @@ public class LanguageDetectorProcessor implements TextProcessor {
             collected.addAll(outcome.keywords());
         }
         return new TranslationResult(result, collected);
+    }
+
+    private static DictionaryTranslation applyDictionaryTranslations(String sample) {
+        if (sample == null || sample.isEmpty()) {
+            return new DictionaryTranslation("", new LinkedHashSet<>());
+        }
+        Matcher matcher = HAN_SEQUENCE.matcher(sample);
+        StringBuilder english = new StringBuilder();
+        LinkedHashSet<String> keywords = new LinkedHashSet<>();
+        while (matcher.find()) {
+            String han = matcher.group();
+            List<String> phrases = ChineseDictionary.translate(han);
+            if (phrases.isEmpty()) continue;
+            for (String phrase : phrases) {
+                if (english.length() > 0) english.append(' ');
+                english.append(phrase);
+                keywords.add(phrase);
+            }
+        }
+        return new DictionaryTranslation(english.toString(), keywords);
     }
 
     private static String toEnglishName(com.github.pemistahl.lingua.api.Language lang) {
@@ -189,6 +216,179 @@ public class LanguageDetectorProcessor implements TextProcessor {
             ReplacementRule.literal("高盛", "Goldman Sachs", "Goldman Sachs")
     );
 
+    private static final class ChineseDictionary {
+        private static final Map<String, List<String>> PHRASE_MAP;
+        private static final int MAX_PHRASE_LENGTH;
+
+        static {
+            Map<String, List<String>> map = new LinkedHashMap<>();
+            put(map, "请提供", "please provide");
+            put(map, "请比较", "please compare");
+            put(map, "请使用", "please use");
+            put(map, "请解释", "please explain");
+            put(map, "请", "please");
+            put(map, "比较", "compare");
+            put(map, "分析", "analyze");
+            put(map, "生成", "generate");
+            put(map, "总结", "summarize");
+            put(map, "提供", "provide");
+            put(map, "使用", "use");
+            put(map, "转换", "convert");
+            put(map, "改成", "convert");
+            put(map, "解释", "explain");
+            put(map, "详细", "detailed");
+            put(map, "步骤", "steps");
+            put(map, "说明", "description");
+            put(map, "示例", "example");
+            put(map, "回答", "answer");
+            put(map, "问题", "question");
+            put(map, "方案", "solution");
+            put(map, "策略", "strategy");
+            put(map, "要求", "requirements");
+            put(map, "约束", "constraints");
+            put(map, "限制", "constraints");
+            put(map, "必须", "must");
+            put(map, "需要", "need");
+            put(map, "不要", "do not");
+            put(map, "禁止", "forbid");
+            put(map, "仅", "only");
+            put(map, "包括", "include");
+            put(map, "排除", "exclude");
+            put(map, "输出", "output");
+            put(map, "输入", "input");
+            put(map, "格式", "format");
+            put(map, "字段", "fields");
+            put(map, "列表", "list");
+            put(map, "表格", "table");
+            put(map, "代码", "code");
+            put(map, "版本", "version");
+            put(map, "脚本", "script");
+            put(map, "函数", "function");
+            put(map, "类", "class");
+            put(map, "接口", "interface");
+            put(map, "应用", "application");
+            put(map, "程序", "program");
+            put(map, "文档", "documentation");
+            put(map, "描述", "description");
+            put(map, "背景", "background");
+            put(map, "上下文", "context");
+            put(map, "目标", "goal");
+            put(map, "计划", "plan");
+            put(map, "比较", "compare");
+            put(map, "十年", "ten year");
+            put(map, "十", "ten");
+            put(map, "年", "year");
+            put(map, "保值", "resale value");
+            put(map, "保养", "maintenance");
+            put(map, "成本", "cost");
+            put(map, "费用", "costs");
+            put(map, "保险", "insurance");
+            put(map, "支出", "expense");
+            put(map, "考虑", "consider");
+            put(map, "同时", "also");
+            put(map, "以及", "as well as");
+            put(map, "还有", "also");
+            put(map, "客户", "customer");
+            put(map, "用户", "user");
+            put(map, "公司", "company");
+            put(map, "企业", "business");
+            put(map, "项目", "project");
+            put(map, "团队", "team");
+            put(map, "产品", "product");
+            put(map, "服务", "service");
+            put(map, "市场", "market");
+            put(map, "竞争", "competition");
+            put(map, "优势", "advantage");
+            put(map, "风险", "risk");
+            put(map, "机会", "opportunity");
+            put(map, "需求", "demand");
+            put(map, "收益", "benefit");
+            put(map, "收入", "revenue");
+            put(map, "利润", "profit");
+            put(map, "成本", "cost");
+            put(map, "预算", "budget");
+            put(map, "时间", "time");
+            put(map, "日期", "date");
+            put(map, "地点", "location");
+            put(map, "地区", "region");
+            put(map, "国家", "country");
+            put(map, "城市", "city");
+            put(map, "名称", "name");
+            put(map, "标题", "title");
+            put(map, "关键词", "keywords");
+            put(map, "语言", "language");
+            put(map, "中文", "chinese");
+            put(map, "英文", "english");
+            put(map, "翻译", "translate");
+            put(map, "解释", "explain");
+            put(map, "总结", "summarize");
+            put(map, "报告", "report");
+            put(map, "分析", "analysis");
+            put(map, "计划", "plan");
+            put(map, "步骤", "steps");
+            put(map, "原因", "reason");
+            put(map, "影响", "impact");
+            put(map, "建议", "recommendation");
+            put(map, "改进", "improvement");
+            put(map, "优化", "optimize");
+            put(map, "评估", "evaluate");
+            put(map, "测试", "test");
+            put(map, "验证", "validate");
+            put(map, "部署", "deploy");
+            put(map, "发布", "release");
+            put(map, "监控", "monitor");
+            put(map, "维护", "maintain");
+            put(map, "支持", "support");
+            put(map, "文档", "documentation");
+            put(map, "资源", "resources");
+            put(map, "链接", "link");
+            put(map, "附件", "attachment");
+            put(map, "说明", "description");
+            put(map, "背景", "background");
+            put(map, "摘要", "summary");
+            put(map, "目标", "objective");
+
+            PHRASE_MAP = Collections.unmodifiableMap(map);
+            int max = 1;
+            for (String key : map.keySet()) {
+                if (key.length() > max) {
+                    max = key.length();
+                }
+            }
+            MAX_PHRASE_LENGTH = max;
+        }
+
+        private static void put(Map<String, List<String>> map, String han, String english) {
+            map.put(han, List.of(english));
+        }
+
+        static List<String> translate(String han) {
+            if (han == null || han.isEmpty()) {
+                return List.of();
+            }
+            List<String> out = new ArrayList<>();
+            int i = 0;
+            while (i < han.length()) {
+                int max = Math.min(MAX_PHRASE_LENGTH, han.length() - i);
+                boolean matched = false;
+                for (int len = max; len >= 1; len--) {
+                    String sub = han.substring(i, i + len);
+                    List<String> english = PHRASE_MAP.get(sub);
+                    if (english != null) {
+                        out.addAll(english);
+                        i += len;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    i++;
+                }
+            }
+            return out;
+        }
+    }
+
     private record ReplacementRule(Pattern pattern, String replacement, List<String> keywords) {
         static ReplacementRule literal(String literal, String replacement, String... keywords) {
             return new ReplacementRule(
@@ -211,6 +411,7 @@ public class LanguageDetectorProcessor implements TextProcessor {
     private record ReplacementOutcome(String text, List<String> keywords) {}
 
     private record TranslationResult(String text, LinkedHashSet<String> keywords) {}
+    private record DictionaryTranslation(String text, LinkedHashSet<String> keywords) {}
 
     private static final class KeywordCollector {
         private final LinkedHashMap<String, String> keywords = new LinkedHashMap<>();
