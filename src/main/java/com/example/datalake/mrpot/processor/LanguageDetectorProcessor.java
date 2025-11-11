@@ -8,21 +8,21 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import com.github.pemistahl.lingua.api.LanguageDetector;
-import com.ibm.icu.text.Transliterator;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Detect language (Lingua) on NON-CODE text and produce an English-normalized
- * index text using ICU4J transliteration to Latin/ASCII.
+ * Detect language (Lingua) on NON-CODE text and emit a compact set of English
+ * keywords for downstream indexing/search.
  *
  * Pipeline:
  *   - source := normalized if present else rawInput
- *   - detect language on NON-CODE segments
- *   - transliterate NON-CODE segments to Latin/ASCII, lowercase, strip symbols
- *   - ctx.language = detected; ctx.indexLanguage = "en"; ctx.indexText = ascii text
+ *   - detect language on NON-CODE segments (using a truncated sample for speed)
+ *   - surface English keywords from NON-CODE segments (translations + regex)
+ *   - ctx.language = detected; ctx.indexLanguage = "en"; ctx.indexText = keywords
  */
 @Component
 @RequiredArgsConstructor
@@ -30,9 +30,17 @@ public class LanguageDetectorProcessor implements TextProcessor {
 
     private final LanguageDetector detector;
 
-    /** ICU4J transliterator: Any script → Latin → ASCII (remove diacritics). */
-    private static final Transliterator TO_ASCII =
-            Transliterator.getInstance("Any-Latin; Latin-ASCII");
+    private static final int MAX_DETECTION_CHARS = 4000;
+    private static final int MAX_KEYWORD_SOURCE_CHARS = 6000;
+    private static final int MAX_KEYWORDS = 64;
+    private static final int MAX_WORDS_PER_PHRASE = 8;
+    private static final Pattern ENGLISH_KEYWORD_PATTERN =
+            Pattern.compile("(?i)[A-Za-z][A-Za-z0-9]*?(?:[\\s'-]+[A-Za-z][A-Za-z0-9]*)*");
+    private static final Pattern ASCII_LETTER = Pattern.compile("[a-zA-Z]");
+    private static final Set<String> STOPWORDS = Set.of(
+            "a", "an", "and", "are", "as", "at", "be", "but", "by", "for",
+            "from", "in", "is", "it", "of", "on", "or", "the", "to", "with"
+    );
 
     @Override public String name() { return "language-detector"; }
 
@@ -53,6 +61,12 @@ public class LanguageDetectorProcessor implements TextProcessor {
 
         // --- 2) length cap to keep detection fast ---
         if (sample.length() > 12_000) sample = sample.substring(0, 12_000);
+        String detectionSample = sample.length() > MAX_DETECTION_CHARS
+                ? sample.substring(0, MAX_DETECTION_CHARS)
+                : sample;
+        String keywordSource = sample.length() > MAX_KEYWORD_SOURCE_CHARS
+                ? sample.substring(0, MAX_KEYWORD_SOURCE_CHARS)
+                : sample;
 
         // --- 3) empty? -> und + empty index text ---
         if (sample.isBlank()) {
@@ -63,17 +77,17 @@ public class LanguageDetectorProcessor implements TextProcessor {
         }
 
         // --- 4) detect language with Lingua ---
-        com.github.pemistahl.lingua.api.Language best = detector.detectLanguageOf(sample);
+        com.github.pemistahl.lingua.api.Language best = detector.detectLanguageOf(detectionSample);
         if (best == com.github.pemistahl.lingua.api.Language.UNKNOWN) {
             ctx.setLanguage(Language.und());
             // still provide English index text
-            String ascii = toAsciiIndex(sample);
-            ctx.setIndexLanguage("en").setIndexText(ascii);
-            return Mono.just(ctx.addStep(name(), "unknown->und; index(en) len=" + ascii.length()));
+            String keywords = buildEnglishKeywords(keywordSource);
+            ctx.setIndexLanguage("en").setIndexText(keywords);
+            return Mono.just(ctx.addStep(name(), "unknown->und; index(en) len=" + keywords.length()));
         }
 
         Map<com.github.pemistahl.lingua.api.Language, Double> confMap =
-                detector.computeLanguageConfidenceValues(sample);
+                detector.computeLanguageConfidenceValues(detectionSample);
         double conf = confMap.getOrDefault(best, 0.0);
 
         // --- 5) ISO code (prefer 639-1, else 639-3) ---
@@ -88,9 +102,9 @@ public class LanguageDetectorProcessor implements TextProcessor {
                 .setConfidence(conf)
                 .setScript(guessScriptByIso(iso, sample)));
 
-        // --- 7) build English-normalized index text (ASCII) ---
-        String ascii = toAsciiIndex(sample);
-        ctx.setIndexLanguage("en").setIndexText(ascii);
+        // --- 7) build English keyword index text ---
+        String keywords = buildEnglishKeywords(keywordSource);
+        ctx.setIndexLanguage("en").setIndexText(keywords);
 
         // --- 8) log top-3 candidates for auditing ---
         String top3 = confMap.entrySet().stream()
@@ -102,30 +116,36 @@ public class LanguageDetectorProcessor implements TextProcessor {
 
         return Mono.just(ctx.addStep(name(),
                 "best=" + iso + " (" + String.format(Locale.ROOT, "%.2f", conf) + "); top3=" + top3 +
-                        "; index(en) len=" + ascii.length()));
+                        "; index(en) len=" + keywords.length()));
     }
 
     // --- helpers ---
 
-    /** Build ASCII-only, lowercase, symbol-stripped index text from non-code sample. */
-    private static String toAsciiIndex(String sample) {
-        String translated = applyCustomTranslations(sample);
-        String ascii = TO_ASCII.transliterate(translated);
-        // keep letters/digits/space only, collapse spaces, lowercase
-        ascii = ascii.replaceAll("[^A-Za-z0-9\\s]", " ");
-        ascii = ascii.toLowerCase(Locale.ROOT).replaceAll("\\s+", " ").trim();
-        return ascii;
-    }
-
-    private static String applyCustomTranslations(String sample) {
+    private static String buildEnglishKeywords(String sample) {
         if (sample == null || sample.isEmpty()) {
             return "";
         }
-        String result = sample;
-        for (ReplacementRule rule : CUSTOM_TRANSLATIONS) {
-            result = rule.apply(result);
+        TranslationResult translation = applyCustomTranslations(sample);
+        KeywordCollector collector = new KeywordCollector();
+        for (String keyword : translation.keywords()) {
+            collector.addPhrase(keyword);
         }
-        return result;
+        collector.scan(translation.text());
+        return collector.join();
+    }
+
+    private static TranslationResult applyCustomTranslations(String sample) {
+        if (sample == null || sample.isEmpty()) {
+            return new TranslationResult("", new LinkedHashSet<>());
+        }
+        String result = sample;
+        LinkedHashSet<String> collected = new LinkedHashSet<>();
+        for (ReplacementRule rule : CUSTOM_TRANSLATIONS) {
+            ReplacementOutcome outcome = rule.apply(result);
+            result = outcome.text();
+            collected.addAll(outcome.keywords());
+        }
+        return new TranslationResult(result, collected);
     }
 
     private static String toEnglishName(com.github.pemistahl.lingua.api.Language lang) {
@@ -161,21 +181,100 @@ public class LanguageDetectorProcessor implements TextProcessor {
     }
 
     private static final List<ReplacementRule> CUSTOM_TRANSLATIONS = List.of(
-            ReplacementRule.literal("郭育奇高盛", "Yuqi Guo, Goldman Sachs"),
-            ReplacementRule.literal("郭育奇，", "Yuqi Guo, "),
-            ReplacementRule.literal("郭育奇、", "Yuqi Guo, "),
-            ReplacementRule.literal("郭育奇。", "Yuqi Guo."),
-            ReplacementRule.literal("郭育奇", "Yuqi Guo"),
-            ReplacementRule.literal("高盛", "Goldman Sachs")
+            ReplacementRule.literal("郭育奇高盛", "Yuqi Guo, Goldman Sachs", "Yuqi Guo", "Goldman Sachs"),
+            ReplacementRule.literal("郭育奇，", "Yuqi Guo, ", "Yuqi Guo"),
+            ReplacementRule.literal("郭育奇、", "Yuqi Guo, ", "Yuqi Guo"),
+            ReplacementRule.literal("郭育奇。", "Yuqi Guo.", "Yuqi Guo"),
+            ReplacementRule.literal("郭育奇", "Yuqi Guo", "Yuqi Guo"),
+            ReplacementRule.literal("高盛", "Goldman Sachs", "Goldman Sachs")
     );
 
-    private record ReplacementRule(Pattern pattern, String replacement) {
-        static ReplacementRule literal(String literal, String replacement) {
-            return new ReplacementRule(Pattern.compile(Pattern.quote(literal)), replacement);
+    private record ReplacementRule(Pattern pattern, String replacement, List<String> keywords) {
+        static ReplacementRule literal(String literal, String replacement, String... keywords) {
+            return new ReplacementRule(
+                    Pattern.compile(Pattern.quote(literal)),
+                    replacement,
+                    List.of(keywords)
+            );
         }
 
-        String apply(String input) {
-            return pattern.matcher(input).replaceAll(replacement);
+        ReplacementOutcome apply(String input) {
+            Matcher matcher = pattern.matcher(input);
+            if (!matcher.find()) {
+                return new ReplacementOutcome(input, List.of());
+            }
+            String replaced = matcher.replaceAll(replacement);
+            return new ReplacementOutcome(replaced, keywords);
+        }
+    }
+
+    private record ReplacementOutcome(String text, List<String> keywords) {}
+
+    private record TranslationResult(String text, LinkedHashSet<String> keywords) {}
+
+    private static final class KeywordCollector {
+        private final LinkedHashMap<String, String> keywords = new LinkedHashMap<>();
+
+        void addPhrase(String candidate) {
+            if (candidate == null) return;
+            String display = collapseWhitespace(candidate);
+            if (display.isEmpty()) return;
+            String normalized = limitWords(display, MAX_WORDS_PER_PHRASE);
+            String canonical = canonicalize(normalized);
+            if (canonical.isEmpty() || keywords.containsKey(canonical) || keywords.size() >= MAX_KEYWORDS) {
+                return;
+            }
+            keywords.put(canonical, normalized);
+        }
+
+        void addWord(String candidate) {
+            if (candidate == null) return;
+            String trimmed = candidate.trim();
+            if (trimmed.isEmpty()) return;
+            String canonical = trimmed.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+            if (canonical.length() < 2 || STOPWORDS.contains(canonical) || keywords.containsKey(canonical)
+                    || keywords.size() >= MAX_KEYWORDS) {
+                return;
+            }
+            keywords.put(canonical, trimmed);
+        }
+
+        void scan(String text) {
+            if (text == null || text.isEmpty()) return;
+            Matcher matcher = ENGLISH_KEYWORD_PATTERN.matcher(text);
+            while (matcher.find() && keywords.size() < MAX_KEYWORDS) {
+                String phrase = matcher.group();
+                addPhrase(phrase);
+                if (keywords.size() >= MAX_KEYWORDS) break;
+                for (String part : phrase.split("[\\s'-]+")) {
+                    addWord(part);
+                    if (keywords.size() >= MAX_KEYWORDS) break;
+                }
+            }
+        }
+
+        String join() {
+            if (keywords.isEmpty()) return "";
+            return String.join("\n", keywords.values());
+        }
+
+        private static String collapseWhitespace(String value) {
+            return value.replaceAll("\\s{2,}", " ").trim();
+        }
+
+        private static String canonicalize(String value) {
+            String canonical = value.toLowerCase(Locale.ROOT).replaceAll("[\\s'-]+", " ").trim();
+            if (canonical.isEmpty()) return "";
+            if (!ASCII_LETTER.matcher(canonical).find()) return "";
+            return canonical;
+        }
+
+        private static String limitWords(String value, int maxWords) {
+            String[] words = value.split("\\s+");
+            if (words.length <= maxWords) {
+                return value;
+            }
+            return String.join(" ", Arrays.copyOf(words, maxWords));
         }
     }
 }

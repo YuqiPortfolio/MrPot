@@ -7,6 +7,8 @@ import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Locale;
+
 import static com.github.pemistahl.lingua.api.Language.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,8 +33,11 @@ public class LanguageDetectorProcessorTest {
         assertEquals("en", out.getIndexLanguage(), "Index language is fixed to 'en'");
         assertNotNull(out.getIndexText());
         assertFalse(out.getIndexText().isBlank(), "Index text should not be blank");
-        // Should be ASCII only (no Han characters)
         assertFalse(containsHan(out.getIndexText()), "Index text should contain no Han characters");
+        assertTrue(out.getIndexText().toLowerCase(Locale.ROOT).contains("rav4 hybrid"),
+                "Keywords should surface 'RAV4 Hybrid'");
+        assertTrue(out.getIndexText().toLowerCase(Locale.ROOT).contains("cr-v hybrid"),
+                "Keywords should surface 'CR-V Hybrid'");
     }
 
     @Test
@@ -45,7 +50,8 @@ public class LanguageDetectorProcessorTest {
         assertNotNull(out);
         assertEquals("en", out.getLanguage().getIsoCode());
         assertEquals("en", out.getIndexLanguage());
-        assertTrue(out.getIndexText().contains("please"), "Index text should be lower-cased English");
+        assertTrue(out.getIndexText().toLowerCase(Locale.ROOT).contains("please summarize"),
+                "Keywords should preserve English phrases");
     }
 
     @Test
@@ -86,8 +92,8 @@ public class LanguageDetectorProcessorTest {
         ProcessingContext out = p.process(ctx).block();
         assertNotNull(out);
         assertEquals("zh", out.getLanguage().getIsoCode(), "Detection should still report Chinese");
-        assertTrue(out.getIndexText().contains("yuqi guo"), "Index text should surface 'Yuqi Guo'");
-        assertTrue(out.getIndexText().contains("goldman sachs"), "Index text should surface 'Goldman Sachs'");
+        assertTrue(out.getIndexText().contains("Yuqi Guo"), "Index text should surface 'Yuqi Guo'");
+        assertTrue(out.getIndexText().contains("Goldman Sachs"), "Index text should surface 'Goldman Sachs'");
     }
 
     @Test
