@@ -1,7 +1,6 @@
 package com.example.datalake.mrpot.service;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
-import com.example.datalake.mrpot.processor.LanguageDetectorProcessor;
 import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
@@ -21,8 +20,7 @@ import java.util.stream.Collectors;
 public class PromptPipeline {
 
     private static final List<Class<? extends TextProcessor>> DEFAULT_ORDER = List.of(
-            UnifiedCleanCorrectProcessor.class,
-            LanguageDetectorProcessor.class
+            UnifiedCleanCorrectProcessor.class
     );
 
     private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
