@@ -31,7 +31,7 @@ class UnifiedCleanCorrectProcessorTest {
     }
 
     @Test
-    void typoFixes_and_UrlsEmailsUntouched() {
+    void basicNormalization_and_UrlsEmailsUntouched_noTypoFix() {
         String raw = "i like teh apples!! See https://example.com and email foo.bar+baz@test.co.uk";
         UnifiedCleanCorrectProcessor processor = newProcessor();
         ProcessingContext ctx = mockCtx(raw, 4096);
@@ -43,16 +43,19 @@ class UnifiedCleanCorrectProcessorTest {
         String out = corrected.getValue();
         assertNotNull(out);
 
+        // Sentence-start 'i' should become 'I'
         assertTrue(out.startsWith("I "), "Sentence-start 'i' should become 'I'");
-        assertFalse(out.contains("teh"), "Misspelling 'teh' should be corrected");
-        assertTrue(out.contains("the apples!"), "Double '!!' should be normalized to '!'");
 
+        // No typo correction now: 'teh' should remain, but '!!' -> '!'
+        assertTrue(out.contains("teh apples!"), "'teh' should remain (no typo rules), and '!!' should normalize to '!'");
+
+        // URL and Email must be preserved verbatim
         assertTrue(out.contains("https://example.com"), "URL must be preserved");
         assertTrue(out.contains("foo.bar+baz@test.co.uk"), "Email must be preserved");
     }
 
     @Test
-    void codeFences_areKept_butWhitespaceMayChange_afterCondense() {
+    void codeFences_areKept_butWhitespaceMayChange_afterCondense_noTypoFix() {
         String code = "```\nfunction test(){\n  console.log('teh');\n}\n```";
         String raw = "please fix teh code:\n" + code + "\nthanks!";
         UnifiedCleanCorrectProcessor processor = newProcessor();
@@ -76,18 +79,16 @@ class UnifiedCleanCorrectProcessorTest {
         assertTrue(inside.contains("console.log('teh');"), "Console line should still be inside the fence");
         assertTrue(inside.contains("}"), "Closing brace should still be inside the fence");
 
-        // Assert the outside text is corrected:
-        // - case-insensitive: "please" may be capitalized to "Please"
-        // - allow optional whitespace/newline between ':' and the opening fence
+        // Text outside code fence should remain 'teh' (no typo fix), case-insensitive for 'please'
         assertTrue(
                 java.util.regex.Pattern
-                        .compile("(?i)please\\s+fix\\s+the\\s+code:\\s*```")
+                        .compile("(?i)please\\s+fix\\s+teh\\s+code:\\s*```")
                         .matcher(out)
                         .find(),
-                "Text outside code fence should be corrected (case-insensitive) and may be adjacent to the fence"
+                "Outside text should keep 'teh' and may be adjacent to the fence"
         );
 
-        // Sanity: code inside fence should not be corrected ('teh' remains)
+        // Sanity: code inside fence is untouched
         assertTrue(inside.contains("teh"), "Code inside fence should not be altered by corrections");
     }
 
@@ -114,8 +115,7 @@ class UnifiedCleanCorrectProcessorTest {
                 Pattern.compile("这是测试\\s*[，,]\\s*好[！!]").matcher(out).find(),
                 "Chinese spacing/punctuation should be normalized (CJK or ASCII ok; spaces around comma optional)"
         );
-        // And ensure repeated ASCII commas are collapsed: ",,," -> ","
-        // 同时校验 ASCII 逗号被压缩
+        // ASCII commas collapsed: ",,," -> ","
         assertFalse(out.contains(",,,"), "Repeated ASCII commas should be collapsed to a single ','");
 
         @SuppressWarnings("unchecked")
@@ -145,7 +145,6 @@ class UnifiedCleanCorrectProcessorTest {
     @Test
     void lengthControl_truncates_whenOver2000_and_appendsMarker() {
         // Build a >2000 chars input to trigger truncation at the minimum limit (2000)
-        // 中文：构造超过 2000 的内容，并将 charLimit 设低，强制 limit = 2000
         StringBuilder sb = new StringBuilder();
         sb.append("write summary.\n");
         for (int i = 0; i < 3100; i++) sb.append('x'); // total ≈ 3115 > 2000

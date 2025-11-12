@@ -1,0 +1,13285 @@
+{
+  "_meta": {
+    "generated_at": "2025-11-11",
+    "description": "Bilingual keyword expansion map for retrieval. Values include provenance: D=dataset, C=curated.",
+    "provenance": {
+      "D": "dataset",
+      "C": "curated"
+    },
+    "sources": [
+      "blog_embeddings_rows.json",
+      "chat_history_rows.json"
+    ],
+    "stats": {
+      "unique_terms_total": 2093,
+      "unique_dataset_tokens": 2086,
+      "top20_dataset_tokens": [
+        [
+          "e-05",
+          93
+        ],
+        [
+          "and",
+          41
+        ],
+        [
+          "the",
+          38
+        ],
+        [
+          "in",
+          38
+        ],
+        [
+          "of",
+          33
+        ],
+        [
+          "for",
+          32
+        ],
+        [
+          "is",
+          31
+        ],
+        [
+          "with",
+          26
+        ],
+        [
+          "e-06",
+          24
+        ],
+        [
+          "yuqi",
+          22
+        ],
+        [
+          "chat",
+          22
+        ],
+        [
+          "to",
+          21
+        ],
+        [
+          "can",
+          21
+        ],
+        [
+          "university",
+          19
+        ],
+        [
+          "react",
+          19
+        ],
+        [
+          "boot",
+          19
+        ],
+        [
+          "spring",
+          19
+        ],
+        [
+          "you",
+          18
+        ],
+        [
+          "as",
+          18
+        ],
+        [
+          "goldman",
+          18
+        ]
+      ]
+    }
+  },
+  "terms": {
+    "h1b": {
+      "D": [
+        "h1b"
+      ],
+      "C": [
+        "h-1b",
+        "visa",
+        "work visa",
+        "us visa",
+        "nonimmigrant visa",
+        "签证",
+        "工签",
+        "抽签",
+        "移民",
+        "绿卡",
+        "uscis",
+        "opt",
+        "cpt",
+        "stem opt",
+        "i-20",
+        "ead"
+      ]
+    },
+    "visa": {
+      "D": [],
+      "C": [
+        "work visa",
+        "h1b",
+        "h-1b",
+        "immigration",
+        "签证",
+        "工签",
+        "移民",
+        "绿卡",
+        "uscis",
+        "opt",
+        "cpt",
+        "抽签"
+      ]
+    },
+    "签证": {
+      "D": [],
+      "C": [
+        "visa",
+        "h1b",
+        "h-1b",
+        "工签",
+        "移民",
+        "绿卡",
+        "抽签",
+        "uscis",
+        "opt",
+        "cpt",
+        "i-20",
+        "ead"
+      ]
+    },
+    "Yuqi Guo": {
+      "D": [],
+      "C": [
+        "Yuqi",
+        "Yuqi Guo",
+        "郭育奇"
+      ]
+    },
+    "工签": {
+      "D": [],
+      "C": [
+        "工作签证",
+        "签证",
+        "h1b",
+        "h-1b",
+        "移民",
+        "绿卡",
+        "抽签",
+        "uscis",
+        "opt",
+        "cpt"
+      ]
+    },
+    "visa documents": {
+      "D": [],
+      "C": [
+        "i-20",
+        "ds-160",
+        "i-129",
+        "i-765",
+        "i-485",
+        "perm",
+        "lca",
+        "sevis",
+        "ead",
+        "i-944",
+        "w-2",
+        "paystub",
+        "bank statement",
+        "offer letter",
+        "employment verification"
+      ]
+    },
+    "national parks": {
+      "D": [],
+      "C": [
+        "zion",
+        "bryce",
+        "arches",
+        "canyonlands",
+        "capitol reef",
+        "yosemite",
+        "yellowstone",
+        "grand canyon",
+        "glacier",
+        "acadia",
+        "death valley",
+        "joshua tree",
+        "rocky mountain",
+        "grand teton",
+        "sequoia",
+        "kings canyon",
+        "olympic",
+        "mount rainier",
+        "great smoky mountains",
+        "arches national park",
+        "zion national park"
+      ]
+    },
+    "国家公园": {
+      "D": [],
+      "C": [
+        "锡安",
+        "zion",
+        "布莱斯",
+        "bryce",
+        "拱门",
+        "arches",
+        "峡谷地",
+        "canyonlands",
+        "圆顶礁",
+        "capitol reef",
+        "优胜美地",
+        "约塞米蒂",
+        "黄石",
+        "大峡谷",
+        "冰川国家公园",
+        "阿卡迪亚",
+        "死亡谷",
+        "约书亚树",
+        "落基山",
+        "大提顿",
+        "红杉",
+        "国王峡谷",
+        "奥林匹克",
+        "雷尼尔山",
+        "大烟山"
+      ]
+    },
+    "city": {
+      "D": [
+        "City"
+      ],
+      "C": [
+        "纽约",
+        "New York",
+        "NYC",
+        "芝加哥",
+        "Chicago",
+        "雪城",
+        "Syracuse",
+        "洛杉矶",
+        "Los Angeles",
+        "LA",
+        "旧金山",
+        "San Francisco",
+        "SF",
+        "西雅图",
+        "Seattle",
+        "波士顿",
+        "Boston",
+        "奥斯汀",
+        "Austin",
+        "达拉斯",
+        "Dallas",
+        "凤凰城",
+        "Phoenix",
+        "休斯敦",
+        "Houston",
+        "圣地亚哥",
+        "San Diego",
+        "迈阿密",
+        "Miami",
+        "拉斯维加斯",
+        "Las Vegas",
+        "费城",
+        "Philadelphia",
+        "丹佛",
+        "Denver",
+        "亚特兰大",
+        "Atlanta",
+        "底特律",
+        "Detroit",
+        "圣何塞",
+        "San Jose"
+      ]
+    },
+    "城市": {
+      "D": [],
+      "C": [
+        "纽约",
+        "New York",
+        "NYC",
+        "芝加哥",
+        "Chicago",
+        "雪城",
+        "Syracuse",
+        "洛杉矶",
+        "Los Angeles",
+        "LA",
+        "旧金山",
+        "San Francisco",
+        "SF",
+        "西雅图",
+        "Seattle",
+        "波士顿",
+        "Boston",
+        "奥斯汀",
+        "Austin",
+        "达拉斯",
+        "Dallas",
+        "凤凰城",
+        "Phoenix",
+        "休斯敦",
+        "Houston",
+        "圣地亚哥",
+        "San Diego",
+        "迈阿密",
+        "Miami",
+        "拉斯维加斯",
+        "Las Vegas",
+        "费城",
+        "Philadelphia",
+        "丹佛",
+        "Denver",
+        "亚特兰大",
+        "Atlanta",
+        "底特律",
+        "Detroit",
+        "圣何塞",
+        "San Jose"
+      ]
+    },
+    "compact suv": {
+      "D": [],
+      "C": [
+        "rav4",
+        "rav4 hybrid",
+        "cr-v",
+        "crv",
+        "cr-v hybrid",
+        "forester",
+        "cx-5",
+        "cx5",
+        "cx-50",
+        "outback",
+        "rogue",
+        "tucson",
+        "sportage",
+        "escape",
+        "grand cherokee",
+        "equinox"
+      ]
+    },
+    "auto insurance": {
+      "D": [],
+      "C": [
+        "insurance",
+        "policy",
+        "premium",
+        "deductible",
+        "liability",
+        "collision",
+        "comprehensive",
+        "uninsured motorist",
+        "claim",
+        "claim number",
+        "adjuster",
+        "subrogation",
+        "police report",
+        "dmv",
+        "citation",
+        "ticket",
+        "fine",
+        "case number",
+        "estimate",
+        "rental reimbursement",
+        "total loss"
+      ]
+    },
+    "理赔": {
+      "D": [],
+      "C": [
+        "保险",
+        "报案",
+        "索赔",
+        "定损",
+        "免赔额",
+        "保费",
+        "事故报告",
+        "警察报告",
+        "无保险驾驶员",
+        "代位求偿",
+        "理赔员",
+        "案件号",
+        "租车报销"
+      ]
+    },
+    "罚单": {
+      "D": [],
+      "C": [
+        "停车罚单",
+        "交通罚单",
+        "罚款",
+        "申诉",
+        "dmv",
+        "court",
+        "due date",
+        "case number"
+      ]
+    },
+    "spring": {
+      "D": [
+        "Spring"
+      ],
+      "C": [
+        "spring-boot",
+        "springboot",
+        "spring cloud",
+        "actuator",
+        "security",
+        "aop",
+        "jpa",
+        "hibernate"
+      ]
+    },
+    "docker": {
+      "D": [
+        "Docker"
+      ],
+      "C": [
+        "kubernetes",
+        "k8s",
+        "compose",
+        "registry",
+        "image",
+        "volume",
+        "bridge network"
+      ]
+    },
+    "kubernetes": {
+      "D": [
+        "Kubernetes"
+      ],
+      "C": [
+        "k8s",
+        "helm",
+        "statefulset",
+        "deployment",
+        "service",
+        "ingress-nginx",
+        "namespace",
+        "configmap",
+        "secret"
+      ]
+    },
+    "git": {
+      "D": [
+        "Git",
+        "git"
+      ],
+      "C": [
+        "branch",
+        "tag",
+        "commit",
+        "pull request",
+        "code review"
+      ]
+    },
+    "ci/cd": {
+      "D": [
+        "CI/CD"
+      ],
+      "C": [
+        "pipeline",
+        "github actions",
+        "gitlab ci",
+        "jenkins",
+        "maven",
+        "gradle",
+        "artifact",
+        "release"
+      ]
+    },
+    "kafka": {
+      "D": [
+        "Kafka"
+      ],
+      "C": [
+        "kafka",
+        "topic",
+        "partition",
+        "consumer group",
+        "offset",
+        "zookeeper",
+        "stream"
+      ]
+    },
+    "rabbitmq": {
+      "D": [
+        "RabbitMQ"
+      ],
+      "C": [
+        "rabbitmq",
+        "exchange",
+        "queue",
+        "routing key",
+        "publisher",
+        "consumer",
+        "ack"
+      ]
+    },
+    "sse": {
+      "D": [],
+      "C": [
+        "server-sent events",
+        "eventsource",
+        "streaming",
+        "flask sse",
+        "spring sse"
+      ]
+    },
+    "langchain4j": {
+      "D": [],
+      "C": [
+        "rag",
+        "retrieval",
+        "prompt",
+        "embedding",
+        "memory",
+        "chain"
+      ]
+    },
+    "elasticsearch": {
+      "D": [],
+      "C": [
+        "elastic",
+        "es",
+        "inverted index",
+        "query dsl",
+        "analyzer",
+        "vector",
+        "knn",
+        "opensearch"
+      ]
+    },
+    "supabase": {
+      "D": [
+        "Supabase"
+      ],
+      "C": [
+        "postgres",
+        "postgresql",
+        "auth",
+        "storage",
+        "functions",
+        "realtime",
+        "vector"
+      ]
+    },
+    "postgres": {
+      "D": [],
+      "C": [
+        "sql",
+        "database",
+        "index",
+        "view",
+        "materialized view",
+        "jsonb",
+        "ctes"
+      ]
+    },
+    "next.js": {
+      "D": [],
+      "C": [
+        "nextjs",
+        "app router",
+        "ssr",
+        "isr",
+        "edge",
+        "route handlers"
+      ]
+    },
+    "react": {
+      "D": [
+        "React"
+      ],
+      "C": [
+        "hooks",
+        "useEffect",
+        "useState",
+        "context",
+        "suspense",
+        "component",
+        "jsx"
+      ]
+    },
+    "programming languages": {
+      "D": [],
+      "C": [
+        "java",
+        "python",
+        "javascript",
+        "typescript",
+        "sql",
+        "go",
+        "rust",
+        "kotlin",
+        "c++",
+        "c#",
+        "scala",
+        "bash",
+        "shell"
+      ]
+    },
+    "database": {
+      "D": [
+        "Database",
+        "database"
+      ],
+      "C": [
+        "postgres",
+        "mysql",
+        "sqlite",
+        "supabase",
+        "mongodb",
+        "redis",
+        "elasticsearch",
+        "opensearch"
+      ]
+    },
+    "cloud": {
+      "D": [
+        "Cloud",
+        "cloud"
+      ],
+      "C": [
+        "aws",
+        "gcp",
+        "azure",
+        "cloud run",
+        "ec2",
+        "s3",
+        "cloudfront",
+        "vpc",
+        "iam",
+        "load balancer"
+      ]
+    },
+    "auth": {
+      "D": [],
+      "C": [
+        "oauth",
+        "keycloak",
+        "firebase auth",
+        "jwt",
+        "refresh token",
+        "access token",
+        "rbac",
+        "@PreAuthorize"
+      ]
+    },
+    "linkedin account recovery": {
+      "D": [],
+      "C": [
+        "persona",
+        "affidavit of identity",
+        "notary",
+        "notarization",
+        "case number",
+        "support ticket",
+        "verification",
+        "id upload"
+      ]
+    },
+    "salt lake city": {
+      "D": [
+        "Salt Lake City"
+      ],
+      "C": [
+        "utah",
+        "wasatch",
+        "slc downtown",
+        "temple square"
+      ]
+    },
+    "郭育奇风趣幽默吗？": {
+      "D": [],
+      "C": [
+        "幽默",
+        "搞笑",
+        "有趣",
+        "风趣",
+        "性格",
+        "humor",
+        "funny",
+        "witty"
+      ]
+    },
+    "郭育奇有几任前女友": {
+      "D": [
+        "郭育奇有几任前女友"
+      ],
+      "C": [
+        "前女友",
+        "恋爱史",
+        "感情经历",
+        "dating history",
+        "ex-girlfriend",
+	"single"
+      ]
+    },
+    "blogs": {
+      "D": [
+        "Blogs",
+        "blogs"
+      ],
+      "C": []
+    },
+    "df9bed8e-163b-41bb-82be-7f970eb7875d": {
+      "D": [
+        "df9bed8e-163b-41bb-82be-7f970eb7875d"
+      ],
+      "C": []
+    },
+    "message.": {
+      "D": [
+        "message."
+      ],
+      "C": []
+    },
+    "single": {
+      "D": [
+        "single"
+      ],
+      "C": []
+    },
+    "squashing": {
+      "D": [
+        "Squashing",
+        "squashing"
+      ],
+      "C": []
+    },
+    "merging": {
+      "D": [
+        "Merging",
+        "merging"
+      ],
+      "C": []
+    },
+    "preserves": {
+      "D": [
+        "preserves"
+      ],
+      "C": []
+    },
+    "merge": {
+      "D": [
+        "Merge",
+        "merge"
+      ],
+      "C": []
+    },
+    "editor.": {
+      "D": [
+        "editor."
+      ],
+      "C": []
+    },
+    "useful": {
+      "D": [
+        "useful"
+      ],
+      "C": []
+    },
+    "changes": {
+      "D": [
+        "Changes",
+        "changes"
+      ],
+      "C": []
+    },
+    "pick": {
+      "D": [
+        "pick"
+      ],
+      "C": []
+    },
+    "merged": {
+      "D": [
+        "merged"
+      ],
+      "C": []
+    },
+    "which": {
+      "D": [
+        "which"
+      ],
+      "C": []
+    },
+    "interactive": {
+      "D": [
+        "interactive"
+      ],
+      "C": []
+    },
+    "onto": {
+      "D": [
+        "onto"
+      ],
+      "C": []
+    },
+    "text": {
+      "D": [
+        "text"
+      ],
+      "C": []
+    },
+    "how": {
+      "D": [
+        "How",
+        "how"
+      ],
+      "C": []
+    },
+    "particularly": {
+      "D": [
+        "particularly"
+      ],
+      "C": []
+    },
+    "first": {
+      "D": [
+        "First",
+        "first"
+      ],
+      "C": []
+    },
+    "save": {
+      "D": [
+        "Save"
+      ],
+      "C": []
+    },
+    "rebase": {
+      "D": [
+        "Rebase",
+        "rebase"
+      ],
+      "C": []
+    },
+    "occur": {
+      "D": [
+        "occur"
+      ],
+      "C": []
+    },
+    "resolution": {
+      "D": [
+        "Resolution"
+      ],
+      "C": []
+    },
+    "list": {
+      "D": [
+        "list"
+      ],
+      "C": []
+    },
+    "cherry-pick": {
+      "D": [
+        "Cherry-Pick",
+        "cherry-pick"
+      ],
+      "C": []
+    },
+    "of": {
+      "D": [
+        "of"
+      ],
+      "C": []
+    },
+    "project": {
+      "D": [
+        "project"
+      ],
+      "C": []
+    },
+    "close": {
+      "D": [
+        "close"
+      ],
+      "C": []
+    },
+    "unlike": {
+      "D": [
+        "Unlike"
+      ],
+      "C": []
+    },
+    "integrating": {
+      "D": [
+        "integrating"
+      ],
+      "C": []
+    },
+    "have": {
+      "D": [
+        "have"
+      ],
+      "C": []
+    },
+    "integrated": {
+      "D": [
+        "integrated"
+      ],
+      "C": []
+    },
+    "commit": {
+      "D": [
+        "commit"
+      ],
+      "C": []
+    },
+    "essential": {
+      "D": [
+        "essential"
+      ],
+      "C": []
+    },
+    "understandable.": {
+      "D": [
+        "understandable."
+      ],
+      "C": []
+    },
+    "combining": {
+      "D": [
+        "combining"
+      ],
+      "C": []
+    },
+    "work": {
+      "D": [
+        "work"
+      ],
+      "C": []
+    },
+    "method": {
+      "D": [
+        "method"
+      ],
+      "C": []
+    },
+    "edit": {
+      "D": [
+        "edit"
+      ],
+      "C": []
+    },
+    "software": {
+      "D": [
+        "Software",
+        "software"
+      ],
+      "C": []
+    },
+    "or": {
+      "D": [
+        "or"
+      ],
+      "C": []
+    },
+    "if": {
+      "D": [
+        "If",
+        "if"
+      ],
+      "C": []
+    },
+    "often": {
+      "D": [
+        "often"
+      ],
+      "C": []
+    },
+    "problematic": {
+      "D": [
+        "problematic"
+      ],
+      "C": []
+    },
+    "branches": {
+      "D": [
+        "Branches",
+        "branches"
+      ],
+      "C": []
+    },
+    "prompted": {
+      "D": [
+        "prompted"
+      ],
+      "C": []
+    },
+    "one.": {
+      "D": [
+        "one."
+      ],
+      "C": []
+    },
+    "non-destructive": {
+      "D": [
+        "non-destructive"
+      ],
+      "C": []
+    },
+    "example": {
+      "D": [
+        "example"
+      ],
+      "C": []
+    },
+    "changes.": {
+      "D": [
+        "changes."
+      ],
+      "C": []
+    },
+    "allows": {
+      "D": [
+        "Allows",
+        "allows"
+      ],
+      "C": []
+    },
+    "back": {
+      "D": [
+        "back"
+      ],
+      "C": []
+    },
+    "rewrites": {
+      "D": [
+        "rewrites"
+      ],
+      "C": []
+    },
+    "commits": {
+      "D": [
+        "Commits",
+        "commits"
+      ],
+      "C": []
+    },
+    "branches.": {
+      "D": [
+        "branches."
+      ],
+      "C": []
+    },
+    "arise": {
+      "D": [
+        "arise"
+      ],
+      "C": []
+    },
+    "basic": {
+      "D": [
+        "basic"
+      ],
+      "C": []
+    },
+    "so": {
+      "D": [
+        "so"
+      ],
+      "C": []
+    },
+    "would": {
+      "D": [
+        "would"
+      ],
+      "C": []
+    },
+    "rebasing": {
+      "D": [
+        "Rebasing",
+        "rebasing"
+      ],
+      "C": []
+    },
+    "into": {
+      "D": [
+        "into"
+      ],
+      "C": []
+    },
+    "create": {
+      "D": [
+        "Create",
+        "create"
+      ],
+      "C": []
+    },
+    "advanced": {
+      "D": [
+        "Advanced",
+        "advanced"
+      ],
+      "C": []
+    },
+    "pause": {
+      "D": [
+        "pause"
+      ],
+      "C": []
+    },
+    "complete": {
+      "D": [
+        "complete"
+      ],
+      "C": []
+    },
+    "after": {
+      "D": [
+        "After",
+        "after"
+      ],
+      "C": []
+    },
+    "merging branches\n\n\nmerging": {
+      "D": [
+        "Merging Branches\n\n\nMerging"
+      ],
+      "C": []
+    },
+    "bash": {
+      "D": [
+        "Bash"
+      ],
+      "C": []
+    },
+    "head": {
+      "D": [
+        "HEAD"
+      ],
+      "C": []
+    },
+    "keep.": {
+      "D": [
+        "keep."
+      ],
+      "C": []
+    },
+    "rebasing.": {
+      "D": [
+        "rebasing."
+      ],
+      "C": []
+    },
+    "during": {
+      "D": [
+        "During",
+        "during"
+      ],
+      "C": []
+    },
+    "last": {
+      "D": [
+        "last"
+      ],
+      "C": []
+    },
+    "it": {
+      "D": [
+        "It",
+        "it"
+      ],
+      "C": []
+    },
+    "started": {
+      "D": [
+        "Started",
+        "started"
+      ],
+      "C": []
+    },
+    "at": {
+      "D": [
+        "at"
+      ],
+      "C": []
+    },
+    "workflow.": {
+      "D": [
+        "workflow."
+      ],
+      "C": []
+    },
+    "another.": {
+      "D": [
+        "another."
+      ],
+      "C": []
+    },
+    "understand": {
+      "D": [
+        "understand"
+      ],
+      "C": []
+    },
+    "resolving": {
+      "D": [
+        "Resolving",
+        "resolving"
+      ],
+      "C": []
+    },
+    "multiple": {
+      "D": [
+        "multiple"
+      ],
+      "C": []
+    },
+    "by": {
+      "D": [
+        "By",
+        "by"
+      ],
+      "C": []
+    },
+    "conflict": {
+      "D": [
+        "Conflict",
+        "conflict"
+      ],
+      "C": []
+    },
+    "squashing commits\n\n\nsquashing": {
+      "D": [
+        "Squashing Commits\n\n\nSquashing"
+      ],
+      "C": []
+    },
+    "start": {
+      "D": [
+        "Start",
+        "start"
+      ],
+      "C": []
+    },
+    "like": {
+      "D": [
+        "Like",
+        "like"
+      ],
+      "C": []
+    },
+    "when": {
+      "D": [
+        "When",
+        "when"
+      ],
+      "C": []
+    },
+    "conflicts": {
+      "D": [
+        "Conflicts",
+        "conflicts"
+      ],
+      "C": []
+    },
+    "files": {
+      "D": [
+        "files"
+      ],
+      "C": []
+    },
+    "includes": {
+      "D": [
+        "includes"
+      ],
+      "C": []
+    },
+    "selected": {
+      "D": [
+        "selected"
+      ],
+      "C": []
+    },
+    "mastering": {
+      "D": [
+        "Mastering"
+      ],
+      "C": []
+    },
+    "base-branch": {
+      "D": [
+        "base-branch"
+      ],
+      "C": []
+    },
+    "use": {
+      "D": [
+        "Use",
+        "use"
+      ],
+      "C": []
+    },
+    "through": {
+      "D": [
+        "through"
+      ],
+      "C": []
+    },
+    "be": {
+      "D": [
+        "be"
+      ],
+      "C": []
+    },
+    "want": {
+      "D": [
+        "want"
+      ],
+      "C": []
+    },
+    "another": {
+      "D": [
+        "Another",
+        "another"
+      ],
+      "C": []
+    },
+    "to": {
+      "D": [
+        "To",
+        "to"
+      ],
+      "C": []
+    },
+    "without": {
+      "D": [
+        "without"
+      ],
+      "C": []
+    },
+    "conflicting": {
+      "D": [
+        "conflicting"
+      ],
+      "C": []
+    },
+    "in": {
+      "D": [
+        "In",
+        "in"
+      ],
+      "C": []
+    },
+    "squash commits using": {
+      "D": [
+        "Squash Commits Using"
+      ],
+      "C": []
+    },
+    "developers": {
+      "D": [
+        "developers"
+      ],
+      "C": []
+    },
+    "affecting": {
+      "D": [
+        "affecting"
+      ],
+      "C": []
+    },
+    "before": {
+      "D": [
+        "Before",
+        "before"
+      ],
+      "C": []
+    },
+    "messages": {
+      "D": [
+        "messages"
+      ],
+      "C": []
+    },
+    "new": {
+      "D": [
+        "New",
+        "new"
+      ],
+      "C": []
+    },
+    "resolve conflicts\n\n\n\n\nstart": {
+      "D": [
+        "Resolve Conflicts\n\n\n\n\nStart"
+      ],
+      "C": []
+    },
+    "manually": {
+      "D": [
+        "manually"
+      ],
+      "C": []
+    },
+    "rebasing branches\n\n\nrebasing": {
+      "D": [
+        "Rebasing Branches\n\n\nRebasing"
+      ],
+      "C": []
+    },
+    "replace": {
+      "D": [
+        "replace"
+      ],
+      "C": []
+    },
+    "conflicts.": {
+      "D": [
+        "conflicts."
+      ],
+      "C": []
+    },
+    "as": {
+      "D": [
+        "As",
+        "as"
+      ],
+      "C": []
+    },
+    "see": {
+      "D": [
+        "see"
+      ],
+      "C": []
+    },
+    "next": {
+      "D": [
+        "next"
+      ],
+      "C": []
+    },
+    "will": {
+      "D": [
+        "will"
+      ],
+      "C": []
+    },
+    "resolve": {
+      "D": [
+        "Resolve",
+        "resolve"
+      ],
+      "C": []
+    },
+    "areas": {
+      "D": [
+        "areas"
+      ],
+      "C": []
+    },
+    "software development\n\nmastering git": {
+      "D": [
+        "Software Development\n\nMastering Git"
+      ],
+      "C": []
+    },
+    "made": {
+      "D": [
+        "made"
+      ],
+      "C": []
+    },
+    "is": {
+      "D": [
+        "Is",
+        "is"
+      ],
+      "C": []
+    },
+    "main": {
+      "D": [
+        "Main",
+        "main"
+      ],
+      "C": []
+    },
+    "isolate": {
+      "D": [
+        "isolate"
+      ],
+      "C": []
+    },
+    "master": {
+      "D": [
+        "Master",
+        "master"
+      ],
+      "C": []
+    },
+    "can": {
+      "D": [
+        "Can",
+        "can"
+      ],
+      "C": []
+    },
+    "marks": {
+      "D": [
+        "marks"
+      ],
+      "C": []
+    },
+    "github": {
+      "D": [
+        "GitHub",
+        "github"
+      ],
+      "C": []
+    },
+    "keeping": {
+      "D": [
+        "keeping"
+      ],
+      "C": []
+    },
+    "operation": {
+      "D": [
+        "operation"
+      ],
+      "C": []
+    },
+    "applying": {
+      "D": [
+        "applying"
+      ],
+      "C": []
+    },
+    "clean": {
+      "D": [
+        "clean"
+      ],
+      "C": []
+    },
+    "mark": {
+      "D": [
+        "mark"
+      ],
+      "C": []
+    },
+    "mode": {
+      "D": [
+        "mode"
+      ],
+      "C": []
+    },
+    "branch": {
+      "D": [
+        "branch"
+      ],
+      "C": []
+    },
+    "then": {
+      "D": [
+        "Then",
+        "then"
+      ],
+      "C": []
+    },
+    "one": {
+      "D": [
+        "One",
+        "one"
+      ],
+      "C": []
+    },
+    "stop": {
+      "D": [
+        "stop"
+      ],
+      "C": []
+    },
+    "conflict\n                    resolution\n\n\ngit basics": {
+      "D": [
+        "Conflict\n                    Resolution\n\n\nGit Basics"
+      ],
+      "C": []
+    },
+    "process": {
+      "D": [
+        "Process",
+        "process"
+      ],
+      "C": []
+    },
+    "commit.": {
+      "D": [
+        "commit."
+      ],
+      "C": []
+    },
+    "development": {
+      "D": [
+        "Development",
+        "development"
+      ],
+      "C": []
+    },
+    "squash": {
+      "D": [
+        "Squash",
+        "squash"
+      ],
+      "C": []
+    },
+    "resolving conflicts during": {
+      "D": [
+        "Resolving Conflicts During"
+      ],
+      "C": []
+    },
+    "getting": {
+      "D": [
+        "Getting"
+      ],
+      "C": []
+    },
+    "ll": {
+      "D": [
+        "ll"
+      ],
+      "C": []
+    },
+    "diving": {
+      "D": [
+        "diving"
+      ],
+      "C": []
+    },
+    "combine.": {
+      "D": [
+        "combine."
+      ],
+      "C": []
+    },
+    "differences": {
+      "D": [
+        "differences"
+      ],
+      "C": []
+    },
+    "basics": {
+      "D": [
+        "Basics"
+      ],
+      "C": []
+    },
+    "operations": {
+      "D": [
+        "operations"
+      ],
+      "C": []
+    },
+    "using": {
+      "D": [
+        "Using",
+        "using"
+      ],
+      "C": []
+    },
+    "add": {
+      "D": [
+        "Add",
+        "add"
+      ],
+      "C": []
+    },
+    "merge\n\n\n\n\nwhen": {
+      "D": [
+        "Merge\n\n\n\n\nWhen"
+      ],
+      "C": []
+    },
+    "three": {
+      "D": [
+        "three"
+      ],
+      "C": []
+    },
+    "both": {
+      "D": [
+        "both"
+      ],
+      "C": []
+    },
+    "integrate": {
+      "D": [
+        "Integrate",
+        "integrate"
+      ],
+      "C": []
+    },
+    "getting started": {
+      "D": [
+        "Getting Started"
+      ],
+      "C": []
+    },
+    "referred": {
+      "D": [
+        "referred"
+      ],
+      "C": []
+    },
+    "decide": {
+      "D": [
+        "decide"
+      ],
+      "C": []
+    },
+    "history": {
+      "D": [
+        "history"
+      ],
+      "C": []
+    },
+    "combine": {
+      "D": [
+        "combine"
+      ],
+      "C": []
+    },
+    "e-05": {
+      "D": [
+        "e-05"
+      ],
+      "C": []
+    },
+    "best practices": {
+      "D": [
+        "Best Practices"
+      ],
+      "C": []
+    },
+    "all": {
+      "D": [
+        "all"
+      ],
+      "C": []
+    },
+    "work.": {
+      "D": [
+        "work."
+      ],
+      "C": []
+    },
+    "entire": {
+      "D": [
+        "entire"
+      ],
+      "C": []
+    },
+    "files.": {
+      "D": [
+        "files."
+      ],
+      "C": []
+    },
+    "cherry-pick.": {
+      "D": [
+        "cherry-pick."
+      ],
+      "C": []
+    },
+    "find": {
+      "D": [
+        "find"
+      ],
+      "C": []
+    },
+    "overlapping": {
+      "D": [
+        "overlapping"
+      ],
+      "C": []
+    },
+    "pull": {
+      "D": [
+        "pull"
+      ],
+      "C": []
+    },
+    "fixing": {
+      "D": [
+        "fixing"
+      ],
+      "C": []
+    },
+    "commits.": {
+      "D": [
+        "commits."
+      ],
+      "C": []
+    },
+    "frequent": {
+      "D": [
+        "frequent"
+      ],
+      "C": []
+    },
+    "proceed": {
+      "D": [
+        "proceed"
+      ],
+      "C": []
+    },
+    "pick commits\n\n\n\n\nfirst": {
+      "D": [
+        "Pick Commits\n\n\n\n\nFirst"
+      ],
+      "C": []
+    },
+    "commit-hash": {
+      "D": [
+        "commit-hash"
+      ],
+      "C": []
+    },
+    "specific": {
+      "D": [
+        "specific"
+      ],
+      "C": []
+    },
+    "same": {
+      "D": [
+        "same"
+      ],
+      "C": []
+    },
+    "avoid": {
+      "D": [
+        "avoid"
+      ],
+      "C": []
+    },
+    "hash": {
+      "D": [
+        "hash"
+      ],
+      "C": []
+    },
+    "minimize": {
+      "D": [
+        "minimize"
+      ],
+      "C": []
+    },
+    "team": {
+      "D": [
+        "Team",
+        "team"
+      ],
+      "C": []
+    },
+    "practices": {
+      "D": [
+        "Practices"
+      ],
+      "C": []
+    },
+    "cherry-picking": {
+      "D": [
+        "Cherry-Picking",
+        "Cherry-picking"
+      ],
+      "C": []
+    },
+    "there": {
+      "D": [
+        "There",
+        "there"
+      ],
+      "C": []
+    },
+    "until": {
+      "D": [
+        "until"
+      ],
+      "C": []
+    },
+    "smaller": {
+      "D": [
+        "smaller"
+      ],
+      "C": []
+    },
+    "latest": {
+      "D": [
+        "latest"
+      ],
+      "C": []
+    },
+    "complexity": {
+      "D": [
+        "complexity"
+      ],
+      "C": []
+    },
+    "base": {
+      "D": [
+        "base"
+      ],
+      "C": []
+    },
+    "switch": {
+      "D": [
+        "switch"
+      ],
+      "C": []
+    },
+    "log": {
+      "D": [
+        "log"
+      ],
+      "C": []
+    },
+    "resolved": {
+      "D": [
+        "resolved"
+      ],
+      "C": []
+    },
+    "always": {
+      "D": [
+        "Always",
+        "always"
+      ],
+      "C": []
+    },
+    "run": {
+      "D": [
+        "Run",
+        "run"
+      ],
+      "C": []
+    },
+    "complete.": {
+      "D": [
+        "complete."
+      ],
+      "C": []
+    },
+    "repeat": {
+      "D": [
+        "Repeat"
+      ],
+      "C": []
+    },
+    "branch.": {
+      "D": [
+        "branch."
+      ],
+      "C": []
+    },
+    "affected": {
+      "D": [
+        "affected"
+      ],
+      "C": []
+    },
+    "best": {
+      "D": [
+        "Best",
+        "best"
+      ],
+      "C": []
+    },
+    "conflict resolution\n\n\n\n\nalways": {
+      "D": [
+        "Conflict Resolution\n\n\n\n\nAlways"
+      ],
+      "C": []
+    },
+    "rebase.": {
+      "D": [
+        "rebase."
+      ],
+      "C": []
+    },
+    "where": {
+      "D": [
+        "where"
+      ],
+      "C": []
+    },
+    "continue": {
+      "D": [
+        "continue"
+      ],
+      "C": []
+    },
+    "merges": {
+      "D": [
+        "merges"
+      ],
+      "C": []
+    },
+    "affect": {
+      "D": [
+        "affect"
+      ],
+      "C": []
+    },
+    "between": {
+      "D": [
+        "between"
+      ],
+      "C": []
+    },
+    "them": {
+      "D": [
+        "them"
+      ],
+      "C": []
+    },
+    "starting": {
+      "D": [
+        "starting"
+      ],
+      "C": []
+    },
+    "communicate": {
+      "D": [
+        "Communicate",
+        "communicate"
+      ],
+      "C": []
+    },
+    "picking commits\n\n\ncherry": {
+      "D": [
+        "Picking Commits\n\n\nCherry"
+      ],
+      "C": []
+    },
+    "apply": {
+      "D": [
+        "apply"
+      ],
+      "C": []
+    },
+    "performing": {
+      "D": [
+        "performing"
+      ],
+      "C": []
+    },
+    "shared": {
+      "D": [
+        "shared"
+      ],
+      "C": []
+    },
+    "way": {
+      "D": [
+        "way"
+      ],
+      "C": []
+    },
+    "prefer": {
+      "D": [
+        "Prefer"
+      ],
+      "C": []
+    },
+    "reduce": {
+      "D": [
+        "reduce"
+      ],
+      "C": []
+    },
+    "stage": {
+      "D": [
+        "stage"
+      ],
+      "C": []
+    },
+    "select": {
+      "D": [
+        "select"
+      ],
+      "C": []
+    },
+    "b4fdb28-9305-4f16-95f5-1a76dad6b039": {
+      "D": [
+        "b4fdb28-9305-4f16-95f5-1a76dad6b039"
+      ],
+      "C": []
+    },
+    "tests": {
+      "D": [
+        "tests"
+      ],
+      "C": []
+    },
+    "they": {
+      "D": [
+        "They",
+        "they"
+      ],
+      "C": []
+    },
+    "isolation": {
+      "D": [
+        "isolation"
+      ],
+      "C": []
+    },
+    "but": {
+      "D": [
+        "But",
+        "but"
+      ],
+      "C": []
+    },
+    "put": {
+      "D": [
+        "put"
+      ],
+      "C": []
+    },
+    "component": {
+      "D": [
+        "component"
+      ],
+      "C": []
+    },
+    "sure": {
+      "D": [
+        "sure"
+      ],
+      "C": []
+    },
+    "output": {
+      "D": [
+        "output"
+      ],
+      "C": []
+    },
+    "each": {
+      "D": [
+        "Each",
+        "each"
+      ],
+      "C": []
+    },
+    "required": {
+      "D": [
+        "required"
+      ],
+      "C": []
+    },
+    "lies": {
+      "D": [
+        "lies"
+      ],
+      "C": []
+    },
+    "we": {
+      "D": [
+        "We",
+        "we"
+      ],
+      "C": []
+    },
+    "system": {
+      "D": [
+        "system"
+      ],
+      "C": []
+    },
+    "guarantee": {
+      "D": [
+        "guarantee"
+      ],
+      "C": []
+    },
+    "tested": {
+      "D": [
+        "tested"
+      ],
+      "C": []
+    },
+    "unit": {
+      "D": [
+        "Unit",
+        "unit"
+      ],
+      "C": []
+    },
+    "executed": {
+      "D": [
+        "executed"
+      ],
+      "C": []
+    },
+    "why": {
+      "D": [
+        "Why"
+      ],
+      "C": []
+    },
+    "ensuring": {
+      "D": [
+        "Ensuring",
+        "ensuring"
+      ],
+      "C": []
+    },
+    "certain": {
+      "D": [
+        "certain"
+      ],
+      "C": []
+    },
+    "about": {
+      "D": [
+        "about"
+      ],
+      "C": []
+    },
+    "different": {
+      "D": [
+        "different"
+      ],
+      "C": []
+    },
+    "outputs": {
+      "D": [
+        "outputs"
+      ],
+      "C": []
+    },
+    "e2e": {
+      "D": [
+        "E2E"
+      ],
+      "C": []
+    },
+    "workflows": {
+      "D": [
+        "workflows"
+      ],
+      "C": []
+    },
+    "delivering": {
+      "D": [
+        "delivering"
+      ],
+      "C": []
+    },
+    "similar": {
+      "D": [
+        "similar"
+      ],
+      "C": []
+    },
+    "on": {
+      "D": [
+        "On",
+        "on"
+      ],
+      "C": []
+    },
+    "tools": {
+      "D": [
+        "Tools",
+        "tools"
+      ],
+      "C": []
+    },
+    "upper": {
+      "D": [
+        "upper"
+      ],
+      "C": []
+    },
+    "resilient": {
+      "D": [
+        "resilient"
+      ],
+      "C": []
+    },
+    "reliable.": {
+      "D": [
+        "reliable."
+      ],
+      "C": []
+    },
+    "found": {
+      "D": [
+        "found"
+      ],
+      "C": []
+    },
+    "benefits": {
+      "D": [
+        "Benefits",
+        "benefits"
+      ],
+      "C": []
+    },
+    "these": {
+      "D": [
+        "These",
+        "these"
+      ],
+      "C": []
+    },
+    "stability": {
+      "D": [
+        "stability"
+      ],
+      "C": []
+    },
+    "top": {
+      "D": [
+        "top"
+      ],
+      "C": []
+    },
+    "works.": {
+      "D": [
+        "works."
+      ],
+      "C": []
+    },
+    "must": {
+      "D": [
+        "must"
+      ],
+      "C": []
+    },
+    "loophole": {
+      "D": [
+        "loophole"
+      ],
+      "C": []
+    },
+    "cause": {
+      "D": [
+        "cause"
+      ],
+      "C": []
+    },
+    "confidence": {
+      "D": [
+        "confidence"
+      ],
+      "C": []
+    },
+    "experience": {
+      "D": [
+        "experience"
+      ],
+      "C": []
+    },
+    "level": {
+      "D": [
+        "level"
+      ],
+      "C": []
+    },
+    "i.e.": {
+      "D": [
+        "i.e."
+      ],
+      "C": []
+    },
+    "achieved.": {
+      "D": [
+        "achieved."
+      ],
+      "C": []
+    },
+    "stacks": {
+      "D": [
+        "stacks"
+      ],
+      "C": []
+    },
+    "components": {
+      "D": [
+        "components"
+      ],
+      "C": []
+    },
+    "make": {
+      "D": [
+        "make"
+      ],
+      "C": []
+    },
+    "produce": {
+      "D": [
+        "produce"
+      ],
+      "C": []
+    },
+    "suites.": {
+      "D": [
+        "suites."
+      ],
+      "C": []
+    },
+    "resources": {
+      "D": [
+        "resources"
+      ],
+      "C": []
+    },
+    "dive": {
+      "D": [
+        "dive"
+      ],
+      "C": []
+    },
+    "test": {
+      "D": [
+        "Test",
+        "test"
+      ],
+      "C": []
+    },
+    "post": {
+      "D": [
+        "post"
+      ],
+      "C": []
+    },
+    "look": {
+      "D": [
+        "look"
+      ],
+      "C": []
+    },
+    "ci": {
+      "D": [
+        "CI"
+      ],
+      "C": []
+    },
+    "outcome.": {
+      "D": [
+        "outcome."
+      ],
+      "C": []
+    },
+    "small": {
+      "D": [
+        "small"
+      ],
+      "C": []
+    },
+    "costly": {
+      "D": [
+        "costly"
+      ],
+      "C": []
+    },
+    "near": {
+      "D": [
+        "near"
+      ],
+      "C": []
+    },
+    "integrity": {
+      "D": [
+        "integrity"
+      ],
+      "C": []
+    },
+    "tech": {
+      "D": [
+        "tech"
+      ],
+      "C": []
+    },
+    "joyous": {
+      "D": [
+        "joyous"
+      ],
+      "C": []
+    },
+    "possible": {
+      "D": [
+        "possible"
+      ],
+      "C": []
+    },
+    "ensure": {
+      "D": [
+        "ensure"
+      ],
+      "C": []
+    },
+    "deliver": {
+      "D": [
+        "deliver"
+      ],
+      "C": []
+    },
+    "end-users": {
+      "D": [
+        "end-users"
+      ],
+      "C": []
+    },
+    "end-to-end": {
+      "D": [
+        "End-to-End"
+      ],
+      "C": []
+    },
+    "testing": {
+      "D": [
+        "Testing",
+        "testing"
+      ],
+      "C": []
+    },
+    "an": {
+      "D": [
+        "an"
+      ],
+      "C": []
+    },
+    "correct": {
+      "D": [
+        "correct"
+      ],
+      "C": []
+    },
+    "fulfilling": {
+      "D": [
+        "fulfilling"
+      ],
+      "C": []
+    },
+    "system.": {
+      "D": [
+        "system."
+      ],
+      "C": []
+    },
+    "provide": {
+      "D": [
+        "provide"
+      ],
+      "C": []
+    },
+    "whole": {
+      "D": [
+        "whole"
+      ],
+      "C": []
+    },
+    "optimized": {
+      "D": [
+        "optimized"
+      ],
+      "C": []
+    },
+    "challenges.": {
+      "D": [
+        "challenges."
+      ],
+      "C": []
+    },
+    "assurance.": {
+      "D": [
+        "assurance."
+      ],
+      "C": []
+    },
+    "crumble.": {
+      "D": [
+        "crumble."
+      ],
+      "C": []
+    },
+    "interact.": {
+      "D": [
+        "interact."
+      ],
+      "C": []
+    },
+    "only": {
+      "D": [
+        "Only",
+        "only"
+      ],
+      "C": []
+    },
+    "cannot": {
+      "D": [
+        "cannot"
+      ],
+      "C": []
+    },
+    "because": {
+      "D": [
+        "because"
+      ],
+      "C": []
+    },
+    "common": {
+      "D": [
+        "common"
+      ],
+      "C": []
+    },
+    "achieve": {
+      "D": [
+        "achieve"
+      ],
+      "C": []
+    },
+    "together": {
+      "D": [
+        "together"
+      ],
+      "C": []
+    },
+    "environment.": {
+      "D": [
+        "environment."
+      ],
+      "C": []
+    },
+    "sanity": {
+      "D": [
+        "sanity"
+      ],
+      "C": []
+    },
+    "desired": {
+      "D": [
+        "desired"
+      ],
+      "C": []
+    },
+    "application": {
+      "D": [
+        "Application",
+        "application"
+      ],
+      "C": []
+    },
+    "developed": {
+      "D": [
+        "Developed",
+        "developed"
+      ],
+      "C": []
+    },
+    "order": {
+      "D": [
+        "order"
+      ],
+      "C": []
+    },
+    "ui": {
+      "D": [
+        "UI"
+      ],
+      "C": []
+    },
+    "consists": {
+      "D": [
+        "consists"
+      ],
+      "C": []
+    },
+    "pyramid": {
+      "D": [
+        "pyramid"
+      ],
+      "C": []
+    },
+    "impact": {
+      "D": [
+        "impact"
+      ],
+      "C": []
+    },
+    "issue": {
+      "D": [
+        "issue"
+      ],
+      "C": []
+    },
+    "integration": {
+      "D": [
+        "Integration",
+        "integration"
+      ],
+      "C": []
+    },
+    "right": {
+      "D": [
+        "right"
+      ],
+      "C": []
+    },
+    "has": {
+      "D": [
+        "has"
+      ],
+      "C": []
+    },
+    "below": {
+      "D": [
+        "below"
+      ],
+      "C": []
+    },
+    "production.": {
+      "D": [
+        "production."
+      ],
+      "C": []
+    },
+    "also": {
+      "D": [
+        "also"
+      ],
+      "C": []
+    },
+    "end": {
+      "D": [
+        "End"
+      ],
+      "C": []
+    },
+    "available": {
+      "D": [
+        "available"
+      ],
+      "C": []
+    },
+    "better": {
+      "D": [
+        "better"
+      ],
+      "C": []
+    },
+    "any": {
+      "D": [
+        "Any",
+        "any"
+      ],
+      "C": []
+    },
+    "than": {
+      "D": [
+        "than"
+      ],
+      "C": []
+    },
+    "write": {
+      "D": [
+        "write"
+      ],
+      "C": []
+    },
+    "user": {
+      "D": [
+        "User",
+        "user"
+      ],
+      "C": []
+    },
+    "requirements.": {
+      "D": [
+        "requirements."
+      ],
+      "C": []
+    },
+    "give": {
+      "D": [
+        "give"
+      ],
+      "C": []
+    },
+    "requirements": {
+      "D": [
+        "requirements"
+      ],
+      "C": []
+    },
+    "our": {
+      "D": [
+        "our"
+      ],
+      "C": []
+    },
+    "environment": {
+      "D": [
+        "environment"
+      ],
+      "C": []
+    },
+    "importance": {
+      "D": [
+        "importance"
+      ],
+      "C": []
+    },
+    "systems": {
+      "D": [
+        "Systems",
+        "systems"
+      ],
+      "C": []
+    },
+    "tier": {
+      "D": [
+        "tier"
+      ],
+      "C": []
+    },
+    "discuss": {
+      "D": [
+        "discuss"
+      ],
+      "C": []
+    },
+    "apps": {
+      "D": [
+        "apps"
+      ],
+      "C": []
+    },
+    "critical": {
+      "D": [
+        "critical"
+      ],
+      "C": []
+    },
+    "built": {
+      "D": [
+        "built"
+      ],
+      "C": []
+    },
+    "more": {
+      "D": [
+        "more"
+      ],
+      "C": []
+    },
+    "might": {
+      "D": [
+        "might"
+      ],
+      "C": []
+    },
+    "confident": {
+      "D": [
+        "confident"
+      ],
+      "C": []
+    },
+    "whole.": {
+      "D": [
+        "whole."
+      ],
+      "C": []
+    },
+    "may": {
+      "D": [
+        "May",
+        "may"
+      ],
+      "C": []
+    },
+    "fulfills": {
+      "D": [
+        "fulfills"
+      ],
+      "C": []
+    },
+    "sensitive": {
+      "D": [
+        "sensitive"
+      ],
+      "C": []
+    },
+    "quality": {
+      "D": [
+        "quality"
+      ],
+      "C": []
+    },
+    "parts": {
+      "D": [
+        "parts"
+      ],
+      "C": []
+    },
+    "production": {
+      "D": [
+        "Production",
+        "production"
+      ],
+      "C": []
+    },
+    "let": {
+      "D": [
+        "Let",
+        "let"
+      ],
+      "C": []
+    },
+    "fault": {
+      "D": [
+        "fault"
+      ],
+      "C": []
+    },
+    "today": {
+      "D": [
+        "today"
+      ],
+      "C": []
+    },
+    "much": {
+      "D": [
+        "much"
+      ],
+      "C": []
+    },
+    "what": {
+      "D": [
+        "What",
+        "what"
+      ],
+      "C": []
+    },
+    "scenarios": {
+      "D": [
+        "scenarios"
+      ],
+      "C": []
+    },
+    "exactly": {
+      "D": [
+        "exactly"
+      ],
+      "C": []
+    },
+    "teams": {
+      "D": [
+        "teams"
+      ],
+      "C": []
+    },
+    "terms": {
+      "D": [
+        "terms"
+      ],
+      "C": []
+    },
+    "many": {
+      "D": [
+        "many"
+      ],
+      "C": []
+    },
+    "their": {
+      "D": [
+        "their"
+      ],
+      "C": []
+    },
+    "test\n\nend": {
+      "D": [
+        "Test\n\nEnd"
+      ],
+      "C": []
+    },
+    "results.": {
+      "D": [
+        "results."
+      ],
+      "C": []
+    },
+    "logging": {
+      "D": [
+        "logging"
+      ],
+      "C": []
+    },
+    "such": {
+      "D": [
+        "Such",
+        "such"
+      ],
+      "C": []
+    },
+    "together.": {
+      "D": [
+        "together."
+      ],
+      "C": []
+    },
+    "analysis": {
+      "D": [
+        "Analysis",
+        "analysis"
+      ],
+      "C": []
+    },
+    "mocking": {
+      "D": [
+        "mocking"
+      ],
+      "C": []
+    },
+    "mobile": {
+      "D": [
+        "mobile"
+      ],
+      "C": []
+    },
+    "design": {
+      "D": [
+        "Design",
+        "design"
+      ],
+      "C": []
+    },
+    "case": {
+      "D": [
+        "case"
+      ],
+      "C": []
+    },
+    "conditions": {
+      "D": [
+        "conditions"
+      ],
+      "C": []
+    },
+    "promo": {
+      "D": [
+        "promo"
+      ],
+      "C": []
+    },
+    "discounts": {
+      "D": [
+        "discounts"
+      ],
+      "C": []
+    },
+    "e-commerce": {
+      "D": [
+        "e-commerce"
+      ],
+      "C": []
+    },
+    "gateway": {
+      "D": [
+        "Gateway",
+        "gateway"
+      ],
+      "C": []
+    },
+    "cases": {
+      "D": [
+        "cases"
+      ],
+      "C": []
+    },
+    "code": {
+      "D": [
+        "code"
+      ],
+      "C": []
+    },
+    "purpose": {
+      "D": [
+        "purpose"
+      ],
+      "C": []
+    },
+    "just": {
+      "D": [
+        "just"
+      ],
+      "C": []
+    },
+    "communicates": {
+      "D": [
+        "communicates"
+      ],
+      "C": []
+    },
+    "words": {
+      "D": [
+        "words"
+      ],
+      "C": []
+    },
+    "modal": {
+      "D": [
+        "modal"
+      ],
+      "C": []
+    },
+    "like.": {
+      "D": [
+        "like."
+      ],
+      "C": []
+    },
+    "fast": {
+      "D": [
+        "fast"
+      ],
+      "C": []
+    },
+    "covers": {
+      "D": [
+        "covers"
+      ],
+      "C": []
+    },
+    "feature": {
+      "D": [
+        "Feature",
+        "feature"
+      ],
+      "C": []
+    },
+    "relevant": {
+      "D": [
+        "Relevant",
+        "relevant"
+      ],
+      "C": []
+    },
+    "other.": {
+      "D": [
+        "other."
+      ],
+      "C": []
+    },
+    "various": {
+      "D": [
+        "various"
+      ],
+      "C": []
+    },
+    "continuous": {
+      "D": [
+        "Continuous",
+        "continuous"
+      ],
+      "C": []
+    },
+    "depending": {
+      "D": [
+        "depending"
+      ],
+      "C": []
+    },
+    "phases.": {
+      "D": [
+        "phases."
+      ],
+      "C": []
+    },
+    "ui.": {
+      "D": [
+        "UI."
+      ],
+      "C": []
+    },
+    "requirement.": {
+      "D": [
+        "requirement."
+      ],
+      "C": []
+    },
+    "analyzing": {
+      "D": [
+        "analyzing"
+      ],
+      "C": []
+    },
+    "over": {
+      "D": [
+        "over"
+      ],
+      "C": []
+    },
+    "resulting": {
+      "D": [
+        "resulting"
+      ],
+      "C": []
+    },
+    "placed": {
+      "D": [
+        "placed"
+      ],
+      "C": []
+    },
+    "alarms": {
+      "D": [
+        "alarms"
+      ],
+      "C": []
+    },
+    "service.": {
+      "D": [
+        "service."
+      ],
+      "C": []
+    },
+    "cover": {
+      "D": [
+        "cover"
+      ],
+      "C": []
+    },
+    "requirement": {
+      "D": [
+        "requirement"
+      ],
+      "C": []
+    },
+    "done": {
+      "D": [
+        "done"
+      ],
+      "C": []
+    },
+    "execution": {
+      "D": [
+        "Execution",
+        "execution"
+      ],
+      "C": []
+    },
+    "don": {
+      "D": [
+        "don"
+      ],
+      "C": []
+    },
+    "signup": {
+      "D": [
+        "signup"
+      ],
+      "C": []
+    },
+    "errant": {
+      "D": [
+        "errant"
+      ],
+      "C": []
+    },
+    "consider": {
+      "D": [
+        "consider"
+      ],
+      "C": []
+    },
+    "once": {
+      "D": [
+        "Once"
+      ],
+      "C": []
+    },
+    "company": {
+      "D": [
+        "company"
+      ],
+      "C": []
+    },
+    "website": {
+      "D": [
+        "website"
+      ],
+      "C": []
+    },
+    "validation": {
+      "D": [
+        "validation"
+      ],
+      "C": []
+    },
+    "cart": {
+      "D": [
+        "cart"
+      ],
+      "C": []
+    },
+    "differs": {
+      "D": [
+        "differs"
+      ],
+      "C": []
+    },
+    "hand": {
+      "D": [
+        "hand"
+      ],
+      "C": []
+    },
+    "planning\n\n\nthe": {
+      "D": [
+        "Planning\n\n\nThe"
+      ],
+      "C": []
+    },
+    "ensures": {
+      "D": [
+        "ensures"
+      ],
+      "C": []
+    },
+    "rendered": {
+      "D": [
+        "rendered"
+      ],
+      "C": []
+    },
+    "responding": {
+      "D": [
+        "responding"
+      ],
+      "C": []
+    },
+    "fine.": {
+      "D": [
+        "fine."
+      ],
+      "C": []
+    },
+    "analytics": {
+      "D": [
+        "analytics"
+      ],
+      "C": []
+    },
+    "e.g.": {
+      "D": [
+        "e.g."
+      ],
+      "C": []
+    },
+    "itself": {
+      "D": [
+        "itself"
+      ],
+      "C": []
+    },
+    "parallel": {
+      "D": [
+        "parallel"
+      ],
+      "C": []
+    },
+    "take": {
+      "D": [
+        "take"
+      ],
+      "C": []
+    },
+    "other": {
+      "D": [
+        "Other",
+        "other"
+      ],
+      "C": []
+    },
+    "cases.": {
+      "D": [
+        "cases."
+      ],
+      "C": []
+    },
+    "headaches": {
+      "D": [
+        "headaches"
+      ],
+      "C": []
+    },
+    "functions": {
+      "D": [
+        "functions"
+      ],
+      "C": []
+    },
+    "payment.": {
+      "D": [
+        "payment."
+      ],
+      "C": []
+    },
+    "tests.": {
+      "D": [
+        "tests."
+      ],
+      "C": []
+    },
+    "calculated.": {
+      "D": [
+        "calculated."
+      ],
+      "C": []
+    },
+    "checkout": {
+      "D": [
+        "checkout"
+      ],
+      "C": []
+    },
+    "keep": {
+      "D": [
+        "keep"
+      ],
+      "C": []
+    },
+    "some": {
+      "D": [
+        "Some",
+        "some"
+      ],
+      "C": []
+    },
+    "reduced": {
+      "D": [
+        "reduced"
+      ],
+      "C": []
+    },
+    "login": {
+      "D": [
+        "login"
+      ],
+      "C": []
+    },
+    "generate": {
+      "D": [
+        "generate"
+      ],
+      "C": []
+    },
+    "mapped": {
+      "D": [
+        "mapped"
+      ],
+      "C": []
+    },
+    "data": {
+      "D": [
+        "Data",
+        "data"
+      ],
+      "C": []
+    },
+    "payment": {
+      "D": [
+        "payment"
+      ],
+      "C": []
+    },
+    "extra": {
+      "D": [
+        "extra"
+      ],
+      "C": []
+    },
+    "well": {
+      "D": [
+        "well"
+      ],
+      "C": []
+    },
+    "input": {
+      "D": [
+        "input"
+      ],
+      "C": []
+    },
+    "go": {
+      "D": [
+        "go"
+      ],
+      "C": []
+    },
+    "monitoring": {
+      "D": [
+        "monitoring"
+      ],
+      "C": []
+    },
+    "layer": {
+      "D": [
+        "layer"
+      ],
+      "C": []
+    },
+    "requires": {
+      "D": [
+        "requires"
+      ],
+      "C": []
+    },
+    "even": {
+      "D": [
+        "Even",
+        "even"
+      ],
+      "C": []
+    },
+    "design\n\n\nonce": {
+      "D": [
+        "Design\n\n\nOnce"
+      ],
+      "C": []
+    },
+    "should": {
+      "D": [
+        "should"
+      ],
+      "C": []
+    },
+    "regression": {
+      "D": [
+        "regression"
+      ],
+      "C": []
+    },
+    "checking.": {
+      "D": [
+        "checking."
+      ],
+      "C": []
+    },
+    "function.": {
+      "D": [
+        "function."
+      ],
+      "C": []
+    },
+    "incorrect": {
+      "D": [
+        "incorrect"
+      ],
+      "C": []
+    },
+    "being": {
+      "D": [
+        "being"
+      ],
+      "C": []
+    },
+    "workflows.": {
+      "D": [
+        "workflows."
+      ],
+      "C": []
+    },
+    "field": {
+      "D": [
+        "field"
+      ],
+      "C": []
+    },
+    "execute": {
+      "D": [
+        "execute"
+      ],
+      "C": []
+    },
+    "app": {
+      "D": [
+        "app"
+      ],
+      "C": []
+    },
+    "designed": {
+      "D": [
+        "designed"
+      ],
+      "C": []
+    },
+    "helpful": {
+      "D": [
+        "helpful"
+      ],
+      "C": []
+    },
+    "journey.": {
+      "D": [
+        "journey."
+      ],
+      "C": []
+    },
+    "planning": {
+      "D": [
+        "Planning",
+        "planning"
+      ],
+      "C": []
+    },
+    "prevents": {
+      "D": [
+        "prevents"
+      ],
+      "C": []
+    },
+    "focused": {
+      "D": [
+        "Focused",
+        "focused"
+      ],
+      "C": []
+    },
+    "check": {
+      "D": [
+        "check"
+      ],
+      "C": []
+    },
+    "related": {
+      "D": [
+        "related"
+      ],
+      "C": []
+    },
+    "external": {
+      "D": [
+        "external"
+      ],
+      "C": []
+    },
+    "fleet": {
+      "D": [
+        "Fleet"
+      ],
+      "C": []
+    },
+    "suite": {
+      "D": [
+        "suite"
+      ],
+      "C": []
+    },
+    "existing": {
+      "D": [
+        "existing"
+      ],
+      "C": []
+    },
+    "components.": {
+      "D": [
+        "components."
+      ],
+      "C": []
+    },
+    "crucial": {
+      "D": [
+        "crucial"
+      ],
+      "C": []
+    },
+    "business": {
+      "D": [
+        "business"
+      ],
+      "C": []
+    },
+    "applied": {
+      "D": [
+        "applied"
+      ],
+      "C": []
+    },
+    "intended": {
+      "D": [
+        "intended"
+      ],
+      "C": []
+    },
+    "super": {
+      "D": [
+        "super"
+      ],
+      "C": []
+    },
+    "phase": {
+      "D": [
+        "phase"
+      ],
+      "C": []
+    },
+    "correctly": {
+      "D": [
+        "correctly"
+      ],
+      "C": []
+    },
+    "hence": {
+      "D": [
+        "Hence"
+      ],
+      "C": []
+    },
+    "api": {
+      "D": [
+        "API"
+      ],
+      "C": []
+    },
+    "happens": {
+      "D": [
+        "happens"
+      ],
+      "C": []
+    },
+    "functioning": {
+      "D": [
+        "functioning"
+      ],
+      "C": []
+    },
+    "fail": {
+      "D": [
+        "fail"
+      ],
+      "C": []
+    },
+    "suites": {
+      "D": [
+        "suites"
+      ],
+      "C": []
+    },
+    "working": {
+      "D": [
+        "working"
+      ],
+      "C": []
+    },
+    "pipeline": {
+      "D": [
+        "pipeline"
+      ],
+      "C": []
+    },
+    "composite": {
+      "D": [
+        "composite"
+      ],
+      "C": []
+    },
+    "not": {
+      "D": [
+        "not"
+      ],
+      "C": []
+    },
+    "expected.": {
+      "D": [
+        "expected."
+      ],
+      "C": []
+    },
+    "backend": {
+      "D": [
+        "Backend",
+        "backend"
+      ],
+      "C": []
+    },
+    "validate": {
+      "D": [
+        "validate"
+      ],
+      "C": []
+    },
+    "services.": {
+      "D": [
+        "services."
+      ],
+      "C": []
+    },
+    "across": {
+      "D": [
+        "across"
+      ],
+      "C": []
+    },
+    "examples": {
+      "D": [
+        "examples"
+      ],
+      "C": []
+    },
+    "inputs": {
+      "D": [
+        "inputs"
+      ],
+      "C": []
+    },
+    "e-06": {
+      "D": [
+        "e-06"
+      ],
+      "C": []
+    },
+    "hard": {
+      "D": [
+        "hard"
+      ],
+      "C": []
+    },
+    "stakeholders.": {
+      "D": [
+        "stakeholders."
+      ],
+      "C": []
+    },
+    "great": {
+      "D": [
+        "great"
+      ],
+      "C": []
+    },
+    "no": {
+      "D": [
+        "no"
+      ],
+      "C": []
+    },
+    "talk": {
+      "D": [
+        "talk"
+      ],
+      "C": []
+    },
+    "given": {
+      "D": [
+        "given"
+      ],
+      "C": []
+    },
+    "resource-intensive.": {
+      "D": [
+        "resource-intensive."
+      ],
+      "C": []
+    },
+    "environments": {
+      "D": [
+        "environments"
+      ],
+      "C": []
+    },
+    "happen": {
+      "D": [
+        "happen"
+      ],
+      "C": []
+    },
+    "simulation": {
+      "D": [
+        "Simulation"
+      ],
+      "C": []
+    },
+    "positives": {
+      "D": [
+        "positives"
+      ],
+      "C": []
+    },
+    "maintenance\n\n\nsystems": {
+      "D": [
+        "Maintenance\n\n\nSystems"
+      ],
+      "C": []
+    },
+    "third": {
+      "D": [
+        "third"
+      ],
+      "C": []
+    },
+    "lose": {
+      "D": [
+        "lose"
+      ],
+      "C": []
+    },
+    "big": {
+      "D": [
+        "big"
+      ],
+      "C": []
+    },
+    "suggests": {
+      "D": [
+        "suggests"
+      ],
+      "C": []
+    },
+    "impacting": {
+      "D": [
+        "impacting"
+      ],
+      "C": []
+    },
+    "devices": {
+      "D": [
+        "devices"
+      ],
+      "C": []
+    },
+    "maintain": {
+      "D": [
+        "maintain"
+      ],
+      "C": []
+    },
+    "having": {
+      "D": [
+        "having"
+      ],
+      "C": []
+    },
+    "services": {
+      "D": [
+        "Services",
+        "services"
+      ],
+      "C": []
+    },
+    "apps.": {
+      "D": [
+        "apps."
+      ],
+      "C": []
+    },
+    "fewer": {
+      "D": [
+        "fewer"
+      ],
+      "C": []
+    },
+    "broken": {
+      "D": [
+        "broken"
+      ],
+      "C": []
+    },
+    "reasons": {
+      "D": [
+        "reasons"
+      ],
+      "C": []
+    },
+    "base.": {
+      "D": [
+        "base."
+      ],
+      "C": []
+    },
+    "errors.": {
+      "D": [
+        "errors."
+      ],
+      "C": []
+    },
+    "creating": {
+      "D": [
+        "Creating",
+        "creating"
+      ],
+      "C": []
+    },
+    "most": {
+      "D": [
+        "most"
+      ],
+      "C": []
+    },
+    "centralized": {
+      "D": [
+        "centralized"
+      ],
+      "C": []
+    },
+    "now": {
+      "D": [
+        "Now",
+        "now"
+      ],
+      "C": []
+    },
+    "shadow": {
+      "D": [
+        "shadow"
+      ],
+      "C": []
+    },
+    "sometimes": {
+      "D": [
+        "sometimes"
+      ],
+      "C": []
+    },
+    "manage.": {
+      "D": [
+        "manage."
+      ],
+      "C": []
+    },
+    "sent": {
+      "D": [
+        "sent"
+      ],
+      "C": []
+    },
+    "very": {
+      "D": [
+        "very"
+      ],
+      "C": []
+    },
+    "bit": {
+      "D": [
+        "bit"
+      ],
+      "C": []
+    },
+    "relying": {
+      "D": [
+        "relying"
+      ],
+      "C": []
+    },
+    "location": {
+      "D": [
+        "location"
+      ],
+      "C": []
+    },
+    "part": {
+      "D": [
+        "part"
+      ],
+      "C": []
+    },
+    "come": {
+      "D": [
+        "come"
+      ],
+      "C": []
+    },
+    "spanning": {
+      "D": [
+        "spanning"
+      ],
+      "C": []
+    },
+    "results": {
+      "D": [
+        "results"
+      ],
+      "C": []
+    },
+    "determined": {
+      "D": [
+        "determined"
+      ],
+      "C": []
+    },
+    "responsible": {
+      "D": [
+        "responsible"
+      ],
+      "C": []
+    },
+    "simulating": {
+      "D": [
+        "Simulating",
+        "simulating"
+      ],
+      "C": []
+    },
+    "simple": {
+      "D": [
+        "simple"
+      ],
+      "C": []
+    },
+    "architectures": {
+      "D": [
+        "architectures"
+      ],
+      "C": []
+    },
+    "unexpected": {
+      "D": [
+        "unexpected"
+      ],
+      "C": []
+    },
+    "microservices": {
+      "D": [
+        "Microservices",
+        "microservices"
+      ],
+      "C": []
+    },
+    "reports": {
+      "D": [
+        "reports"
+      ],
+      "C": []
+    },
+    "works": {
+      "D": [
+        "works"
+      ],
+      "C": []
+    },
+    "vary": {
+      "D": [
+        "vary"
+      ],
+      "C": []
+    },
+    "charge": {
+      "D": [
+        "charge"
+      ],
+      "C": []
+    },
+    "failing": {
+      "D": [
+        "failing"
+      ],
+      "C": []
+    },
+    "additionally": {
+      "D": [
+        "Additionally"
+      ],
+      "C": []
+    },
+    "written": {
+      "D": [
+        "written"
+      ],
+      "C": []
+    },
+    "issues": {
+      "D": [
+        "issues"
+      ],
+      "C": []
+    },
+    "challenging": {
+      "D": [
+        "challenging"
+      ],
+      "C": []
+    },
+    "connect": {
+      "D": [
+        "Connect",
+        "connect"
+      ],
+      "C": []
+    },
+    "reasons.": {
+      "D": [
+        "reasons."
+      ],
+      "C": []
+    },
+    "own": {
+      "D": [
+        "own"
+      ],
+      "C": []
+    },
+    "sensors": {
+      "D": [
+        "sensors"
+      ],
+      "C": []
+    },
+    "few": {
+      "D": [
+        "few"
+      ],
+      "C": []
+    },
+    "along": {
+      "D": [
+        "along"
+      ],
+      "C": []
+    },
+    "torn": {
+      "D": [
+        "torn"
+      ],
+      "C": []
+    },
+    "who": {
+      "D": [
+        "Who",
+        "who"
+      ],
+      "C": []
+    },
+    "usually": {
+      "D": [
+        "Usually"
+      ],
+      "C": []
+    },
+    "closely": {
+      "D": [
+        "closely"
+      ],
+      "C": []
+    },
+    "places": {
+      "D": [
+        "places"
+      ],
+      "C": []
+    },
+    "real": {
+      "D": [
+        "Real",
+        "real"
+      ],
+      "C": []
+    },
+    "etc..": {
+      "D": [
+        "etc.."
+      ],
+      "C": []
+    },
+    "analyze": {
+      "D": [
+        "analyze"
+      ],
+      "C": []
+    },
+    "problems.": {
+      "D": [
+        "problems."
+      ],
+      "C": []
+    },
+    "question": {
+      "D": [
+        "question"
+      ],
+      "C": []
+    },
+    "structure": {
+      "D": [
+        "structure"
+      ],
+      "C": []
+    },
+    "organization": {
+      "D": [
+        "organization"
+      ],
+      "C": []
+    },
+    "nevertheless": {
+      "D": [
+        "Nevertheless"
+      ],
+      "C": []
+    },
+    "maintain.": {
+      "D": [
+        "maintain."
+      ],
+      "C": []
+    },
+    "rely": {
+      "D": [
+        "rely"
+      ],
+      "C": []
+    },
+    "predictability": {
+      "D": [
+        "predictability"
+      ],
+      "C": []
+    },
+    "causing": {
+      "D": [
+        "causing"
+      ],
+      "C": []
+    },
+    "users": {
+      "D": [
+        "users"
+      ],
+      "C": []
+    },
+    "span": {
+      "D": [
+        "span"
+      ],
+      "C": []
+    },
+    "problem.": {
+      "D": [
+        "problem."
+      ],
+      "C": []
+    },
+    "flaky": {
+      "D": [
+        "flaky"
+      ],
+      "C": []
+    },
+    "party": {
+      "D": [
+        "party"
+      ],
+      "C": []
+    },
+    "devops": {
+      "D": [
+        "DevOps"
+      ],
+      "C": []
+    },
+    "easier": {
+      "D": [
+        "easier"
+      ],
+      "C": []
+    },
+    "mostly": {
+      "D": [
+        "mostly"
+      ],
+      "C": []
+    },
+    "set": {
+      "D": [
+        "Set",
+        "set"
+      ],
+      "C": []
+    },
+    "gps-based": {
+      "D": [
+        "GPS-based"
+      ],
+      "C": []
+    },
+    "purity": {
+      "D": [
+        "purity"
+      ],
+      "C": []
+    },
+    "unforeseeable": {
+      "D": [
+        "unforeseeable"
+      ],
+      "C": []
+    },
+    "simulations": {
+      "D": [
+        "simulations"
+      ],
+      "C": []
+    },
+    "notoriously": {
+      "D": [
+        "notoriously"
+      ],
+      "C": []
+    },
+    "writing": {
+      "D": [
+        "Writing",
+        "writing"
+      ],
+      "C": []
+    },
+    "since": {
+      "D": [
+        "Since",
+        "since"
+      ],
+      "C": []
+    },
+    "starts": {
+      "D": [
+        "Starts",
+        "starts"
+      ],
+      "C": []
+    },
+    "scenario": {
+      "D": [
+        "scenario"
+      ],
+      "C": []
+    },
+    "down": {
+      "D": [
+        "down"
+      ],
+      "C": []
+    },
+    "pitfalls": {
+      "D": [
+        "Pitfalls"
+      ],
+      "C": []
+    },
+    "intact": {
+      "D": [
+        "intact"
+      ],
+      "C": []
+    },
+    "micro-frontends": {
+      "D": [
+        "micro-frontends"
+      ],
+      "C": []
+    },
+    "maintenance": {
+      "D": [
+        "Maintenance"
+      ],
+      "C": []
+    },
+    "identify": {
+      "D": [
+        "identify"
+      ],
+      "C": []
+    },
+    "heavily": {
+      "D": [
+        "heavily"
+      ],
+      "C": []
+    },
+    "dependent": {
+      "D": [
+        "dependent"
+      ],
+      "C": []
+    },
+    "run.": {
+      "D": [
+        "run."
+      ],
+      "C": []
+    },
+    "completes": {
+      "D": [
+        "completes"
+      ],
+      "C": []
+    },
+    "pitfalls.": {
+      "D": [
+        "pitfalls."
+      ],
+      "C": []
+    },
+    "time.": {
+      "D": [
+        "time."
+      ],
+      "C": []
+    },
+    "assurance": {
+      "D": [
+        "assurance"
+      ],
+      "C": []
+    },
+    "tough.": {
+      "D": [
+        "tough."
+      ],
+      "C": []
+    },
+    "analysis\n\n\nonce": {
+      "D": [
+        "Analysis\n\n\nOnce"
+      ],
+      "C": []
+    },
+    "teams.": {
+      "D": [
+        "teams."
+      ],
+      "C": []
+    },
+    "properly.": {
+      "D": [
+        "properly."
+      ],
+      "C": []
+    },
+    "distributed": {
+      "D": [
+        "distributed"
+      ],
+      "C": []
+    },
+    "several": {
+      "D": [
+        "several"
+      ],
+      "C": []
+    },
+    "up": {
+      "D": [
+        "up"
+      ],
+      "C": []
+    },
+    "fruit": {
+      "D": [
+        "fruit"
+      ],
+      "C": []
+    },
+    "created": {
+      "D": [
+        "created"
+      ],
+      "C": []
+    },
+    "verify": {
+      "D": [
+        "verify"
+      ],
+      "C": []
+    },
+    "here": {
+      "D": [
+        "Here",
+        "here"
+      ],
+      "C": []
+    },
+    "tester": {
+      "D": [
+        "tester"
+      ],
+      "C": []
+    },
+    "sense": {
+      "D": [
+        "sense"
+      ],
+      "C": []
+    },
+    "free": {
+      "D": [
+        "free"
+      ],
+      "C": []
+    },
+    "ability": {
+      "D": [
+        "ability"
+      ],
+      "C": []
+    },
+    "feedback": {
+      "D": [
+        "feedback"
+      ],
+      "C": []
+    },
+    "feel": {
+      "D": [
+        "feel"
+      ],
+      "C": []
+    },
+    "users.": {
+      "D": [
+        "users."
+      ],
+      "C": []
+    },
+    "enough": {
+      "D": [
+        "enough"
+      ],
+      "C": []
+    },
+    "function": {
+      "D": [
+        "function"
+      ],
+      "C": []
+    },
+    "list.": {
+      "D": [
+        "list."
+      ],
+      "C": []
+    },
+    "avoids": {
+      "D": [
+        "avoids"
+      ],
+      "C": []
+    },
+    "though": {
+      "D": [
+        "though"
+      ],
+      "C": []
+    },
+    "become": {
+      "D": [
+        "become"
+      ],
+      "C": []
+    },
+    "cycles.": {
+      "D": [
+        "cycles."
+      ],
+      "C": []
+    },
+    "makes": {
+      "D": [
+        "makes"
+      ],
+      "C": []
+    },
+    "briefly.": {
+      "D": [
+        "briefly."
+      ],
+      "C": []
+    },
+    "offers": {
+      "D": [
+        "offers"
+      ],
+      "C": []
+    },
+    "number": {
+      "D": [
+        "number"
+      ],
+      "C": []
+    },
+    "help": {
+      "D": [
+        "help"
+      ],
+      "C": []
+    },
+    "accomplishment.": {
+      "D": [
+        "accomplishment."
+      ],
+      "C": []
+    },
+    "verifying": {
+      "D": [
+        "Verifying"
+      ],
+      "C": []
+    },
+    "tool": {
+      "D": [
+        "tool"
+      ],
+      "C": []
+    },
+    "remains": {
+      "D": [
+        "remains"
+      ],
+      "C": []
+    },
+    "postman": {
+      "D": [
+        "Postman"
+      ],
+      "C": []
+    },
+    "shipped": {
+      "D": [
+        "shipped"
+      ],
+      "C": []
+    },
+    "was": {
+      "D": [
+        "was"
+      ],
+      "C": []
+    },
+    "think": {
+      "D": [
+        "think"
+      ],
+      "C": []
+    },
+    "alleviates": {
+      "D": [
+        "alleviates"
+      ],
+      "C": []
+    },
+    "supports": {
+      "D": [
+        "Supports",
+        "supports"
+      ],
+      "C": []
+    },
+    "problems": {
+      "D": [
+        "problems"
+      ],
+      "C": []
+    },
+    "gain": {
+      "D": [
+        "gain"
+      ],
+      "C": []
+    },
+    "real-world": {
+      "D": [
+        "real-world"
+      ],
+      "C": []
+    },
+    "effort": {
+      "D": [
+        "effort"
+      ],
+      "C": []
+    },
+    "fun": {
+      "D": [
+        "fun"
+      ],
+      "C": []
+    },
+    "missing": {
+      "D": [
+        "missing"
+      ],
+      "C": []
+    },
+    "machines": {
+      "D": [
+        "machines"
+      ],
+      "C": []
+    },
+    "apis": {
+      "D": [
+        "APIs"
+      ],
+      "C": []
+    },
+    "capable": {
+      "D": [
+        "capable"
+      ],
+      "C": []
+    },
+    "reliability": {
+      "D": [
+        "Reliability",
+        "reliability"
+      ],
+      "C": []
+    },
+    "despite": {
+      "D": [
+        "despite"
+      ],
+      "C": []
+    },
+    "rapid": {
+      "D": [
+        "rapid"
+      ],
+      "C": []
+    },
+    "handling": {
+      "D": [
+        "Handling",
+        "handling"
+      ],
+      "C": []
+    },
+    "say": {
+      "D": [
+        "say"
+      ],
+      "C": []
+    },
+    "inherently": {
+      "D": [
+        "inherently"
+      ],
+      "C": []
+    },
+    "accelerate": {
+      "D": [
+        "accelerate"
+      ],
+      "C": []
+    },
+    "support": {
+      "D": [
+        "support"
+      ],
+      "C": []
+    },
+    "edge": {
+      "D": [
+        "edge"
+      ],
+      "C": []
+    },
+    "performed": {
+      "D": [
+        "performed"
+      ],
+      "C": []
+    },
+    "gives": {
+      "D": [
+        "gives"
+      ],
+      "C": []
+    },
+    "greater": {
+      "D": [
+        "greater"
+      ],
+      "C": []
+    },
+    "compiled": {
+      "D": [
+        "compiled"
+      ],
+      "C": []
+    },
+    "get": {
+      "D": [
+        "Get",
+        "get"
+      ],
+      "C": []
+    },
+    "consistent": {
+      "D": [
+        "consistent"
+      ],
+      "C": []
+    },
+    "stable": {
+      "D": [
+        "stable"
+      ],
+      "C": []
+    },
+    "deployment": {
+      "D": [
+        "Deployment",
+        "deployment"
+      ],
+      "C": []
+    },
+    "leave": {
+      "D": [
+        "leave"
+      ],
+      "C": []
+    },
+    "awesome": {
+      "D": [
+        "awesome"
+      ],
+      "C": []
+    },
+    "running": {
+      "D": [
+        "Running",
+        "running"
+      ],
+      "C": []
+    },
+    "generally": {
+      "D": [
+        "generally"
+      ],
+      "C": []
+    },
+    "pipelines": {
+      "D": [
+        "pipelines"
+      ],
+      "C": []
+    },
+    "reliability\n\n\nsince": {
+      "D": [
+        "Reliability\n\n\nSince"
+      ],
+      "C": []
+    },
+    "potential": {
+      "D": [
+        "potential"
+      ],
+      "C": []
+    },
+    "user.": {
+      "D": [
+        "user."
+      ],
+      "C": []
+    },
+    "assertible": {
+      "D": [
+        "Assertible"
+      ],
+      "C": []
+    },
+    "environments.": {
+      "D": [
+        "environments."
+      ],
+      "C": []
+    },
+    "important": {
+      "D": [
+        "important"
+      ],
+      "C": []
+    },
+    "leveraged": {
+      "D": [
+        "leveraged"
+      ],
+      "C": []
+    },
+    "app.": {
+      "D": [
+        "app."
+      ],
+      "C": []
+    },
+    "standalone": {
+      "D": [
+        "standalone"
+      ],
+      "C": []
+    },
+    "bear": {
+      "D": [
+        "bear"
+      ],
+      "C": []
+    },
+    "bug": {
+      "D": [
+        "bug"
+      ],
+      "C": []
+    },
+    "stress": {
+      "D": [
+        "stress"
+      ],
+      "C": []
+    },
+    "determine": {
+      "D": [
+        "determine"
+      ],
+      "C": []
+    },
+    "exact": {
+      "D": [
+        "exact"
+      ],
+      "C": []
+    },
+    "truly": {
+      "D": [
+        "truly"
+      ],
+      "C": []
+    },
+    "worry": {
+      "D": [
+        "worry"
+      ],
+      "C": []
+    },
+    "private": {
+      "D": [
+        "private"
+      ],
+      "C": []
+    },
+    "faults": {
+      "D": [
+        "faults"
+      ],
+      "C": []
+    },
+    "covered": {
+      "D": [
+        "covered"
+      ],
+      "C": []
+    },
+    "periodically": {
+      "D": [
+        "periodically"
+      ],
+      "C": []
+    },
+    "please": {
+      "D": [
+        "Please"
+      ],
+      "C": []
+    },
+    "comment": {
+      "D": [
+        "comment"
+      ],
+      "C": []
+    },
+    "them.": {
+      "D": [
+        "them."
+      ],
+      "C": []
+    },
+    "overhead": {
+      "D": [
+        "overhead"
+      ],
+      "C": []
+    },
+    "features": {
+      "D": [
+        "Features",
+        "features"
+      ],
+      "C": []
+    },
+    "solutions": {
+      "D": [
+        "solutions"
+      ],
+      "C": []
+    },
+    "monitors": {
+      "D": [
+        "monitors"
+      ],
+      "C": []
+    },
+    "bottleneck": {
+      "D": [
+        "bottleneck"
+      ],
+      "C": []
+    },
+    "semaphoreci": {
+      "D": [
+        "SemaphoreCI"
+      ],
+      "C": []
+    },
+    "perspective": {
+      "D": [
+        "perspective"
+      ],
+      "C": []
+    },
+    "slowest": {
+      "D": [
+        "slowest"
+      ],
+      "C": []
+    },
+    "smartly": {
+      "D": [
+        "smartly"
+      ],
+      "C": []
+    },
+    "testers": {
+      "D": [
+        "Testers"
+      ],
+      "C": []
+    },
+    "opposite.": {
+      "D": [
+        "opposite."
+      ],
+      "C": []
+    },
+    "why end": {
+      "D": [
+        "Why End"
+      ],
+      "C": []
+    },
+    "worthwhile.": {
+      "D": [
+        "worthwhile."
+      ],
+      "C": []
+    },
+    "does": {
+      "D": [
+        "does"
+      ],
+      "C": []
+    },
+    "systems.": {
+      "D": [
+        "systems."
+      ],
+      "C": []
+    },
+    "behavior.": {
+      "D": [
+        "behavior."
+      ],
+      "C": []
+    },
+    "jmeter": {
+      "D": [
+        "JMeter"
+      ],
+      "C": []
+    },
+    "d83bfe7-f639-47af-a613-50add642c293": {
+      "D": [
+        "d83bfe7-f639-47af-a613-50add642c293"
+      ],
+      "C": []
+    },
+    "images": {
+      "D": [
+        "images"
+      ],
+      "C": []
+    },
+    "server": {
+      "D": [
+        "server"
+      ],
+      "C": []
+    },
+    "stack": {
+      "D": [
+        "stack"
+      ],
+      "C": []
+    },
+    "filesystem": {
+      "D": [
+        "filesystem"
+      ],
+      "C": []
+    },
+    "images.": {
+      "D": [
+        "images."
+      ],
+      "C": []
+    },
+    "chroot": {
+      "D": [
+        "Chroot",
+        "chroot"
+      ],
+      "C": []
+    },
+    "activity.": {
+      "D": [
+        "activity."
+      ],
+      "C": []
+    },
+    "late": {
+      "D": [
+        "late"
+      ],
+      "C": []
+    },
+    "freebsd": {
+      "D": [
+        "FreeBSD"
+      ],
+      "C": []
+    },
+    "evolved": {
+      "D": [
+        "evolved"
+      ],
+      "C": []
+    },
+    "really": {
+      "D": [
+        "really"
+      ],
+      "C": []
+    },
+    "shouldn": {
+      "D": [
+        "shouldn"
+      ],
+      "C": []
+    },
+    "kubernetes.": {
+      "D": [
+        "Kubernetes."
+      ],
+      "C": []
+    },
+    "directories.": {
+      "D": [
+        "directories."
+      ],
+      "C": []
+    },
+    "admins": {
+      "D": [
+        "admins"
+      ],
+      "C": []
+    },
+    "applications": {
+      "D": [
+        "Applications",
+        "applications"
+      ],
+      "C": []
+    },
+    "jails": {
+      "D": [
+        "Jails"
+      ],
+      "C": []
+    },
+    "dockerd": {
+      "D": [
+        "dockerd"
+      ],
+      "C": []
+    },
+    "push": {
+      "D": [
+        "Push",
+        "push"
+      ],
+      "C": []
+    },
+    "resource": {
+      "D": [
+        "resource"
+      ],
+      "C": []
+    },
+    "engines": {
+      "D": [
+        "engines"
+      ],
+      "C": []
+    },
+    "runtime": {
+      "D": [
+        "Runtime",
+        "runtime"
+      ],
+      "C": []
+    },
+    "the \ndockerfile": {
+      "D": [
+        "The \nDockerfile"
+      ],
+      "C": []
+    },
+    "enhanced": {
+      "D": [
+        "enhanced"
+      ],
+      "C": []
+    },
+    "installing": {
+      "D": [
+        "installing"
+      ],
+      "C": []
+    },
+    "turns": {
+      "D": [
+        "turns"
+      ],
+      "C": []
+    },
+    "thing.": {
+      "D": [
+        "thing."
+      ],
+      "C": []
+    },
+    "otherwise.": {
+      "D": [
+        "otherwise."
+      ],
+      "C": []
+    },
+    "proxy": {
+      "D": [
+        "Proxy",
+        "proxy"
+      ],
+      "C": []
+    },
+    "de-facto": {
+      "D": [
+        "de-facto"
+      ],
+      "C": []
+    },
+    "containers.": {
+      "D": [
+        "containers."
+      ],
+      "C": []
+    },
+    "concept": {
+      "D": [
+        "concept"
+      ],
+      "C": []
+    },
+    "portable": {
+      "D": [
+        "portable"
+      ],
+      "C": []
+    },
+    "before docker": {
+      "D": [
+        "Before Docker"
+      ],
+      "C": []
+    },
+    "surprising": {
+      "D": [
+        "surprising"
+      ],
+      "C": []
+    },
+    "turn": {
+      "D": [
+        "turn"
+      ],
+      "C": []
+    },
+    "takes": {
+      "D": [
+        "takes"
+      ],
+      "C": []
+    },
+    "implementation.": {
+      "D": [
+        "implementation."
+      ],
+      "C": []
+    },
+    "container": {
+      "D": [
+        "Container",
+        "container"
+      ],
+      "C": []
+    },
+    "later": {
+      "D": [
+        "Later"
+      ],
+      "C": []
+    },
+    "programs": {
+      "D": [
+        "programs"
+      ],
+      "C": []
+    },
+    "need": {
+      "D": [
+        "need"
+      ],
+      "C": []
+    },
+    "gets": {
+      "D": [
+        "gets"
+      ],
+      "C": []
+    },
+    "cluster": {
+      "D": [
+        "cluster"
+      ],
+      "C": []
+    },
+    "server.": {
+      "D": [
+        "server."
+      ],
+      "C": []
+    },
+    "piece": {
+      "D": [
+        "piece"
+      ],
+      "C": []
+    },
+    "lot": {
+      "D": [
+        "lot"
+      ],
+      "C": []
+    },
+    "openvz": {
+      "D": [
+        "OpenVZ"
+      ],
+      "C": []
+    },
+    "network": {
+      "D": [
+        "network"
+      ],
+      "C": []
+    },
+    "iterations": {
+      "D": [
+        "iterations"
+      ],
+      "C": []
+    },
+    "synonym": {
+      "D": [
+        "synonym"
+      ],
+      "C": []
+    },
+    "instead": {
+      "D": [
+        "Instead"
+      ],
+      "C": []
+    },
+    "rest": {
+      "D": [
+        "rest"
+      ],
+      "C": []
+    },
+    "program": {
+      "D": [
+        "program"
+      ],
+      "C": []
+    },
+    "backend.": {
+      "D": [
+        "backend."
+      ],
+      "C": []
+    },
+    "lifecycle.": {
+      "D": [
+        "lifecycle."
+      ],
+      "C": []
+    },
+    "do": {
+      "D": [
+        "do"
+      ],
+      "C": []
+    },
+    "linux": {
+      "D": [
+        "Linux"
+      ],
+      "C": []
+    },
+    "overlap": {
+      "D": [
+        "overlap"
+      ],
+      "C": []
+    },
+    "backend\n\nwhat": {
+      "D": [
+        "Backend\n\nWhat"
+      ],
+      "C": []
+    },
+    "containers": {
+      "D": [
+        "Containers",
+        "containers"
+      ],
+      "C": []
+    },
+    "used": {
+      "D": [
+        "Used",
+        "used"
+      ],
+      "C": []
+    },
+    "linux containers": {
+      "D": [
+        "Linux Containers"
+      ],
+      "C": []
+    },
+    "brought": {
+      "D": [
+        "brought"
+      ],
+      "C": []
+    },
+    "something": {
+      "D": [
+        "something"
+      ],
+      "C": []
+    },
+    "configuring": {
+      "D": [
+        "configuring"
+      ],
+      "C": []
+    },
+    "virtual": {
+      "D": [
+        "virtual"
+      ],
+      "C": []
+    },
+    "dockerfile": {
+      "D": [
+        "Dockerfile"
+      ],
+      "C": []
+    },
+    "notch.": {
+      "D": [
+        "notch."
+      ],
+      "C": []
+    },
+    "divided": {
+      "D": [
+        "divided"
+      ],
+      "C": []
+    },
+    "platforms": {
+      "D": [
+        "platforms"
+      ],
+      "C": []
+    },
+    "thing": {
+      "D": [
+        "thing"
+      ],
+      "C": []
+    },
+    "containerized": {
+      "D": [
+        "containerized"
+      ],
+      "C": []
+    },
+    "rest.": {
+      "D": [
+        "rest."
+      ],
+      "C": []
+    },
+    "building": {
+      "D": [
+        "building"
+      ],
+      "C": []
+    },
+    "build": {
+      "D": [
+        "Build",
+        "build"
+      ],
+      "C": []
+    },
+    "simultaneously": {
+      "D": [
+        "simultaneously"
+      ],
+      "C": []
+    },
+    "convenient": {
+      "D": [
+        "convenient"
+      ],
+      "C": []
+    },
+    "two": {
+      "D": [
+        "two"
+      ],
+      "C": []
+    },
+    "popular": {
+      "D": [
+        "popular"
+      ],
+      "C": []
+    },
+    "requests": {
+      "D": [
+        "requests"
+      ],
+      "C": []
+    },
+    "shot.": {
+      "D": [
+        "shot."
+      ],
+      "C": []
+    },
+    "lxc": {
+      "D": [
+        "LXC"
+      ],
+      "C": []
+    },
+    "containerd": {
+      "D": [
+        "containerd"
+      ],
+      "C": []
+    },
+    "its": {
+      "D": [
+        "its"
+      ],
+      "C": []
+    },
+    "introduced.": {
+      "D": [
+        "introduced."
+      ],
+      "C": []
+    },
+    "host.": {
+      "D": [
+        "host."
+      ],
+      "C": []
+    },
+    "managing": {
+      "D": [
+        "managing"
+      ],
+      "C": []
+    },
+    "modern": {
+      "D": [
+        "modern"
+      ],
+      "C": []
+    },
+    "however": {
+      "D": [
+        "However",
+        "however"
+      ],
+      "C": []
+    },
+    "manage": {
+      "D": [
+        "Manage",
+        "manage"
+      ],
+      "C": []
+    },
+    "long": {
+      "D": [
+        "long"
+      ],
+      "C": []
+    },
+    "format": {
+      "D": [
+        "format"
+      ],
+      "C": []
+    },
+    "vs": {
+      "D": [
+        "vs"
+      ],
+      "C": []
+    },
+    "mount": {
+      "D": [
+        "Mount"
+      ],
+      "C": []
+    },
+    "monitor": {
+      "D": [
+        "Monitor",
+        "monitor"
+      ],
+      "C": []
+    },
+    "indeed": {
+      "D": [
+        "indeed"
+      ],
+      "C": []
+    },
+    "copies": {
+      "D": [
+        "copies"
+      ],
+      "C": []
+    },
+    "reality": {
+      "D": [
+        "reality"
+      ],
+      "C": []
+    },
+    "kind-but-not-really-isolated": {
+      "D": [
+        "kind-but-not-really-isolated"
+      ],
+      "C": []
+    },
+    "idea": {
+      "D": [
+        "idea"
+      ],
+      "C": []
+    },
+    "isolated": {
+      "D": [
+        "isolated"
+      ],
+      "C": []
+    },
+    "things": {
+      "D": [
+        "things"
+      ],
+      "C": []
+    },
+    "distributes": {
+      "D": [
+        "distributes"
+      ],
+      "C": []
+    },
+    "logical": {
+      "D": [
+        "logical"
+      ],
+      "C": []
+    },
+    "form": {
+      "D": [
+        "form"
+      ],
+      "C": []
+    },
+    "had": {
+      "D": [
+        "had"
+      ],
+      "C": []
+    },
+    "mainstream": {
+      "D": [
+        "mainstream"
+      ],
+      "C": []
+    },
+    "software.": {
+      "D": [
+        "software."
+      ],
+      "C": []
+    },
+    "installation": {
+      "D": [
+        "installation"
+      ],
+      "C": []
+    },
+    "unix": {
+      "D": [
+        "Unix"
+      ],
+      "C": []
+    },
+    "filesystem.": {
+      "D": [
+        "filesystem."
+      ],
+      "C": []
+    },
+    "existed": {
+      "D": [
+        "existed"
+      ],
+      "C": []
+    },
+    "replaced": {
+      "D": [
+        "replaced"
+      ],
+      "C": []
+    },
+    "inspired": {
+      "D": [
+        "inspired"
+      ],
+      "C": []
+    },
+    "registries.": {
+      "D": [
+        "registries."
+      ],
+      "C": []
+    },
+    "creation": {
+      "D": [
+        "creation"
+      ],
+      "C": []
+    },
+    "advantage": {
+      "D": [
+        "advantage"
+      ],
+      "C": []
+    },
+    "limits": {
+      "D": [
+        "limits"
+      ],
+      "C": []
+    },
+    "allowed": {
+      "D": [
+        "allowed"
+      ],
+      "C": []
+    },
+    "partition": {
+      "D": [
+        "partition"
+      ],
+      "C": []
+    },
+    "refined": {
+      "D": [
+        "refined"
+      ],
+      "C": []
+    },
+    "complex": {
+      "D": [
+        "complex"
+      ],
+      "C": []
+    },
+    "storage": {
+      "D": [
+        "storage"
+      ],
+      "C": []
+    },
+    "service": {
+      "D": [
+        "Service",
+        "service"
+      ],
+      "C": []
+    },
+    "us": {
+      "D": [
+        "us"
+      ],
+      "C": []
+    },
+    "interface": {
+      "D": [
+        "Interface",
+        "interface"
+      ],
+      "C": []
+    },
+    "cpu": {
+      "D": [
+        "CPU"
+      ],
+      "C": []
+    },
+    "node": {
+      "D": [
+        "node"
+      ],
+      "C": []
+    },
+    "canary": {
+      "D": [
+        "Canary"
+      ],
+      "C": []
+    },
+    "changing": {
+      "D": [
+        "changing"
+      ],
+      "C": []
+    },
+    "rollbacks.": {
+      "D": [
+        "rollbacks."
+      ],
+      "C": []
+    },
+    "manages": {
+      "D": [
+        "manages"
+      ],
+      "C": []
+    },
+    "pods.": {
+      "D": [
+        "pods."
+      ],
+      "C": []
+    },
+    "self-healing": {
+      "D": [
+        "Self-healing"
+      ],
+      "C": []
+    },
+    "vs.": {
+      "D": [
+        "Vs."
+      ],
+      "C": []
+    },
+    "runs": {
+      "D": [
+        "runs"
+      ],
+      "C": []
+    },
+    "combination": {
+      "D": [
+        "combination"
+      ],
+      "C": []
+    },
+    "machines.": {
+      "D": [
+        "machines."
+      ],
+      "C": []
+    },
+    "needs": {
+      "D": [
+        "needs"
+      ],
+      "C": []
+    },
+    "kubernetes\n\n\nhere": {
+      "D": [
+        "Kubernetes\n\n\nHere"
+      ],
+      "C": []
+    },
+    "memory": {
+      "D": [
+        "memory"
+      ],
+      "C": []
+    },
+    "adapt": {
+      "D": [
+        "adapt"
+      ],
+      "C": []
+    },
+    "brain": {
+      "D": [
+        "brain"
+      ],
+      "C": []
+    },
+    "problem": {
+      "D": [
+        "problem"
+      ],
+      "C": []
+    },
+    "automatically": {
+      "D": [
+        "automatically"
+      ],
+      "C": []
+    },
+    "arrangement": {
+      "D": [
+        "arrangement"
+      ],
+      "C": []
+    },
+    "consist": {
+      "D": [
+        "consist"
+      ],
+      "C": []
+    },
+    "handles": {
+      "D": [
+        "handles"
+      ],
+      "C": []
+    },
+    "otherwise": {
+      "D": [
+        "otherwise"
+      ],
+      "C": []
+    },
+    "trivial.": {
+      "D": [
+        "trivial."
+      ],
+      "C": []
+    },
+    "load-balancing": {
+      "D": [
+        "Load-balancing"
+      ],
+      "C": []
+    },
+    "among": {
+      "D": [
+        "among"
+      ],
+      "C": []
+    },
+    "highly-available": {
+      "D": [
+        "highly-available"
+      ],
+      "C": []
+    },
+    "monitored": {
+      "D": [
+        "monitored"
+      ],
+      "C": []
+    },
+    "inseparable": {
+      "D": [
+        "inseparable"
+      ],
+      "C": []
+    },
+    "releases": {
+      "D": [
+        "releases"
+      ],
+      "C": []
+    },
+    "choose": {
+      "D": [
+        "choose"
+      ],
+      "C": []
+    },
+    "plane": {
+      "D": [
+        "plane"
+      ],
+      "C": []
+    },
+    "architecture": {
+      "D": [
+        "Architecture",
+        "architecture"
+      ],
+      "C": []
+    },
+    "said": {
+      "D": [
+        "said"
+      ],
+      "C": []
+    },
+    "failure.": {
+      "D": [
+        "failure."
+      ],
+      "C": []
+    },
+    "runtimes": {
+      "D": [
+        "runtimes"
+      ],
+      "C": []
+    },
+    "platform": {
+      "D": [
+        "platform"
+      ],
+      "C": []
+    },
+    "making": {
+      "D": [
+        "Making",
+        "making"
+      ],
+      "C": []
+    },
+    "workloads": {
+      "D": [
+        "workloads"
+      ],
+      "C": []
+    },
+    "nodes": {
+      "D": [
+        "nodes"
+      ],
+      "C": []
+    },
+    "stopping": {
+      "D": [
+        "stopping"
+      ],
+      "C": []
+    },
+    "less": {
+      "D": [
+        "less"
+      ],
+      "C": []
+    },
+    "realizing": {
+      "D": [
+        "Realizing"
+      ],
+      "C": []
+    },
+    "called": {
+      "D": [
+        "called"
+      ],
+      "C": []
+    },
+    "technical.": {
+      "D": [
+        "technical."
+      ],
+      "C": []
+    },
+    "default": {
+      "D": [
+        "default"
+      ],
+      "C": []
+    },
+    "behave": {
+      "D": [
+        "behave"
+      ],
+      "C": []
+    },
+    "needed.": {
+      "D": [
+        "needed."
+      ],
+      "C": []
+    },
+    "planes": {
+      "D": [
+        "planes"
+      ],
+      "C": []
+    },
+    "rollouts": {
+      "D": [
+        "Rollouts",
+        "rollouts"
+      ],
+      "C": []
+    },
+    "flexible": {
+      "D": [
+        "flexible"
+      ],
+      "C": []
+    },
+    "cri": {
+      "D": [
+        "CRI"
+      ],
+      "C": []
+    },
+    "restarted": {
+      "D": [
+        "restarted"
+      ],
+      "C": []
+    },
+    "implemented": {
+      "D": [
+        "Implemented",
+        "implemented"
+      ],
+      "C": []
+    },
+    "automated": {
+      "D": [
+        "automated"
+      ],
+      "C": []
+    },
+    "controller": {
+      "D": [
+        "Controller",
+        "controller"
+      ],
+      "C": []
+    },
+    "healthy": {
+      "D": [
+        "healthy"
+      ],
+      "C": []
+    },
+    "auto-scaling": {
+      "D": [
+        "Auto-scaling"
+      ],
+      "C": []
+    },
+    "etcd": {
+      "D": [
+        "etcd"
+      ],
+      "C": []
+    },
+    "container runtime interface": {
+      "D": [
+        "Container Runtime Interface"
+      ],
+      "C": []
+    },
+    "supported.": {
+      "D": [
+        "supported."
+      ],
+      "C": []
+    },
+    "pods": {
+      "D": [
+        "Pods",
+        "pods"
+      ],
+      "C": []
+    },
+    "groups": {
+      "D": [
+        "groups"
+      ],
+      "C": []
+    },
+    "cluster.": {
+      "D": [
+        "cluster."
+      ],
+      "C": []
+    },
+    "understanding containers": {
+      "D": [
+        "Understanding Containers"
+      ],
+      "C": []
+    },
+    "worker": {
+      "D": [
+        "worker"
+      ],
+      "C": []
+    },
+    "runtime.": {
+      "D": [
+        "runtime."
+      ],
+      "C": []
+    },
+    "eventually": {
+      "D": [
+        "eventually"
+      ],
+      "C": []
+    },
+    "configuration": {
+      "D": [
+        "Configuration"
+      ],
+      "C": []
+    },
+    "original": {
+      "D": [
+        "original"
+      ],
+      "C": []
+    },
+    "docker.": {
+      "D": [
+        "Docker."
+      ],
+      "C": []
+    },
+    "loosely-coupled": {
+      "D": [
+        "loosely-coupled"
+      ],
+      "C": []
+    },
+    "procedures": {
+      "D": [
+        "procedures"
+      ],
+      "C": []
+    },
+    "docker vs": {
+      "D": [
+        "Docker Vs"
+      ],
+      "C": []
+    },
+    "inside": {
+      "D": [
+        "inside"
+      ],
+      "C": []
+    },
+    "network.": {
+      "D": [
+        "network."
+      ],
+      "C": []
+    },
+    "understanding": {
+      "D": [
+        "Understanding"
+      ],
+      "C": []
+    },
+    "version": {
+      "D": [
+        "version"
+      ],
+      "C": []
+    },
+    "scheduler": {
+      "D": [
+        "scheduler"
+      ],
+      "C": []
+    },
+    "coordinating": {
+      "D": [
+        "coordinating"
+      ],
+      "C": []
+    },
+    "assigns": {
+      "D": [
+        "assigns"
+      ],
+      "C": []
+    },
+    "kubelet": {
+      "D": [
+        "kubelet"
+      ],
+      "C": []
+    },
+    "v1.20": {
+      "D": [
+        "v1.20"
+      ],
+      "C": []
+    },
+    "adds": {
+      "D": [
+        "adds"
+      ],
+      "C": []
+    },
+    "computing": {
+      "D": [
+        "Computing",
+        "computing"
+      ],
+      "C": []
+    },
+    "state": {
+      "D": [
+        "state"
+      ],
+      "C": []
+    },
+    "never": {
+      "D": [
+        "never"
+      ],
+      "C": []
+    },
+    "communication.": {
+      "D": [
+        "communication."
+      ],
+      "C": []
+    },
+    "agent": {
+      "D": [
+        "agent"
+      ],
+      "C": []
+    },
+    "blue-green": {
+      "D": [
+        "Blue-Green"
+      ],
+      "C": []
+    },
+    "share": {
+      "D": [
+        "share"
+      ],
+      "C": []
+    },
+    "control": {
+      "D": [
+        "control"
+      ],
+      "C": []
+    },
+    "stored": {
+      "D": [
+        "stored"
+      ],
+      "C": []
+    },
+    "profile": {
+      "D": [
+        "Profile",
+        "profile"
+      ],
+      "C": []
+    },
+    "personal": {
+      "D": [
+        "personal"
+      ],
+      "C": []
+    },
+    "edu": {
+      "D": [
+        "edu"
+      ],
+      "C": []
+    },
+    "yuqi": {
+      "D": [
+        "Yuqi",
+        "yuqi"
+      ],
+      "C": []
+    },
+    "information": {
+      "D": [
+        "Information",
+        "information"
+      ],
+      "C": []
+    },
+    "university": {
+      "D": [
+        "University",
+        "university"
+      ],
+      "C": []
+    },
+    "computer science": {
+      "D": [
+        "Computer Science"
+      ],
+      "C": []
+    },
+    "graduated": {
+      "D": [
+        "graduated"
+      ],
+      "C": []
+    },
+    "computing science": {
+      "D": [
+        "Computing Science"
+      ],
+      "C": []
+    },
+    "syracuse": {
+      "D": [
+        "Syracuse"
+      ],
+      "C": []
+    },
+    "liverpool.": {
+      "D": [
+        "Liverpool."
+      ],
+      "C": []
+    },
+    "syracuse university": {
+      "D": [
+        "Syracuse University"
+      ],
+      "C": []
+    },
+    "science": {
+      "D": [
+        "Science",
+        "science"
+      ],
+      "C": []
+    },
+    "yuqi guo": {
+      "D": [
+        "Yuqi Guo"
+      ],
+      "C": []
+    },
+    "degree": {
+      "D": [
+        "degree"
+      ],
+      "C": []
+    },
+    "computer": {
+      "D": [
+        "Computer",
+        "computer"
+      ],
+      "C": []
+    },
+    "bachelor": {
+      "D": [
+        "Bachelor"
+      ],
+      "C": []
+    },
+    "guo": {
+      "D": [
+        "Guo",
+        "guo"
+      ],
+      "C": []
+    },
+    "projects": {
+      "D": [
+        "Projects",
+        "projects"
+      ],
+      "C": []
+    },
+    "e42b9d7-c888-429e-8b61-5a6888bf6699": {
+      "D": [
+        "e42b9d7-c888-429e-8b61-5a6888bf6699"
+      ],
+      "C": []
+    },
+    "delightful": {
+      "D": [
+        "delightful"
+      ],
+      "C": []
+    },
+    "facilitated": {
+      "D": [
+        "Facilitated"
+      ],
+      "C": []
+    },
+    "audio": {
+      "D": [
+        "audio"
+      ],
+      "C": []
+    },
+    "front-end": {
+      "D": [
+        "front-end"
+      ],
+      "C": []
+    },
+    "connection": {
+      "D": [
+        "Connection",
+        "connection"
+      ],
+      "C": []
+    },
+    "registration": {
+      "D": [
+        "registration"
+      ],
+      "C": []
+    },
+    "sending": {
+      "D": [
+        "sending"
+      ],
+      "C": []
+    },
+    "searching": {
+      "D": [
+        "searching"
+      ],
+      "C": []
+    },
+    "initiate": {
+      "D": [
+        "initiate"
+      ],
+      "C": []
+    },
+    "firebase": {
+      "D": [
+        "Firebase"
+      ],
+      "C": []
+    },
+    "integrates": {
+      "D": [
+        "Integrates"
+      ],
+      "C": []
+    },
+    "authentication": {
+      "D": [
+        "Authentication",
+        "authentication"
+      ],
+      "C": []
+    },
+    "management": {
+      "D": [
+        "Management",
+        "management"
+      ],
+      "C": []
+    },
+    "server-side": {
+      "D": [
+        "server-side"
+      ],
+      "C": []
+    },
+    "call initiation": {
+      "D": [
+        "Call Initiation"
+      ],
+      "C": []
+    },
+    "deploying": {
+      "D": [
+        "deploying"
+      ],
+      "C": []
+    },
+    "maintaining": {
+      "D": [
+        "maintaining"
+      ],
+      "C": []
+    },
+    "unique": {
+      "D": [
+        "unique"
+      ],
+      "C": []
+    },
+    "socketid": {
+      "D": [
+        "socketId"
+      ],
+      "C": []
+    },
+    "including": {
+      "D": [
+        "including"
+      ],
+      "C": []
+    },
+    "application.": {
+      "D": [
+        "application."
+      ],
+      "C": []
+    },
+    "event": {
+      "D": [
+        "event"
+      ],
+      "C": []
+    },
+    "develop": {
+      "D": [
+        "Develop",
+        "develop"
+      ],
+      "C": []
+    },
+    "real-time": {
+      "D": [
+        "Real-Time",
+        "Real-time",
+        "real-time"
+      ],
+      "C": []
+    },
+    "interaction.": {
+      "D": [
+        "interaction."
+      ],
+      "C": []
+    },
+    "technologies used": {
+      "D": [
+        "Technologies Used"
+      ],
+      "C": []
+    },
+    "accurate": {
+      "D": [
+        "accurate"
+      ],
+      "C": []
+    },
+    "messaging": {
+      "D": [
+        "Messaging",
+        "messaging"
+      ],
+      "C": []
+    },
+    "node.js": {
+      "D": [
+        "Node.js"
+      ],
+      "C": []
+    },
+    "enabling": {
+      "D": [
+        "enabling"
+      ],
+      "C": []
+    },
+    "interacts": {
+      "D": [
+        "interacts"
+      ],
+      "C": []
+    },
+    "script testing framework": {
+      "D": [
+        "Script Testing Framework"
+      ],
+      "C": []
+    },
+    "javascript": {
+      "D": [
+        "JavaScript"
+      ],
+      "C": []
+    },
+    "calls.": {
+      "D": [
+        "calls."
+      ],
+      "C": []
+    },
+    "chat": {
+      "D": [
+        "Chat",
+        "chat"
+      ],
+      "C": []
+    },
+    "integrates web": {
+      "D": [
+        "Integrates Web"
+      ],
+      "C": []
+    },
+    "talknest": {
+      "D": [
+        "TalkNest"
+      ],
+      "C": []
+    },
+    "sign-in": {
+      "D": [
+        "sign-in"
+      ],
+      "C": []
+    },
+    "demo\n \n\n\nobjective": {
+      "D": [
+        "Demo\n \n\n\nObjective"
+      ],
+      "C": []
+    },
+    "user authentication": {
+      "D": [
+        "User Authentication"
+      ],
+      "C": []
+    },
+    "implementation": {
+      "D": [
+        "Implementation"
+      ],
+      "C": []
+    },
+    "initiation": {
+      "D": [
+        "Initiation",
+        "initiation"
+      ],
+      "C": []
+    },
+    "availability": {
+      "D": [
+        "availability"
+      ],
+      "C": []
+    },
+    "secure": {
+      "D": [
+        "secure"
+      ],
+      "C": []
+    },
+    "web": {
+      "D": [
+        "web"
+      ],
+      "C": []
+    },
+    "key features": {
+      "D": [
+        "Key Features"
+      ],
+      "C": []
+    },
+    "time messaging": {
+      "D": [
+        "Time Messaging"
+      ],
+      "C": []
+    },
+    "actions": {
+      "D": [
+        "Actions"
+      ],
+      "C": []
+    },
+    "calling": {
+      "D": [
+        "Calling",
+        "calling"
+      ],
+      "C": []
+    },
+    "showcases": {
+      "D": [
+        "showcases"
+      ],
+      "C": []
+    },
+    "disconnection.": {
+      "D": [
+        "disconnection."
+      ],
+      "C": []
+    },
+    "engagement": {
+      "D": [
+        "engagement"
+      ],
+      "C": []
+    },
+    "express": {
+      "D": [
+        "Express"
+      ],
+      "C": []
+    },
+    "efficient": {
+      "D": [
+        "Efficient",
+        "efficient"
+      ],
+      "C": []
+    },
+    "aims": {
+      "D": [
+        "aims"
+      ],
+      "C": []
+    },
+    "logic": {
+      "D": [
+        "logic"
+      ],
+      "C": []
+    },
+    "upon": {
+      "D": [
+        "Upon",
+        "upon"
+      ],
+      "C": []
+    },
+    "peer-to-peer": {
+      "D": [
+        "peer-to-peer"
+      ],
+      "C": []
+    },
+    "socket.io.": {
+      "D": [
+        "Socket.io."
+      ],
+      "C": []
+    },
+    "time": {
+      "D": [
+        "Time",
+        "time"
+      ],
+      "C": []
+    },
+    "simple-peer": {
+      "D": [
+        "Simple-peer",
+        "simple-peer"
+      ],
+      "C": []
+    },
+    "sophisticated": {
+      "D": [
+        "sophisticated"
+      ],
+      "C": []
+    },
+    "enhancing": {
+      "D": [
+        "enhancing"
+      ],
+      "C": []
+    },
+    "profiles": {
+      "D": [
+        "profiles"
+      ],
+      "C": []
+    },
+    "firebase firestore": {
+      "D": [
+        "Firebase Firestore"
+      ],
+      "C": []
+    },
+    "details": {
+      "D": [
+        "Details",
+        "details"
+      ],
+      "C": []
+    },
+    "call": {
+      "D": [
+        "Call",
+        "call"
+      ],
+      "C": []
+    },
+    "webrtc": {
+      "D": [
+        "WebRTC"
+      ],
+      "C": []
+    },
+    "user connection management": {
+      "D": [
+        "User Connection Management"
+      ],
+      "C": []
+    },
+    "calluser": {
+      "D": [
+        "callUser"
+      ],
+      "C": []
+    },
+    "calls": {
+      "D": [
+        "Calls",
+        "calls"
+      ],
+      "C": []
+    },
+    "library": {
+      "D": [
+        "library"
+      ],
+      "C": []
+    },
+    "focus": {
+      "D": [
+        "focus"
+      ],
+      "C": []
+    },
+    "demo": {
+      "D": [
+        "Demo"
+      ],
+      "C": []
+    },
+    "firestore database": {
+      "D": [
+        "Firestore Database"
+      ],
+      "C": []
+    },
+    "feb": {
+      "D": [
+        "Feb"
+      ],
+      "C": []
+    },
+    "react.js": {
+      "D": [
+        "React.js"
+      ],
+      "C": []
+    },
+    "next-generation": {
+      "D": [
+        "next-generation"
+      ],
+      "C": []
+    },
+    "interface.": {
+      "D": [
+        "interface."
+      ],
+      "C": []
+    },
+    "enables": {
+      "D": [
+        "Enables",
+        "enables"
+      ],
+      "C": []
+    },
+    "firestore": {
+      "D": [
+        "Firestore"
+      ],
+      "C": []
+    },
+    "triggers": {
+      "D": [
+        "triggers"
+      ],
+      "C": []
+    },
+    "video": {
+      "D": [
+        "Video",
+        "video"
+      ],
+      "C": []
+    },
+    "functionality": {
+      "D": [
+        "functionality"
+      ],
+      "C": []
+    },
+    "interaction": {
+      "D": [
+        "Interaction"
+      ],
+      "C": []
+    },
+    "technologies": {
+      "D": [
+        "Technologies"
+      ],
+      "C": []
+    },
+    "real time chat application": {
+      "D": [
+        "Real Time Chat Application"
+      ],
+      "C": []
+    },
+    "clients": {
+      "D": [
+        "clients"
+      ],
+      "C": []
+    },
+    "servers": {
+      "D": [
+        "servers"
+      ],
+      "C": []
+    },
+    "availability.": {
+      "D": [
+        "availability."
+      ],
+      "C": []
+    },
+    "employed": {
+      "D": [
+        "Employed"
+      ],
+      "C": []
+    },
+    "access": {
+      "D": [
+        "access"
+      ],
+      "C": []
+    },
+    "removal": {
+      "D": [
+        "removal"
+      ],
+      "C": []
+    },
+    "tracking": {
+      "D": [
+        "tracking"
+      ],
+      "C": []
+    },
+    "search": {
+      "D": [
+        "Search"
+      ],
+      "C": []
+    },
+    "responses.": {
+      "D": [
+        "responses."
+      ],
+      "C": []
+    },
+    "key": {
+      "D": [
+        "Key",
+        "key"
+      ],
+      "C": []
+    },
+    "leveraging": {
+      "D": [
+        "leveraging"
+      ],
+      "C": []
+    },
+    "google": {
+      "D": [
+        "Google"
+      ],
+      "C": []
+    },
+    "comprehensive": {
+      "D": [
+        "comprehensive"
+      ],
+      "C": []
+    },
+    "database interaction": {
+      "D": [
+        "Database Interaction"
+      ],
+      "C": []
+    },
+    "communication": {
+      "D": [
+        "Communication",
+        "communication"
+      ],
+      "C": []
+    },
+    "automating": {
+      "D": [
+        "automating"
+      ],
+      "C": []
+    },
+    "update": {
+      "D": [
+        "update"
+      ],
+      "C": []
+    },
+    "register": {
+      "D": [
+        "register"
+      ],
+      "C": []
+    },
+    "personalized": {
+      "D": [
+        "personalized"
+      ],
+      "C": []
+    },
+    "using web": {
+      "D": [
+        "Using Web"
+      ],
+      "C": []
+    },
+    "termination.": {
+      "D": [
+        "termination."
+      ],
+      "C": []
+    },
+    "signaling": {
+      "D": [
+        "signaling"
+      ],
+      "C": []
+    },
+    "experience.": {
+      "D": [
+        "experience."
+      ],
+      "C": []
+    },
+    "status": {
+      "D": [
+        "status"
+      ],
+      "C": []
+    },
+    "profile management": {
+      "D": [
+        "Profile Management"
+      ],
+      "C": []
+    },
+    "socket.io": {
+      "D": [
+        "Socket.IO",
+        "Socket.io"
+      ],
+      "C": []
+    },
+    "robust": {
+      "D": [
+        "robust"
+      ],
+      "C": []
+    },
+    "video calling feature report": {
+      "D": [
+        "Video Calling Feature Report"
+      ],
+      "C": []
+    },
+    "utilized": {
+      "D": [
+        "Utilized"
+      ],
+      "C": []
+    },
+    "user search": {
+      "D": [
+        "User Search"
+      ],
+      "C": []
+    },
+    "userid": {
+      "D": [
+        "userId"
+      ],
+      "C": []
+    },
+    "framework": {
+      "D": [
+        "Framework",
+        "framework"
+      ],
+      "C": []
+    },
+    "key implementation details": {
+      "D": [
+        "Key Implementation Details"
+      ],
+      "C": []
+    },
+    "cypress": {
+      "D": [
+        "Cypress"
+      ],
+      "C": []
+    },
+    "direct": {
+      "D": [
+        "direct"
+      ],
+      "C": []
+    },
+    "alongside": {
+      "D": [
+        "alongside"
+      ],
+      "C": []
+    },
+    "simplicity": {
+      "D": [
+        "simplicity"
+      ],
+      "C": []
+    },
+    "online": {
+      "D": [
+        "online"
+      ],
+      "C": []
+    },
+    "bidirectional": {
+      "D": [
+        "bidirectional"
+      ],
+      "C": []
+    },
+    "utilizes socket": {
+      "D": [
+        "Utilizes Socket"
+      ],
+      "C": []
+    },
+    "utilizes": {
+      "D": [
+        "Utilizes",
+        "utilizes"
+      ],
+      "C": []
+    },
+    "chats": {
+      "D": [
+        "chats"
+      ],
+      "C": []
+    },
+    "retrieval.": {
+      "D": [
+        "retrieval."
+      ],
+      "C": []
+    },
+    "instant": {
+      "D": [
+        "instant"
+      ],
+      "C": []
+    },
+    "snippet": {
+      "D": [
+        "snippet"
+      ],
+      "C": []
+    },
+    "acceptance": {
+      "D": [
+        "acceptance"
+      ],
+      "C": []
+    },
+    "video calling": {
+      "D": [
+        "Video Calling"
+      ],
+      "C": []
+    },
+    "march": {
+      "D": [
+        "March"
+      ],
+      "C": []
+    },
+    "provided": {
+      "D": [
+        "provided"
+      ],
+      "C": []
+    },
+    "objective": {
+      "D": [
+        "Objective"
+      ],
+      "C": []
+    },
+    "report": {
+      "D": [
+        "Report",
+        "report"
+      ],
+      "C": []
+    },
+    "hub actions": {
+      "D": [
+        "Hub Actions"
+      ],
+      "C": []
+    },
+    "facilitating": {
+      "D": [
+        "facilitating"
+      ],
+      "C": []
+    },
+    "feature.": {
+      "D": [
+        "feature."
+      ],
+      "C": []
+    },
+    "core": {
+      "D": [
+        "core"
+      ],
+      "C": []
+    },
+    "jest": {
+      "D": [
+        "Jest"
+      ],
+      "C": []
+    },
+    "integration testing": {
+      "D": [
+        "Integration Testing"
+      ],
+      "C": []
+    },
+    "step": {
+      "D": [
+        "step"
+      ],
+      "C": []
+    },
+    "strategy": {
+      "D": [
+        "Strategy",
+        "strategy"
+      ],
+      "C": []
+    },
+    "successfully": {
+      "D": [
+        "successfully"
+      ],
+      "C": []
+    },
+    "connection.": {
+      "D": [
+        "connection."
+      ],
+      "C": []
+    },
+    "perspective.": {
+      "D": [
+        "perspective."
+      ],
+      "C": []
+    },
+    "hang-up": {
+      "D": [
+        "hang-up"
+      ],
+      "C": []
+    },
+    "answering": {
+      "D": [
+        "Answering"
+      ],
+      "C": []
+    },
+    "pass": {
+      "D": [
+        "pass"
+      ],
+      "C": []
+    },
+    "necessary": {
+      "D": [
+        "necessary"
+      ],
+      "C": []
+    },
+    "callee.": {
+      "D": [
+        "callee."
+      ],
+      "C": []
+    },
+    "providing": {
+      "D": [
+        "providing"
+      ],
+      "C": []
+    },
+    "answercall": {
+      "D": [
+        "answerCall"
+      ],
+      "C": []
+    },
+    "every": {
+      "D": [
+        "Every",
+        "every"
+      ],
+      "C": []
+    },
+    "continuous deployment": {
+      "D": [
+        "Continuous Deployment"
+      ],
+      "C": []
+    },
+    "based": {
+      "D": [
+        "based"
+      ],
+      "C": []
+    },
+    "packaged.": {
+      "D": [
+        "packaged."
+      ],
+      "C": []
+    },
+    "retrieved": {
+      "D": [
+        "retrieved"
+      ],
+      "C": []
+    },
+    "involves": {
+      "D": [
+        "involves"
+      ],
+      "C": []
+    },
+    "perform": {
+      "D": [
+        "perform"
+      ],
+      "C": []
+    },
+    "completing": {
+      "D": [
+        "completing"
+      ],
+      "C": []
+    },
+    "accepting": {
+      "D": [
+        "accepting"
+      ],
+      "C": []
+    },
+    "conduct": {
+      "D": [
+        "conduct"
+      ],
+      "C": []
+    },
+    "routing": {
+      "D": [
+        "routing"
+      ],
+      "C": []
+    },
+    "integration.": {
+      "D": [
+        "integration."
+      ],
+      "C": []
+    },
+    "streams": {
+      "D": [
+        "streams"
+      ],
+      "C": []
+    },
+    "establishing": {
+      "D": [
+        "establishing"
+      ],
+      "C": []
+    },
+    "steps": {
+      "D": [
+        "steps"
+      ],
+      "C": []
+    },
+    "behaves": {
+      "D": [
+        "behaves"
+      ],
+      "C": []
+    },
+    "automate": {
+      "D": [
+        "automate"
+      ],
+      "C": []
+    },
+    "role": {
+      "D": [
+        "Role",
+        "role"
+      ],
+      "C": []
+    },
+    "callee": {
+      "D": [
+        "callee"
+      ],
+      "C": []
+    },
+    "end-user": {
+      "D": [
+        "end-user"
+      ],
+      "C": []
+    },
+    "send": {
+      "D": [
+        "send"
+      ],
+      "C": []
+    },
+    "visibility": {
+      "D": [
+        "visibility"
+      ],
+      "C": []
+    },
+    "independently": {
+      "D": [
+        "independently"
+      ],
+      "C": []
+    },
+    "cypress\n\n\nthe": {
+      "D": [
+        "Cypress\n\n\nThe"
+      ],
+      "C": []
+    },
+    "containing": {
+      "D": [
+        "containing"
+      ],
+      "C": []
+    },
+    "signal": {
+      "D": [
+        "signal"
+      ],
+      "C": []
+    },
+    "callers.": {
+      "D": [
+        "callers."
+      ],
+      "C": []
+    },
+    "mimic": {
+      "D": [
+        "mimic"
+      ],
+      "C": []
+    },
+    "action.": {
+      "D": [
+        "action."
+      ],
+      "C": []
+    },
+    "request": {
+      "D": [
+        "request"
+      ],
+      "C": []
+    },
+    "testing strategy": {
+      "D": [
+        "Testing Strategy"
+      ],
+      "C": []
+    },
+    "offer": {
+      "D": [
+        "Offer",
+        "offer"
+      ],
+      "C": []
+    },
+    "workflow": {
+      "D": [
+        "Workflow",
+        "workflow"
+      ],
+      "C": []
+    },
+    "final": {
+      "D": [
+        "final"
+      ],
+      "C": []
+    },
+    "continuous integration": {
+      "D": [
+        "Continuous Integration"
+      ],
+      "C": []
+    },
+    "heroku": {
+      "D": [
+        "Heroku"
+      ],
+      "C": []
+    },
+    "expected": {
+      "D": [
+        "expected"
+      ],
+      "C": []
+    },
+    "unaffected": {
+      "D": [
+        "unaffected"
+      ],
+      "C": []
+    },
+    "signals": {
+      "D": [
+        "signals"
+      ],
+      "C": []
+    },
+    "answer": {
+      "D": [
+        "answer"
+      ],
+      "C": []
+    },
+    "interactions": {
+      "D": [
+        "Interactions",
+        "interactions"
+      ],
+      "C": []
+    },
+    "plays": {
+      "D": [
+        "plays"
+      ],
+      "C": []
+    },
+    "answering calls": {
+      "D": [
+        "Answering Calls"
+      ],
+      "C": []
+    },
+    "deploy": {
+      "D": [
+        "Deploy"
+      ],
+      "C": []
+    },
+    "database.": {
+      "D": [
+        "database."
+      ],
+      "C": []
+    },
+    "initiating": {
+      "D": [
+        "Initiating"
+      ],
+      "C": []
+    },
+    "following": {
+      "D": [
+        "following"
+      ],
+      "C": []
+    },
+    "caller": {
+      "D": [
+        "caller"
+      ],
+      "C": []
+    },
+    "e592bf77-4279-4a95-8257-3bd95f8f7eb9": {
+      "D": [
+        "e592bf77-4279-4a95-8257-3bd95f8f7eb9"
+      ],
+      "C": []
+    },
+    "clone": {
+      "D": [
+        "Clone"
+      ],
+      "C": []
+    },
+    "endpoint": {
+      "D": [
+        "endpoint"
+      ],
+      "C": []
+    },
+    "accessed": {
+      "D": [
+        "Accessed"
+      ],
+      "C": []
+    },
+    "inter process communication": {
+      "D": [
+        "Inter Process Communication"
+      ],
+      "C": []
+    },
+    "credentials.": {
+      "D": [
+        "credentials."
+      ],
+      "C": []
+    },
+    "desktop": {
+      "D": [
+        "Desktop"
+      ],
+      "C": []
+    },
+    "skaffold": {
+      "D": [
+        "Skaffold"
+      ],
+      "C": []
+    },
+    "values.": {
+      "D": [
+        "values."
+      ],
+      "C": []
+    },
+    "file": {
+      "D": [
+        "file"
+      ],
+      "C": []
+    },
+    "service discovery": {
+      "D": [
+        "Service Discovery"
+      ],
+      "C": []
+    },
+    "testing.": {
+      "D": [
+        "testing."
+      ],
+      "C": []
+    },
+    "successful": {
+      "D": [
+        "successful"
+      ],
+      "C": []
+    },
+    "postgresql": {
+      "D": [
+        "PostgreSQL"
+      ],
+      "C": []
+    },
+    "install": {
+      "D": [
+        "Install"
+      ],
+      "C": []
+    },
+    "applied.": {
+      "D": [
+        "applied."
+      ],
+      "C": []
+    },
+    "microservice": {
+      "D": [
+        "microservice"
+      ],
+      "C": []
+    },
+    "explanation": {
+      "D": [
+        "Explanation"
+      ],
+      "C": []
+    },
+    "navigating": {
+      "D": [
+        "navigating"
+      ],
+      "C": []
+    },
+    "production only": {
+      "D": [
+        "Production Only"
+      ],
+      "C": []
+    },
+    "directory": {
+      "D": [
+        "directory"
+      ],
+      "C": []
+    },
+    "urls.": {
+      "D": [
+        "URLs."
+      ],
+      "C": []
+    },
+    "boot": {
+      "D": [
+        "Boot",
+        "boot"
+      ],
+      "C": []
+    },
+    "kubernetes-based": {
+      "D": [
+        "Kubernetes-based"
+      ],
+      "C": []
+    },
+    "mongodb": {
+      "D": [
+        "MongoDB"
+      ],
+      "C": []
+    },
+    "inter": {
+      "D": [
+        "Inter"
+      ],
+      "C": []
+    },
+    "discovery": {
+      "D": [
+        "Discovery",
+        "discovery"
+      ],
+      "C": []
+    },
+    "helm": {
+      "D": [
+        "Helm"
+      ],
+      "C": []
+    },
+    "repository": {
+      "D": [
+        "Repository",
+        "repository"
+      ],
+      "C": []
+    },
+    "configured": {
+      "D": [
+        "configured"
+      ],
+      "C": []
+    },
+    "conclusion\n\n\nthe gift galaxy": {
+      "D": [
+        "Conclusion\n\n\nThe Gift Galaxy"
+      ],
+      "C": []
+    },
+    "eureka": {
+      "D": [
+        "Eureka"
+      ],
+      "C": []
+    },
+    "applications.": {
+      "D": [
+        "applications."
+      ],
+      "C": []
+    },
+    "protect": {
+      "D": [
+        "protect"
+      ],
+      "C": []
+    },
+    "style": {
+      "D": [
+        "style"
+      ],
+      "C": []
+    },
+    "chart": {
+      "D": [
+        "Chart"
+      ],
+      "C": []
+    },
+    "updated": {
+      "D": [
+        "updated"
+      ],
+      "C": []
+    },
+    "ingress": {
+      "D": [
+        "Ingress",
+        "ingress"
+      ],
+      "C": []
+    },
+    "dns": {
+      "D": [
+        "DNS"
+      ],
+      "C": []
+    },
+    "data.": {
+      "D": [
+        "data."
+      ],
+      "C": []
+    },
+    "package": {
+      "D": [
+        "package"
+      ],
+      "C": []
+    },
+    "secrets": {
+      "D": [
+        "Secrets",
+        "secrets"
+      ],
+      "C": []
+    },
+    "recommendations.": {
+      "D": [
+        "recommendations."
+      ],
+      "C": []
+    },
+    "technology": {
+      "D": [
+        "Technology"
+      ],
+      "C": []
+    },
+    "active": {
+      "D": [
+        "active"
+      ],
+      "C": []
+    },
+    "per": {
+      "D": [
+        "per"
+      ],
+      "C": []
+    },
+    "service instance": {
+      "D": [
+        "Service Instance"
+      ],
+      "C": []
+    },
+    "start helm chart": {
+      "D": [
+        "Start Helm Chart"
+      ],
+      "C": []
+    },
+    "conclusion": {
+      "D": [
+        "Conclusion"
+      ],
+      "C": []
+    },
+    "host": {
+      "D": [
+        "Host"
+      ],
+      "C": []
+    },
+    "endpoints": {
+      "D": [
+        "Endpoints"
+      ],
+      "C": []
+    },
+    "installed": {
+      "D": [
+        "installed"
+      ],
+      "C": []
+    },
+    "nginx": {
+      "D": [
+        "NGINX",
+        "Nginx"
+      ],
+      "C": []
+    },
+    "docker desktop": {
+      "D": [
+        "Docker Desktop"
+      ],
+      "C": []
+    },
+    "gift galaxy microservices\n\n\ndescription": {
+      "D": [
+        "Gift Galaxy Microservices\n\n\nDescription"
+      ],
+      "C": []
+    },
+    "local development": {
+      "D": [
+        "Local Development"
+      ],
+      "C": []
+    },
+    "restful": {
+      "D": [
+        "RESTful"
+      ],
+      "C": []
+    },
+    "utilize": {
+      "D": [
+        "utilize"
+      ],
+      "C": []
+    },
+    "setup": {
+      "D": [
+        "Setup",
+        "setup"
+      ],
+      "C": []
+    },
+    "run microservices": {
+      "D": [
+        "Run Microservices"
+      ],
+      "C": []
+    },
+    "dockerize": {
+      "D": [
+        "Dockerize"
+      ],
+      "C": []
+    },
+    "containerization": {
+      "D": [
+        "Containerization",
+        "containerization"
+      ],
+      "C": []
+    },
+    "outlines": {
+      "D": [
+        "outlines"
+      ],
+      "C": []
+    },
+    "dockerhub": {
+      "D": [
+        "DockerHub"
+      ],
+      "C": []
+    },
+    "cli": {
+      "D": [
+        "CLI"
+      ],
+      "C": []
+    },
+    "simplifies kubernetes": {
+      "D": [
+        "Simplifies Kubernetes"
+      ],
+      "C": []
+    },
+    "ingress controller": {
+      "D": [
+        "Ingress Controller"
+      ],
+      "C": []
+    },
+    "pvc": {
+      "D": [
+        "PVC"
+      ],
+      "C": []
+    },
+    "nosql": {
+      "D": [
+        "NoSQL"
+      ],
+      "C": []
+    },
+    "simplifies": {
+      "D": [
+        "Simplifies",
+        "simplifies"
+      ],
+      "C": []
+    },
+    "claims": {
+      "D": [
+        "Claims"
+      ],
+      "C": []
+    },
+    "via": {
+      "D": [
+        "via"
+      ],
+      "C": []
+    },
+    "synchronous/asynchronous": {
+      "D": [
+        "Synchronous/Asynchronous"
+      ],
+      "C": []
+    },
+    "container.": {
+      "D": [
+        "container."
+      ],
+      "C": []
+    },
+    "description": {
+      "D": [
+        "Description"
+      ],
+      "C": []
+    },
+    "customized": {
+      "D": [
+        "customized"
+      ],
+      "C": []
+    },
+    "manager": {
+      "D": [
+        "manager"
+      ],
+      "C": []
+    },
+    "persistent": {
+      "D": [
+        "Persistent"
+      ],
+      "C": []
+    },
+    "cloned": {
+      "D": [
+        "cloned"
+      ],
+      "C": []
+    },
+    "added": {
+      "D": [
+        "added"
+      ],
+      "C": []
+    },
+    "storing": {
+      "D": [
+        "storing"
+      ],
+      "C": []
+    },
+    "gift": {
+      "D": [
+        "Gift"
+      ],
+      "C": []
+    },
+    "container\n\n\ndockerize": {
+      "D": [
+        "Container\n\n\nDockerize"
+      ],
+      "C": []
+    },
+    "micro-services": {
+      "D": [
+        "micro-services"
+      ],
+      "C": []
+    },
+    "relational": {
+      "D": [
+        "Relational"
+      ],
+      "C": []
+    },
+    "digitalocean.": {
+      "D": [
+        "DigitalOcean."
+      ],
+      "C": []
+    },
+    "create secrets": {
+      "D": [
+        "Create Secrets"
+      ],
+      "C": []
+    },
+    "gift galaxy": {
+      "D": [
+        "Gift Galaxy"
+      ],
+      "C": []
+    },
+    "test connection": {
+      "D": [
+        "Test Connection"
+      ],
+      "C": []
+    },
+    "k9s": {
+      "D": [
+        "K9s"
+      ],
+      "C": []
+    },
+    "locally.": {
+      "D": [
+        "locally."
+      ],
+      "C": []
+    },
+    "ipc": {
+      "D": [
+        "IPC"
+      ],
+      "C": []
+    },
+    "track": {
+      "D": [
+        "track"
+      ],
+      "C": []
+    },
+    "use nginx": {
+      "D": [
+        "Use Nginx"
+      ],
+      "C": []
+    },
+    "microservices architecture\n\n\n\n\ntools used": {
+      "D": [
+        "Microservices Architecture\n\n\n\n\nTools Used"
+      ],
+      "C": []
+    },
+    "local": {
+      "D": [
+        "Local",
+        "local"
+      ],
+      "C": []
+    },
+    "galaxy": {
+      "D": [
+        "Galaxy"
+      ],
+      "C": []
+    },
+    "development.": {
+      "D": [
+        "development."
+      ],
+      "C": []
+    },
+    "helm.": {
+      "D": [
+        "Helm."
+      ],
+      "C": []
+    },
+    "localhost": {
+      "D": [
+        "localhost"
+      ],
+      "C": []
+    },
+    "clusters.": {
+      "D": [
+        "clusters."
+      ],
+      "C": []
+    },
+    "deployed": {
+      "D": [
+        "deployed"
+      ],
+      "C": []
+    },
+    "processes.": {
+      "D": [
+        "processes."
+      ],
+      "C": []
+    },
+    "databases": {
+      "D": [
+        "Databases",
+        "databases"
+      ],
+      "C": []
+    },
+    "with docker": {
+      "D": [
+        "With Docker"
+      ],
+      "C": []
+    },
+    "deployment.": {
+      "D": [
+        "deployment."
+      ],
+      "C": []
+    },
+    "request/response": {
+      "D": [
+        "Request/Response"
+      ],
+      "C": []
+    },
+    "instance": {
+      "D": [
+        "Instance"
+      ],
+      "C": []
+    },
+    "technology used": {
+      "D": [
+        "Technology Used"
+      ],
+      "C": []
+    },
+    "persistent volume claims": {
+      "D": [
+        "Persistent Volume Claims"
+      ],
+      "C": []
+    },
+    "volume": {
+      "D": [
+        "Volume"
+      ],
+      "C": []
+    },
+    "the gift galaxy": {
+      "D": [
+        "The Gift Galaxy"
+      ],
+      "C": []
+    },
+    "local development only": {
+      "D": [
+        "Local Development Only"
+      ],
+      "C": []
+    },
+    "clone repository": {
+      "D": [
+        "Clone Repository"
+      ],
+      "C": []
+    },
+    "spring boot": {
+      "D": [
+        "Spring Boot"
+      ],
+      "C": []
+    },
+    "specified": {
+      "D": [
+        "specified"
+      ],
+      "C": []
+    },
+    "streamlined": {
+      "D": [
+        "Streamlined",
+        "streamlined"
+      ],
+      "C": []
+    },
+    "optimized.": {
+      "D": [
+        "optimized."
+      ],
+      "C": []
+    },
+    "flexibility": {
+      "D": [
+        "flexibility"
+      ],
+      "C": []
+    },
+    "utilizing": {
+      "D": [
+        "utilizing"
+      ],
+      "C": []
+    },
+    "outlined": {
+      "D": [
+        "outlined"
+      ],
+      "C": []
+    },
+    "scalability": {
+      "D": [
+        "Scalability",
+        "scalability"
+      ],
+      "C": []
+    },
+    "efficiency.": {
+      "D": [
+        "efficiency."
+      ],
+      "C": []
+    },
+    "a9b53277-08e9-4727-b136-86cd12e21f22": {
+      "D": [
+        "a9b53277-08e9-4727-b136-86cd12e21f22"
+      ],
+      "C": []
+    },
+    "breaker": {
+      "D": [
+        "Breaker",
+        "breaker"
+      ],
+      "C": []
+    },
+    "circuit": {
+      "D": [
+        "Circuit",
+        "circuit"
+      ],
+      "C": []
+    },
+    "resilience4j": {
+      "D": [
+        "Resilience4j"
+      ],
+      "C": []
+    },
+    "kafka\n\n\ncommunication": {
+      "D": [
+        "Kafka\n\n\nCommunication"
+      ],
+      "C": []
+    },
+    "message": {
+      "D": [
+        "Message",
+        "message"
+      ],
+      "C": []
+    },
+    "limiting.": {
+      "D": [
+        "limiting."
+      ],
+      "C": []
+    },
+    "handled": {
+      "D": [
+        "handled"
+      ],
+      "C": []
+    },
+    "robustness": {
+      "D": [
+        "Robustness"
+      ],
+      "C": []
+    },
+    "leading": {
+      "D": [
+        "leading"
+      ],
+      "C": []
+    },
+    "tracing": {
+      "D": [
+        "tracing"
+      ],
+      "C": []
+    },
+    "unlocking multilingual digital communication": {
+      "D": [
+        "Unlocking Multilingual Digital Communication"
+      ],
+      "C": []
+    },
+    "enhance": {
+      "D": [
+        "enhance"
+      ],
+      "C": []
+    },
+    "demo\n\n\n \n\n\n\n\nstreamlined interactions": {
+      "D": [
+        "Demo\n\n\n \n\n\n\n\nStreamlined Interactions"
+      ],
+      "C": []
+    },
+    "improved": {
+      "D": [
+        "improved"
+      ],
+      "C": []
+    },
+    "serves": {
+      "D": [
+        "serves"
+      ],
+      "C": []
+    },
+    "helping": {
+      "D": [
+        "helping"
+      ],
+      "C": []
+    },
+    "gateway\n\n\ncentral": {
+      "D": [
+        "Gateway\n\n\nCentral"
+      ],
+      "C": []
+    },
+    "platform.": {
+      "D": [
+        "platform."
+      ],
+      "C": []
+    },
+    "central": {
+      "D": [
+        "Central"
+      ],
+      "C": []
+    },
+    "latency": {
+      "D": [
+        "latency"
+      ],
+      "C": []
+    },
+    "termination": {
+      "D": [
+        "termination"
+      ],
+      "C": []
+    },
+    "circuit breaker": {
+      "D": [
+        "Circuit Breaker"
+      ],
+      "C": []
+    },
+    "observability": {
+      "D": [
+        "Observability"
+      ],
+      "C": []
+    },
+    "queue": {
+      "D": [
+        "Queue"
+      ],
+      "C": []
+    },
+    "programming.": {
+      "D": [
+        "programming."
+      ],
+      "C": []
+    },
+    "easy-to-use": {
+      "D": [
+        "easy-to-use"
+      ],
+      "C": []
+    },
+    "journey": {
+      "D": [
+        "journey"
+      ],
+      "C": []
+    },
+    "down.": {
+      "D": [
+        "down."
+      ],
+      "C": []
+    },
+    "seamlessly": {
+      "D": [
+        "seamlessly"
+      ],
+      "C": []
+    },
+    "client": {
+      "D": [
+        "client"
+      ],
+      "C": []
+    },
+    "message queue": {
+      "D": [
+        "Message Queue"
+      ],
+      "C": []
+    },
+    "performance": {
+      "D": [
+        "performance"
+      ],
+      "C": []
+    },
+    "nature": {
+      "D": [
+        "nature"
+      ],
+      "C": []
+    },
+    "incorporates": {
+      "D": [
+        "incorporates"
+      ],
+      "C": []
+    },
+    "functional": {
+      "D": [
+        "functional"
+      ],
+      "C": []
+    },
+    "demanding": {
+      "D": [
+        "demanding"
+      ],
+      "C": []
+    },
+    "high": {
+      "D": [
+        "high"
+      ],
+      "C": []
+    },
+    "zipkin": {
+      "D": [
+        "Zipkin"
+      ],
+      "C": []
+    },
+    "streaming": {
+      "D": [
+        "streaming"
+      ],
+      "C": []
+    },
+    "rate": {
+      "D": [
+        "rate"
+      ],
+      "C": []
+    },
+    "unlocking": {
+      "D": [
+        "Unlocking"
+      ],
+      "C": []
+    },
+    "ssl": {
+      "D": [
+        "SSL"
+      ],
+      "C": []
+    },
+    "reliability.": {
+      "D": [
+        "reliability."
+      ],
+      "C": []
+    },
+    "exchange": {
+      "D": [
+        "exchange"
+      ],
+      "C": []
+    },
+    "advanced observability": {
+      "D": [
+        "Advanced Observability"
+      ],
+      "C": []
+    },
+    "while": {
+      "D": [
+        "while"
+      ],
+      "C": []
+    },
+    "java8": {
+      "D": [
+        "Java8"
+      ],
+      "C": []
+    },
+    "resilience": {
+      "D": [
+        "Resilience",
+        "resilience"
+      ],
+      "C": []
+    },
+    "insights": {
+      "D": [
+        "insights"
+      ],
+      "C": []
+    },
+    "point": {
+      "D": [
+        "point"
+      ],
+      "C": []
+    },
+    "requiring": {
+      "D": [
+        "requiring"
+      ],
+      "C": []
+    },
+    "digital": {
+      "D": [
+        "Digital"
+      ],
+      "C": []
+    },
+    "requests.": {
+      "D": [
+        "requests."
+      ],
+      "C": []
+    },
+    "invaluable": {
+      "D": [
+        "invaluable"
+      ],
+      "C": []
+    },
+    "crucial.": {
+      "D": [
+        "crucial."
+      ],
+      "C": []
+    },
+    "powerful": {
+      "D": [
+        "powerful"
+      ],
+      "C": []
+    },
+    "scalability.": {
+      "D": [
+        "scalability."
+      ],
+      "C": []
+    },
+    "appropriate": {
+      "D": [
+        "appropriate"
+      ],
+      "C": []
+    },
+    "outages": {
+      "D": [
+        "outages"
+      ],
+      "C": []
+    },
+    "excels": {
+      "D": [
+        "excels"
+      ],
+      "C": []
+    },
+    "polyglotbot": {
+      "D": [
+        "PolyglotBot"
+      ],
+      "C": []
+    },
+    "enhances": {
+      "D": [
+        "enhances"
+      ],
+      "C": []
+    },
+    "cascade": {
+      "D": [
+        "cascade"
+      ],
+      "C": []
+    },
+    "decoupled": {
+      "D": [
+        "decoupled"
+      ],
+      "C": []
+    },
+    "tolerance": {
+      "D": [
+        "tolerance"
+      ],
+      "C": []
+    },
+    "partial": {
+      "D": [
+        "partial"
+      ],
+      "C": []
+    },
+    "tasks": {
+      "D": [
+        "tasks"
+      ],
+      "C": []
+    },
+    "lightweight": {
+      "D": [
+        "lightweight"
+      ],
+      "C": []
+    },
+    "multilingual": {
+      "D": [
+        "Multilingual"
+      ],
+      "C": []
+    },
+    "conditions.": {
+      "D": [
+        "conditions."
+      ],
+      "C": []
+    },
+    "efficient messaging": {
+      "D": [
+        "Efficient Messaging"
+      ],
+      "C": []
+    },
+    "failures": {
+      "D": [
+        "failures"
+      ],
+      "C": []
+    },
+    "optimal": {
+      "D": [
+        "optimal"
+      ],
+      "C": []
+    },
+    "throughput": {
+      "D": [
+        "throughput"
+      ],
+      "C": []
+    },
+    "mechanisms": {
+      "D": [
+        "mechanisms"
+      ],
+      "C": []
+    },
+    "reliable": {
+      "D": [
+        "reliable"
+      ],
+      "C": []
+    },
+    "architecture.": {
+      "D": [
+        "architecture."
+      ],
+      "C": []
+    },
+    "flask": {
+      "D": [
+        "Flask"
+      ],
+      "C": []
+    },
+    "security": {
+      "D": [
+        "security"
+      ],
+      "C": []
+    },
+    "provides": {
+      "D": [
+        "provides"
+      ],
+      "C": []
+    },
+    "routes": {
+      "D": [
+        "routes"
+      ],
+      "C": []
+    },
+    "efficiently": {
+      "D": [
+        "efficiently"
+      ],
+      "C": []
+    },
+    "goes": {
+      "D": [
+        "goes"
+      ],
+      "C": []
+    },
+    "queues.": {
+      "D": [
+        "queues."
+      ],
+      "C": []
+    },
+    "zipkin\n\n\nin": {
+      "D": [
+        "Zipkin\n\n\nIn"
+      ],
+      "C": []
+    },
+    "primary": {
+      "D": [
+        "primary"
+      ],
+      "C": []
+    },
+    "under": {
+      "D": [
+        "under"
+      ],
+      "C": []
+    },
+    "ensuring robustness": {
+      "D": [
+        "Ensuring Robustness"
+      ],
+      "C": []
+    },
+    "troubleshoot": {
+      "D": [
+        "troubleshoot"
+      ],
+      "C": []
+    },
+    "margins team\nnew chapter": {
+      "D": [
+        "Margins Team\nNew Chapter"
+      ],
+      "C": []
+    },
+    "margins": {
+      "D": [
+        "Margins"
+      ],
+      "C": []
+    },
+    "banking": {
+      "D": [
+        "Banking",
+        "banking"
+      ],
+      "C": []
+    },
+    "global": {
+      "D": [
+        "Global",
+        "global"
+      ],
+      "C": []
+    },
+    "dec": {
+      "D": [
+        "Dec"
+      ],
+      "C": []
+    },
+    "here.....": {
+      "D": [
+        "Here....."
+      ],
+      "C": []
+    },
+    "markets": {
+      "D": [
+        "Markets"
+      ],
+      "C": []
+    },
+    "starts here": {
+      "D": [
+        "Starts Here"
+      ],
+      "C": []
+    },
+    "current": {
+      "D": [
+        "Current"
+      ],
+      "C": []
+    },
+    "engineer": {
+      "D": [
+        "Engineer"
+      ],
+      "C": []
+    },
+    "goldman sachs": {
+      "D": [
+        "Goldman Sachs"
+      ],
+      "C": []
+    },
+    "current\nglobal banking": {
+      "D": [
+        "Current\nGlobal Banking"
+      ],
+      "C": []
+    },
+    "chapter": {
+      "D": [
+        "Chapter"
+      ],
+      "C": []
+    },
+    "software engineer": {
+      "D": [
+        "Software Engineer"
+      ],
+      "C": []
+    },
+    "goldman": {
+      "D": [
+        "Goldman"
+      ],
+      "C": []
+    },
+    "sachs": {
+      "D": [
+        "Sachs"
+      ],
+      "C": []
+    },
+    "full-time": {
+      "D": [
+        "Full-Time",
+        "Full-time",
+        "full-time"
+      ],
+      "C": []
+    },
+    "backend developer intern": {
+      "D": [
+        "Backend Developer Intern"
+      ],
+      "C": []
+    },
+    "pdfs": {
+      "D": [
+        "PDFs"
+      ],
+      "C": []
+    },
+    "dynamodb.": {
+      "D": [
+        "DynamoDB."
+      ],
+      "C": []
+    },
+    "flashcards": {
+      "D": [
+        "flashcards"
+      ],
+      "C": []
+    },
+    "junit": {
+      "D": [
+        "JUnit"
+      ],
+      "C": []
+    },
+    "achieving": {
+      "D": [
+        "achieving"
+      ],
+      "C": []
+    },
+    "uptime.": {
+      "D": [
+        "uptime."
+      ],
+      "C": []
+    },
+    "ecs": {
+      "D": [
+        "ECS"
+      ],
+      "C": []
+    },
+    "aws": {
+      "D": [
+        "AWS"
+      ],
+      "C": []
+    },
+    "corp": {
+      "D": [
+        "Corp"
+      ],
+      "C": []
+    },
+    "curastone": {
+      "D": [
+        "CuraStone"
+      ],
+      "C": []
+    },
+    "converting": {
+      "D": [
+        "converting"
+      ],
+      "C": []
+    },
+    "mockito": {
+      "D": [
+        "Mockito"
+      ],
+      "C": []
+    },
+    "jwt/cognito": {
+      "D": [
+        "JWT/Cognito"
+      ],
+      "C": []
+    },
+    "stone corp": {
+      "D": [
+        "Stone Corp"
+      ],
+      "C": []
+    },
+    "aug": {
+      "D": [
+        "Aug"
+      ],
+      "C": []
+    },
+    "intern": {
+      "D": [
+        "Intern"
+      ],
+      "C": []
+    },
+    "developer": {
+      "D": [
+        "Developer"
+      ],
+      "C": []
+    },
+    "life": {
+      "D": [
+        "life"
+      ],
+      "C": []
+    },
+    "最后是拿了": {
+      "D": [
+        "最后是拿了"
+      ],
+      "C": []
+    },
+    "美国": {
+      "D": [
+        "美国"
+      ],
+      "C": []
+    },
+    "amazon": {
+      "D": [
+        "Amazon",
+        "amazon"
+      ],
+      "C": []
+    },
+    "比较注重实际": {
+      "D": [
+        "比较注重实际"
+      ],
+      "C": []
+    },
+    "必须承认国内也有很天才和勤奋的人": {
+      "D": [
+        "必须承认国内也有很天才和勤奋的人"
+      ],
+      "C": []
+    },
+    "他们更倾向于有经验的": {
+      "D": [
+        "他们更倾向于有经验的"
+      ],
+      "C": []
+    },
+    "这个一直没有背过": {
+      "D": [
+        "这个一直没有背过"
+      ],
+      "C": []
+    },
+    "这些": {
+      "D": [
+        "这些"
+      ],
+      "C": []
+    },
+    "难度除了八股": {
+      "D": [
+        "难度除了八股"
+      ],
+      "C": []
+    },
+    "必须凌晨和国内的面试官聊": {
+      "D": [
+        "必须凌晨和国内的面试官聊"
+      ],
+      "C": []
+    },
+    "out": {
+      "D": [
+        "out"
+      ],
+      "C": []
+    },
+    "聊完再": {
+      "D": [
+        "聊完再"
+      ],
+      "C": []
+    },
+    "为了方便": {
+      "D": [
+        "为了方便"
+      ],
+      "C": []
+    },
+    "过了两天说我过简历关了": {
+      "D": [
+        "过了两天说我过简历关了"
+      ],
+      "C": []
+    },
+    "之后": {
+      "D": [
+        "之后"
+      ],
+      "C": []
+    },
+    "model": {
+      "D": [
+        "model"
+      ],
+      "C": []
+    },
+    "然后面试算法": {
+      "D": [
+        "然后面试算法"
+      ],
+      "C": []
+    },
+    "毕业": {
+      "D": [
+        "毕业"
+      ],
+      "C": []
+    },
+    "不过难度也是独一档的": {
+      "D": [
+        "不过难度也是独一档的"
+      ],
+      "C": []
+    },
+    "还有系统设计": {
+      "D": [
+        "还有系统设计"
+      ],
+      "C": []
+    },
+    "岗位是": {
+      "D": [
+        "岗位是"
+      ],
+      "C": []
+    },
+    "小厂不计": {
+      "D": [
+        "小厂不计"
+      ],
+      "C": []
+    },
+    "hire": {
+      "D": [
+        "hire"
+      ],
+      "C": []
+    },
+    "记录一下": {
+      "D": [
+        "记录一下"
+      ],
+      "C": []
+    },
+    "难度不是很难": {
+      "D": [
+        "难度不是很难"
+      ],
+      "C": []
+    },
+    "但是竞争相当激烈": {
+      "D": [
+        "但是竞争相当激烈"
+      ],
+      "C": []
+    },
+    "的时候": {
+      "D": [
+        "的时候"
+      ],
+      "C": []
+    },
+    "java": {
+      "D": [
+        "Java"
+      ],
+      "C": []
+    },
+    "挂的原因是最后开始面试八股文": {
+      "D": [
+        "挂的原因是最后开始面试八股文"
+      ],
+      "C": []
+    },
+    "java spring": {
+      "D": [
+        "Java Spring"
+      ],
+      "C": []
+    },
+    "然后安排面试": {
+      "D": [
+        "然后安排面试"
+      ],
+      "C": []
+    },
+    "硕士": {
+      "D": [
+        "硕士"
+      ],
+      "C": []
+    },
+    "大名鼎鼎的字节": {
+      "D": [
+        "大名鼎鼎的字节"
+      ],
+      "C": []
+    },
+    "系统设计": {
+      "D": [
+        "系统设计"
+      ],
+      "C": []
+    },
+    "当时有看到说是组招一个": {
+      "D": [
+        "当时有看到说是组招一个"
+      ],
+      "C": []
+    },
+    "hr": {
+      "D": [
+        "hr"
+      ],
+      "C": []
+    },
+    "job": {
+      "D": [
+        "Job",
+        "job"
+      ],
+      "C": []
+    },
+    "因为岗位是招收": {
+      "D": [
+        "因为岗位是招收"
+      ],
+      "C": []
+    },
+    "newsbreak": {
+      "D": [
+        "NewsBreak"
+      ],
+      "C": []
+    },
+    "zoom\n\n\n\n\n\n\nzoom": {
+      "D": [
+        "Zoom\n\n\n\n\n\n\nZoom"
+      ],
+      "C": []
+    },
+    "zoom": {
+      "D": [
+        "Zoom"
+      ],
+      "C": []
+    },
+    "先说一下背景和结果": {
+      "D": [
+        "先说一下背景和结果"
+      ],
+      "C": []
+    },
+    "亚麻给": {
+      "D": [
+        "亚麻给"
+      ],
+      "C": []
+    },
+    "grad get full": {
+      "D": [
+        "Grad Get Full"
+      ],
+      "C": []
+    },
+    "是直接": {
+      "D": [
+        "是直接"
+      ],
+      "C": []
+    },
+    "湾区的": {
+      "D": [
+        "湾区的"
+      ],
+      "C": []
+    },
+    "测试": {
+      "D": [
+        "测试"
+      ],
+      "C": []
+    },
+    "我都抽中": {
+      "D": [
+        "我都抽中"
+      ],
+      "C": []
+    },
+    "的面试就很玄学": {
+      "D": [
+        "的面试就很玄学"
+      ],
+      "C": []
+    },
+    "tiktok": {
+      "D": [
+        "TikTok"
+      ],
+      "C": []
+    },
+    "方面的考点": {
+      "D": [
+        "方面的考点"
+      ],
+      "C": []
+    },
+    "之后收到据信": {
+      "D": [
+        "之后收到据信"
+      ],
+      "C": []
+    },
+    "面到了最后一轮": {
+      "D": [
+        "面到了最后一轮"
+      ],
+      "C": []
+    },
+    "第一个收到面试公司": {
+      "D": [
+        "第一个收到面试公司"
+      ],
+      "C": []
+    },
+    "了一下": {
+      "D": [
+        "了一下"
+      ],
+      "C": []
+    },
+    "president": {
+      "D": [
+        "president"
+      ],
+      "C": []
+    },
+    "time offer": {
+      "D": [
+        "Time Offer"
+      ],
+      "C": []
+    },
+    "上搜到": {
+      "D": [
+        "上搜到"
+      ],
+      "C": []
+    },
+    "new-grad": {
+      "D": [
+        "New-Grad"
+      ],
+      "C": []
+    },
+    "先是": {
+      "D": [
+        "先是"
+      ],
+      "C": []
+    },
+    "如何写多层嵌套的": {
+      "D": [
+        "如何写多层嵌套的"
+      ],
+      "C": []
+    },
+    "top60": {
+      "D": [
+        "top60"
+      ],
+      "C": []
+    },
+    "reach": {
+      "D": [
+        "reach"
+      ],
+      "C": []
+    },
+    "最让我觉得很淦的是字节的面试几乎都是晚上": {
+      "D": [
+        "最让我觉得很淦的是字节的面试几乎都是晚上"
+      ],
+      "C": []
+    },
+    "和高盛的": {
+      "D": [
+        "和高盛的"
+      ],
+      "C": []
+    },
+    "fall": {
+      "D": [
+        "Fall",
+        "fall"
+      ],
+      "C": []
+    },
+    "所以面试不仅有算法": {
+      "D": [
+        "所以面试不仅有算法"
+      ],
+      "C": []
+    },
+    "高盛": {
+      "D": [
+        "高盛"
+      ],
+      "C": []
+    },
+    "挂了不丢人": {
+      "D": [
+        "挂了不丢人"
+      ],
+      "C": []
+    },
+    "考的甚至比大厂还难": {
+      "D": [
+        "考的甚至比大厂还难"
+      ],
+      "C": []
+    },
+    "class": {
+      "D": [
+        "class"
+      ],
+      "C": []
+    },
+    "时间线": {
+      "D": [
+        "时间线"
+      ],
+      "C": []
+    },
+    "简历深挖": {
+      "D": [
+        "简历深挖"
+      ],
+      "C": []
+    },
+    "vice": {
+      "D": [
+        "vice"
+      ],
+      "C": []
+    },
+    "和你聊": {
+      "D": [
+        "和你聊"
+      ],
+      "C": []
+    },
+    "考的范围有日常": {
+      "D": [
+        "考的范围有日常"
+      ],
+      "C": []
+    },
+    "有的小厂确实也很有水平": {
+      "D": [
+        "有的小厂确实也很有水平"
+      ],
+      "C": []
+    },
+    "leetcode": {
+      "D": [
+        "leetcode"
+      ],
+      "C": []
+    },
+    "ps": {
+      "D": [
+        "ps"
+      ],
+      "C": []
+    },
+    "在这里为了方便": {
+      "D": [
+        "在这里为了方便"
+      ],
+      "C": []
+    },
+    "alipay": {
+      "D": [
+        "Alipay"
+      ],
+      "C": []
+    },
+    "ng": {
+      "D": [
+        "ng"
+      ],
+      "C": []
+    },
+    "操作": {
+      "D": [
+        "操作"
+      ],
+      "C": []
+    },
+    "wtf": {
+      "D": [
+        "wtf"
+      ],
+      "C": []
+    },
+    "oa": {
+      "D": [
+        "oa"
+      ],
+      "C": []
+    },
+    "他的面试特点就是聊天聊地聊空气": {
+      "D": [
+        "他的面试特点就是聊天聊地聊空气"
+      ],
+      "C": []
+    },
+    "说是因为我是": {
+      "D": [
+        "说是因为我是"
+      ],
+      "C": []
+    },
+    "然后就": {
+      "D": [
+        "然后就"
+      ],
+      "C": []
+    },
+    "cs": {
+      "D": [
+        "cs"
+      ],
+      "C": []
+    },
+    "在各大厂相继": {
+      "D": [
+        "在各大厂相继"
+      ],
+      "C": []
+    },
+    "算法": {
+      "D": [
+        "算法"
+      ],
+      "C": []
+    },
+    "sde": {
+      "D": [
+        "SDE",
+        "sde"
+      ],
+      "C": []
+    },
+    "只计中大厂": {
+      "D": [
+        "只计中大厂"
+      ],
+      "C": []
+    },
+    "面试": {
+      "D": [
+        "面试"
+      ],
+      "C": []
+    },
+    "上岸历程": {
+      "D": [
+        "上岸历程"
+      ],
+      "C": []
+    },
+    "微服务只是聊了聊": {
+      "D": [
+        "微服务只是聊了聊"
+      ],
+      "C": []
+    },
+    "freeze": {
+      "D": [
+        "freeze"
+      ],
+      "C": []
+    },
+    "experienced": {
+      "D": [
+        "experienced"
+      ],
+      "C": []
+    },
+    "只计算中大厂": {
+      "D": [
+        "只计算中大厂"
+      ],
+      "C": []
+    },
+    "能在": {
+      "D": [
+        "能在"
+      ],
+      "C": []
+    },
+    "和其他公司不一样": {
+      "D": [
+        "和其他公司不一样"
+      ],
+      "C": []
+    },
+    "也可能是因为": {
+      "D": [
+        "也可能是因为"
+      ],
+      "C": []
+    },
+    "只有字节还在不断捞人": {
+      "D": [
+        "只有字节还在不断捞人"
+      ],
+      "C": []
+    },
+    "一个": {
+      "D": [
+        "一个"
+      ],
+      "C": []
+    },
+    "而且工资也没有涨幅": {
+      "D": [
+        "而且工资也没有涨幅"
+      ],
+      "C": []
+    },
+    "qa": {
+      "D": [
+        "QA"
+      ],
+      "C": []
+    },
+    "tag": {
+      "D": [
+        "tag"
+      ],
+      "C": []
+    },
+    "new grad lands": {
+      "D": [
+        "New Grad Lands"
+      ],
+      "C": []
+    },
+    "ipo": {
+      "D": [
+        "IPO"
+      ],
+      "C": []
+    },
+    "今年收到面试": {
+      "D": [
+        "今年收到面试"
+      ],
+      "C": []
+    },
+    "面试就是典型的": {
+      "D": [
+        "面试就是典型的"
+      ],
+      "C": []
+    },
+    "很奇怪": {
+      "D": [
+        "很奇怪"
+      ],
+      "C": []
+    },
+    "会有八股和系统设计": {
+      "D": [
+        "会有八股和系统设计"
+      ],
+      "C": []
+    },
+    "不低": {
+      "D": [
+        "不低"
+      ],
+      "C": []
+    },
+    "bar": {
+      "D": [
+        "bar"
+      ],
+      "C": []
+    },
+    "之前还挺火的": {
+      "D": [
+        "之前还挺火的"
+      ],
+      "C": []
+    },
+    "grad": {
+      "D": [
+        "Grad"
+      ],
+      "C": []
+    },
+    "去年投的": {
+      "D": [
+        "去年投的"
+      ],
+      "C": []
+    },
+    "pre": {
+      "D": [
+        "pre"
+      ],
+      "C": []
+    },
+    "然后我当时已经抽中": {
+      "D": [
+        "然后我当时已经抽中"
+      ],
+      "C": []
+    },
+    "华人开的": {
+      "D": [
+        "华人开的"
+      ],
+      "C": []
+    },
+    "面试邮件截图": {
+      "D": [
+        "面试邮件截图"
+      ],
+      "C": []
+    },
+    "考算法": {
+      "D": [
+        "考算法"
+      ],
+      "C": []
+    },
+    "startup": {
+      "D": [
+        "startup"
+      ],
+      "C": []
+    },
+    "lands": {
+      "D": [
+        "Lands"
+      ],
+      "C": []
+    },
+    "面试算法只能说不按套路出牌": {
+      "D": [
+        "面试算法只能说不按套路出牌"
+      ],
+      "C": []
+    },
+    "第二站": {
+      "D": [
+        "第二站"
+      ],
+      "C": []
+    },
+    "california": {
+      "D": [
+        "California"
+      ],
+      "C": []
+    },
+    "许多": {
+      "D": [
+        "许多"
+      ],
+      "C": []
+    },
+    "我的母校": {
+      "D": [
+        "我的母校"
+      ],
+      "C": []
+    },
+    "这里先放一张最经典的": {
+      "D": [
+        "这里先放一张最经典的"
+      ],
+      "C": []
+    },
+    "下面正式开始行程回顾": {
+      "D": [
+        "下面正式开始行程回顾"
+      ],
+      "C": []
+    },
+    "年代修建的设施因缺乏维护而显得破败": {
+      "D": [
+        "年代修建的设施因缺乏维护而显得破败"
+      ],
+      "C": []
+    },
+    "先打个标题党": {
+      "D": [
+        "先打个标题党"
+      ],
+      "C": []
+    },
+    "第五大道": {
+      "D": [
+        "第五大道"
+      ],
+      "C": []
+    },
+    "百年后华人写代码": {
+      "D": [
+        "百年后华人写代码"
+      ],
+      "C": []
+    },
+    "第一站": {
+      "D": [
+        "第一站"
+      ],
+      "C": []
+    },
+    "如今更多是萧瑟与历史的叹息": {
+      "D": [
+        "如今更多是萧瑟与历史的叹息"
+      ],
+      "C": []
+    },
+    "芝加哥被称作": {
+      "D": [
+        "芝加哥被称作"
+      ],
+      "C": []
+    },
+    "我自驾去湾区和优胜美地的朋友们": {
+      "D": [
+        "我自驾去湾区和优胜美地的朋友们"
+      ],
+      "C": []
+    },
+    "时代广场": {
+      "D": [
+        "时代广场"
+      ],
+      "C": []
+    },
+    "帝国大厦": {
+      "D": [
+        "帝国大厦"
+      ],
+      "C": []
+    },
+    "ny": {
+      "D": [
+        "NY"
+      ],
+      "C": []
+    },
+    "年代达到工业巅峰": {
+      "D": [
+        "年代达到工业巅峰"
+      ],
+      "C": []
+    },
+    "横穿美国": {
+      "D": [
+        "横穿美国"
+      ],
+      "C": []
+    },
+    "冬季的大雪与海量融雪剂让钢铁": {
+      "D": [
+        "冬季的大雪与海量融雪剂让钢铁"
+      ],
+      "C": []
+    },
+    "感谢当时一起": {
+      "D": [
+        "感谢当时一起"
+      ],
+      "C": []
+    },
+    "年来无数移民抵达新大陆": {
+      "D": [
+        "年来无数移民抵达新大陆"
+      ],
+      "C": []
+    },
+    "也是": {
+      "D": [
+        "也是"
+      ],
+      "C": []
+    },
+    "第四": {
+      "D": [
+        "第四"
+      ],
+      "C": []
+    },
+    "纽约大概是我童年时最早能叫出名字的美国城市": {
+      "D": [
+        "纽约大概是我童年时最早能叫出名字的美国城市"
+      ],
+      "C": []
+    },
+    "埃利斯岛": {
+      "D": [
+        "埃利斯岛"
+      ],
+      "C": []
+    },
+    "克利夫兰": {
+      "D": [
+        "克利夫兰"
+      ],
+      "C": []
+    },
+    "ellis": {
+      "D": [
+        "Ellis"
+      ],
+      "C": []
+    },
+    "随后随着产业转移迅速衰落": {
+      "D": [
+        "随后随着产业转移迅速衰落"
+      ],
+      "C": []
+    },
+    "两座城市都坐落在五大湖畔": {
+      "D": [
+        "两座城市都坐落在五大湖畔"
+      ],
+      "C": []
+    },
+    "from new york island": {
+      "D": [
+        "From New York Island"
+      ],
+      "C": []
+    },
+    "追逐美国梦的第一步": {
+      "D": [
+        "追逐美国梦的第一步"
+      ],
+      "C": []
+    },
+    "buffalo": {
+      "D": [
+        "Buffalo"
+      ],
+      "C": []
+    },
+    "她的博物馆与艺术馆几乎囊括全球珍宝": {
+      "D": [
+        "她的博物馆与艺术馆几乎囊括全球珍宝"
+      ],
+      "C": []
+    },
+    "水牛城": {
+      "D": [
+        "水牛城"
+      ],
+      "C": []
+    },
+    "是美国老工业中心": {
+      "D": [
+        "是美国老工业中心"
+      ],
+      "C": []
+    },
+    "校门口那家炸鸡条和披萨依旧排队火爆": {
+      "D": [
+        "校门口那家炸鸡条和披萨依旧排队火爆"
+      ],
+      "C": []
+    },
+    "旁边的": {
+      "D": [
+        "旁边的"
+      ],
+      "C": []
+    },
+    "island": {
+      "D": [
+        "Island"
+      ],
+      "C": []
+    },
+    "不过": {
+      "D": [
+        "不过"
+      ],
+      "C": []
+    },
+    "五站": {
+      "D": [
+        "五站"
+      ],
+      "C": []
+    },
+    "华尔街": {
+      "D": [
+        "华尔街"
+      ],
+      "C": []
+    },
+    "见证了": {
+      "D": [
+        "见证了"
+      ],
+      "C": []
+    },
+    "风城": {
+      "D": [
+        "风城"
+      ],
+      "C": []
+    },
+    "芝加哥": {
+      "D": [
+        "芝加哥"
+      ],
+      "C": []
+    },
+    "new york city": {
+      "D": [
+        "New York City"
+      ],
+      "C": []
+    },
+    "大瀑布": {
+      "D": [
+        "大瀑布"
+      ],
+      "C": []
+    },
+    "ellis island": {
+      "D": [
+        "Ellis Island"
+      ],
+      "C": []
+    },
+    "纽约": {
+      "D": [
+        "纽约"
+      ],
+      "C": []
+    },
+    "百年前华人修铁路": {
+      "D": [
+        "百年前华人修铁路"
+      ],
+      "C": []
+    },
+    "travel": {
+      "D": [
+        "Travel"
+      ],
+      "C": []
+    },
+    "先奉上一张全员合照": {
+      "D": [
+        "先奉上一张全员合照"
+      ],
+      "C": []
+    },
+    "远眺雪城与奥农达加湖": {
+      "D": [
+        "远眺雪城与奥农达加湖"
+      ],
+      "C": []
+    },
+    "oh": {
+      "D": [
+        "OH"
+      ],
+      "C": []
+    },
+    "昔日工业辉煌在码头旧仓库间依稀可见": {
+      "D": [
+        "昔日工业辉煌在码头旧仓库间依稀可见"
+      ],
+      "C": []
+    },
+    "随便一个地标都值得单开篇幅": {
+      "D": [
+        "随便一个地标都值得单开篇幅"
+      ],
+      "C": []
+    },
+    "克莱斯勒大厦": {
+      "D": [
+        "克莱斯勒大厦"
+      ],
+      "C": []
+    },
+    "il": {
+      "D": [
+        "IL"
+      ],
+      "C": []
+    },
+    "世纪": {
+      "D": [
+        "世纪"
+      ],
+      "C": []
+    },
+    "travel \n\n\n\nfrom new york": {
+      "D": [
+        "Travel \n\n\n\nFrom New York"
+      ],
+      "C": []
+    },
+    "依然充满活力": {
+      "D": [
+        "依然充满活力"
+      ],
+      "C": []
+    },
+    "第三站": {
+      "D": [
+        "第三站"
+      ],
+      "C": []
+    },
+    "自由女神像": {
+      "D": [
+        "自由女神像"
+      ],
+      "C": []
+    },
+    "车辆和管道备受腐蚀": {
+      "D": [
+        "车辆和管道备受腐蚀"
+      ],
+      "C": []
+    },
+    "旅行小队整装待发": {
+      "D": [
+        "旅行小队整装待发"
+      ],
+      "C": []
+    },
+    "雪城是典型的铁锈带城市": {
+      "D": [
+        "雪城是典型的铁锈带城市"
+      ],
+      "C": []
+    },
+    "布鲁克林大桥": {
+      "D": [
+        "布鲁克林大桥"
+      ],
+      "C": []
+    },
+    "同属铁锈带": {
+      "D": [
+        "同属铁锈带"
+      ],
+      "C": []
+    },
+    "所见所闻": {
+      "D": [
+        "所见所闻"
+      ],
+      "C": []
+    },
+    "雪城": {
+      "D": [
+        "雪城"
+      ],
+      "C": []
+    },
+    "chicago": {
+      "D": [
+        "Chicago"
+      ],
+      "C": []
+    },
+    "york": {
+      "D": [
+        "York"
+      ],
+      "C": []
+    },
+    "水牛城与雪城类似": {
+      "D": [
+        "水牛城与雪城类似"
+      ],
+      "C": []
+    },
+    "cleveland": {
+      "D": [
+        "Cleveland"
+      ],
+      "C": []
+    },
+    "america": {
+      "D": [
+        "America",
+        "america"
+      ],
+      "C": []
+    },
+    "第六": {
+      "D": [
+        "第六"
+      ],
+      "C": []
+    },
+    "终点": {
+      "D": [
+        "终点"
+      ],
+      "C": []
+    },
+    "如果说公路是序章": {
+      "D": [
+        "如果说公路是序章"
+      ],
+      "C": []
+    },
+    "mph": {
+      "D": [
+        "mph"
+      ],
+      "C": []
+    },
+    "第八站": {
+      "D": [
+        "第八站"
+      ],
+      "C": []
+    },
+    "san": {
+      "D": [
+        "San"
+      ],
+      "C": []
+    },
+    "景观单调": {
+      "D": [
+        "景观单调"
+      ],
+      "C": []
+    },
+    "辽阔草原与苍茫天空让人心旷神怡": {
+      "D": [
+        "辽阔草原与苍茫天空让人心旷神怡"
+      ],
+      "C": []
+    },
+    "林肯": {
+      "D": [
+        "林肯"
+      ],
+      "C": []
+    },
+    "cheyenne": {
+      "D": [
+        "Cheyenne"
+      ],
+      "C": []
+    },
+    "但那是另一个故事": {
+      "D": [
+        "但那是另一个故事"
+      ],
+      "C": []
+    },
+    "云门": {
+      "D": [
+        "云门"
+      ],
+      "C": []
+    },
+    "salt": {
+      "D": [
+        "Salt"
+      ],
+      "C": []
+    },
+    "wy": {
+      "D": [
+        "WY"
+      ],
+      "C": []
+    },
+    "夏延": {
+      "D": [
+        "夏延"
+      ],
+      "C": []
+    },
+    "盐湖城": {
+      "D": [
+        "盐湖城"
+      ],
+      "C": []
+    },
+    "这里是美国的农业心脏地带": {
+      "D": [
+        "这里是美国的农业心脏地带"
+      ],
+      "C": []
+    },
+    "城市拥有仅次于纽约与华盛顿的世界级博物馆": {
+      "D": [
+        "城市拥有仅次于纽约与华盛顿的世界级博物馆"
+      ],
+      "C": []
+    },
+    "lincoln": {
+      "D": [
+        "Lincoln"
+      ],
+      "C": []
+    },
+    "francisco": {
+      "D": [
+        "Francisco"
+      ],
+      "C": []
+    },
+    "the bean": {
+      "D": [
+        "The Bean"
+      ],
+      "C": []
+    },
+    "车窗外瞬间变成一望无际的玉米海洋": {
+      "D": [
+        "车窗外瞬间变成一望无际的玉米海洋"
+      ],
+      "C": []
+    },
+    "ca": {
+      "D": [
+        "CA"
+      ],
+      "C": []
+    },
+    "爱荷华城": {
+      "D": [
+        "爱荷华城"
+      ],
+      "C": []
+    },
+    "艺术馆与科技馆": {
+      "D": [
+        "艺术馆与科技馆"
+      ],
+      "C": []
+    },
+    "美国最早大规模使用钢筋混凝土建摩天楼的地方之一": {
+      "D": [
+        "美国最早大规模使用钢筋混凝土建摩天楼的地方之一"
+      ],
+      "C": []
+    },
+    "yosemite": {
+      "D": [
+        "Yosemite"
+      ],
+      "C": []
+    },
+    "优胜美地就是终章的惊叹号": {
+      "D": [
+        "优胜美地就是终章的惊叹号"
+      ],
+      "C": []
+    },
+    "横穿之旅圆满收官": {
+      "D": [
+        "横穿之旅圆满收官"
+      ],
+      "C": []
+    },
+    "翻越落基山脉后抵达盐湖城": {
+      "D": [
+        "翻越落基山脉后抵达盐湖城"
+      ],
+      "C": []
+    },
+    "待我另文细述": {
+      "D": [
+        "待我另文细述"
+      ],
+      "C": []
+    },
+    "ia": {
+      "D": [
+        "IA"
+      ],
+      "C": []
+    },
+    "一路皆是农田": {
+      "D": [
+        "一路皆是农田"
+      ],
+      "C": []
+    },
+    "气候可类比青海": {
+      "D": [
+        "气候可类比青海"
+      ],
+      "C": []
+    },
+    "见证自然的伟力": {
+      "D": [
+        "见证自然的伟力"
+      ],
+      "C": []
+    },
+    "克利夫兰湖滨远眺": {
+      "D": [
+        "克利夫兰湖滨远眺"
+      ],
+      "C": []
+    },
+    "iowa city": {
+      "D": [
+        "Iowa City"
+      ],
+      "C": []
+    },
+    "怀俄明草原上的公路": {
+      "D": [
+        "怀俄明草原上的公路"
+      ],
+      "C": []
+    },
+    "金门大桥日落": {
+      "D": [
+        "金门大桥日落"
+      ],
+      "C": []
+    },
+    "年代修建": {
+      "D": [
+        "年代修建"
+      ],
+      "C": []
+    },
+    "城市被群山环抱": {
+      "D": [
+        "城市被群山环抱"
+      ],
+      "C": []
+    },
+    "优胜美地": {
+      "D": [
+        "优胜美地"
+      ],
+      "C": []
+    },
+    "coast-to-coast": {
+      "D": [
+        "Coast-to-Coast"
+      ],
+      "C": []
+    },
+    "群山中的城市": {
+      "D": [
+        "群山中的城市"
+      ],
+      "C": []
+    },
+    "晴朗时雪山与盐湖交相辉映": {
+      "D": [
+        "晴朗时雪山与盐湖交相辉映"
+      ],
+      "C": []
+    },
+    "照片就留在记忆里吧": {
+      "D": [
+        "照片就留在记忆里吧"
+      ],
+      "C": []
+    },
+    "san francisco": {
+      "D": [
+        "San Francisco"
+      ],
+      "C": []
+    },
+    "许多大厦": {
+      "D": [
+        "许多大厦"
+      ],
+      "C": []
+    },
+    "unforgettable": {
+      "D": [
+        "unforgettable"
+      ],
+      "C": []
+    },
+    "芝加哥千禧公园": {
+      "D": [
+        "芝加哥千禧公园"
+      ],
+      "C": []
+    },
+    "怀俄明是全美人口密度最低的州": {
+      "D": [
+        "怀俄明是全美人口密度最低的州"
+      ],
+      "C": []
+    },
+    "驶离五大湖后": {
+      "D": [
+        "驶离五大湖后"
+      ],
+      "C": []
+    },
+    "wondrous": {
+      "D": [
+        "wondrous"
+      ],
+      "C": []
+    },
+    "iowa": {
+      "D": [
+        "Iowa"
+      ],
+      "C": []
+    },
+    "西藏": {
+      "D": [
+        "西藏"
+      ],
+      "C": []
+    },
+    "花崗岩巨壁与飞瀑": {
+      "D": [
+        "花崗岩巨壁与飞瀑"
+      ],
+      "C": []
+    },
+    "第九站": {
+      "D": [
+        "第九站"
+      ],
+      "C": []
+    },
+    "七站": {
+      "D": [
+        "七站"
+      ],
+      "C": []
+    },
+    "landscapes.": {
+      "D": [
+        "landscapes."
+      ],
+      "C": []
+    },
+    "km/h": {
+      "D": [
+        "km/h"
+      ],
+      "C": []
+    },
+    "cities": {
+      "D": [
+        "cities"
+      ],
+      "C": []
+    },
+    "bean": {
+      "D": [
+        "Bean"
+      ],
+      "C": []
+    },
+    "包括我当晚入住的酒店": {
+      "D": [
+        "包括我当晚入住的酒店"
+      ],
+      "C": []
+    },
+    "旧金山": {
+      "D": [
+        "旧金山"
+      ],
+      "C": []
+    },
+    "ne": {
+      "D": [
+        "NE"
+      ],
+      "C": []
+    },
+    "高速限速也飙到": {
+      "D": [
+        "高速限速也飙到"
+      ],
+      "C": []
+    },
+    "lake": {
+      "D": [
+        "Lake"
+      ],
+      "C": []
+    },
+    "ut": {
+      "D": [
+        "UT"
+      ],
+      "C": []
+    },
+    "篇外": {
+      "D": [
+        "篇外"
+      ],
+      "C": []
+    },
+    "都是": {
+      "D": [
+        "都是"
+      ],
+      "C": []
+    },
+    "c8de04e-d783-4d4f-b2f0-bf798875336c": {
+      "D": [
+        "c8de04e-d783-4d4f-b2f0-bf798875336c"
+      ],
+      "C": []
+    },
+    "他厨艺一般": {
+      "D": [
+        "他厨艺一般"
+      ],
+      "C": []
+    },
+    "比如炒蔬菜和煮汤": {
+      "D": [
+        "比如炒蔬菜和煮汤"
+      ],
+      "C": []
+    },
+    "郭育奇会做饭吗": {
+      "D": [
+        "郭育奇会做饭吗"
+      ],
+      "C": []
+    },
+    "平时会做简单的家常菜": {
+      "D": [
+        "平时会做简单的家常菜"
+      ],
+      "C": []
+    },
+    "c74f4-4132-404e-b66b-d149aa18ef6a": {
+      "D": [
+        "c74f4-4132-404e-b66b-d149aa18ef6a"
+      ],
+      "C": []
+    },
+    "你从哪里毕业的": {
+      "D": [
+        "你从哪里毕业的"
+      ],
+      "C": []
+    },
+    "liverpool": {
+      "D": [
+        "Liverpool"
+      ],
+      "C": []
+    },
+    "获得计算机科学硕士学位": {
+      "D": [
+        "获得计算机科学硕士学位"
+      ],
+      "C": []
+    },
+    "获得信息与计算科学学士学位": {
+      "D": [
+        "获得信息与计算科学学士学位"
+      ],
+      "C": []
+    },
+    "他在美国雪城大学": {
+      "D": [
+        "他在美国雪城大学"
+      ],
+      "C": []
+    },
+    "并在英国利物浦大学": {
+      "D": [
+        "并在英国利物浦大学"
+      ],
+      "C": []
+    },
+    "b49afa6-b3f9-40a0-96e9-07578a576f22": {
+      "D": [
+        "b49afa6-b3f9-40a0-96e9-07578a576f22"
+      ],
+      "C": []
+    },
+    "documentation": {
+      "D": [
+        "Documentation",
+        "documentation"
+      ],
+      "C": []
+    },
+    "currently": {
+      "D": [
+        "currently"
+      ],
+      "C": []
+    },
+    "margin documentation": {
+      "D": [
+        "Margin Documentation"
+      ],
+      "C": []
+    },
+    "team.": {
+      "D": [
+        "team."
+      ],
+      "C": []
+    },
+    "analyst software development engineer": {
+      "D": [
+        "Analyst Software Development Engineer"
+      ],
+      "C": []
+    },
+    "current role\n\n\nyuqi": {
+      "D": [
+        "Current Role\n\n\nYuqi"
+      ],
+      "C": []
+    },
+    "analyst": {
+      "D": [
+        "Analyst"
+      ],
+      "C": []
+    },
+    "margin": {
+      "D": [
+        "Margin",
+        "margin"
+      ],
+      "C": []
+    },
+    "d4d7e-b714-417d-af83-238bd1da6fba": {
+      "D": [
+        "d4d7e-b714-417d-af83-238bd1da6fba"
+      ],
+      "C": []
+    },
+    "郭育奇在哪工作": {
+      "D": [
+        "郭育奇在哪工作"
+      ],
+      "C": []
+    },
+    "工作经历": {
+      "D": [
+        "工作经历"
+      ],
+      "C": []
+    },
+    "他目前在高盛担任分析师软件开发工程师": {
+      "D": [
+        "他目前在高盛担任分析师软件开发工程师"
+      ],
+      "C": []
+    },
+    "负责保证金文档团队的后端开发工作": {
+      "D": [
+        "负责保证金文档团队的后端开发工作"
+      ],
+      "C": []
+    },
+    "c22e-4864-b3a9-d7040a243c6a": {
+      "D": [
+        "c22e-4864-b3a9-d7040a243c6a"
+      ],
+      "C": []
+    },
+    "hub profile\n\n\ntalk": {
+      "D": [
+        "Hub Profile\n\n\nTalk"
+      ],
+      "C": []
+    },
+    "hi": {
+      "D": [
+        "Hi"
+      ],
+      "C": []
+    },
+    "show": {
+      "D": [
+        "show"
+      ],
+      "C": []
+    },
+    "projects\n\n\n\n\ngit": {
+      "D": [
+        "Projects\n\n\n\n\nGit"
+      ],
+      "C": []
+    },
+    "link": {
+      "D": [
+        "link"
+      ],
+      "C": []
+    },
+    "me": {
+      "D": [
+        "me"
+      ],
+      "C": []
+    },
+    "e747d5-71f0-4f0d-9489-95ae84236d25": {
+      "D": [
+        "e747d5-71f0-4f0d-9489-95ae84236d25"
+      ],
+      "C": []
+    },
+    "yes.": {
+      "D": [
+        "Yes."
+      ],
+      "C": []
+    },
+    "investment": {
+      "D": [
+        "investment"
+      ],
+      "C": []
+    },
+    "firm": {
+      "D": [
+        "firm"
+      ],
+      "C": []
+    },
+    "securities": {
+      "D": [
+        "securities"
+      ],
+      "C": []
+    },
+    "financial": {
+      "D": [
+        "financial"
+      ],
+      "C": []
+    },
+    "is goldman sachs": {
+      "D": [
+        "Is Goldman Sachs"
+      ],
+      "C": []
+    },
+    "reach.": {
+      "D": [
+        "reach."
+      ],
+      "C": []
+    },
+    "famous": {
+      "D": [
+        "famous"
+      ],
+      "C": []
+    },
+    "recognized": {
+      "D": [
+        "recognized"
+      ],
+      "C": []
+    },
+    "widely": {
+      "D": [
+        "widely"
+      ],
+      "C": []
+    },
+    "be7b38f-f2ef-4cbd-8694-f66ff6d7b7ba": {
+      "D": [
+        "be7b38f-f2ef-4cbd-8694-f66ff6d7b7ba"
+      ],
+      "C": []
+    },
+    "his": {
+      "D": [
+        "His",
+        "his"
+      ],
+      "C": []
+    },
+    "sachs.": {
+      "D": [
+        "Sachs."
+      ],
+      "C": []
+    },
+    "he": {
+      "D": [
+        "He",
+        "he"
+      ],
+      "C": []
+    },
+    "b.s.": {
+      "D": [
+        "B.S."
+      ],
+      "C": []
+    },
+    "ai": {
+      "D": [
+        "AI"
+      ],
+      "C": []
+    },
+    "java spring boot": {
+      "D": [
+        "Java Spring Boot"
+      ],
+      "C": []
+    },
+    "m.s.": {
+      "D": [
+        "M.S."
+      ],
+      "C": []
+    },
+    "software development engineer": {
+      "D": [
+        "Software Development Engineer"
+      ],
+      "C": []
+    },
+    "expertise": {
+      "D": [
+        "expertise"
+      ],
+      "C": []
+    },
+    "holds": {
+      "D": [
+        "holds"
+      ],
+      "C": []
+    },
+    "c7185f2-5355-4a7a-8ce4-9d800cb1a60f": {
+      "D": [
+        "c7185f2-5355-4a7a-8ce4-9d800cb1a60f"
+      ],
+      "C": []
+    },
+    "responsibilities": {
+      "D": [
+        "Responsibilities"
+      ],
+      "C": []
+    },
+    "responsibility": {
+      "D": [
+        "responsibility"
+      ],
+      "C": []
+    },
+    "ingestion": {
+      "D": [
+        "ingestion"
+      ],
+      "C": []
+    },
+    "lakes": {
+      "D": [
+        "lakes"
+      ],
+      "C": []
+    },
+    "responsibilities\n\n\n\n\ndevelop": {
+      "D": [
+        "Responsibilities\n\n\n\n\nDevelop"
+      ],
+      "C": []
+    },
+    "processing": {
+      "D": [
+        "processing"
+      ],
+      "C": []
+    },
+    "f4e3-45de-8fe9-11a7f697d6d8": {
+      "D": [
+        "f4e3-45de-8fe9-11a7f697d6d8"
+      ],
+      "C": []
+    },
+    "machine": {
+      "D": [
+        "Machine"
+      ],
+      "C": []
+    },
+    "etl": {
+      "D": [
+        "ETL"
+      ],
+      "C": []
+    },
+    "machine learning": {
+      "D": [
+        "Machine Learning"
+      ],
+      "C": []
+    },
+    "capstone": {
+      "D": [
+        "capstone"
+      ],
+      "C": []
+    },
+    "formal": {
+      "D": [
+        "Formal"
+      ],
+      "C": []
+    },
+    "datasets.": {
+      "D": [
+        "datasets."
+      ],
+      "C": []
+    },
+    "mining": {
+      "D": [
+        "Mining"
+      ],
+      "C": []
+    },
+    "education": {
+      "D": [
+        "Education",
+        "education"
+      ],
+      "C": []
+    },
+    "learning": {
+      "D": [
+        "Learning"
+      ],
+      "C": []
+    },
+    "methods": {
+      "D": [
+        "Methods"
+      ],
+      "C": []
+    },
+    "advanced software design": {
+      "D": [
+        "Advanced Software Design"
+      ],
+      "C": []
+    },
+    "large-scale": {
+      "D": [
+        "large-scale"
+      ],
+      "C": []
+    },
+    "formal methods": {
+      "D": [
+        "Formal Methods"
+      ],
+      "C": []
+    },
+    "data mining": {
+      "D": [
+        "Data Mining"
+      ],
+      "C": []
+    },
+    "optimizing": {
+      "D": [
+        "optimizing"
+      ],
+      "C": []
+    },
+    "cloud computing": {
+      "D": [
+        "Cloud Computing"
+      ],
+      "C": []
+    },
+    "completed": {
+      "D": [
+        "completed"
+      ],
+      "C": []
+    },
+    "computing.": {
+      "D": [
+        "Computing."
+      ],
+      "C": []
+    },
+    "c669785-d976-4a1b-8c49-20668051790b": {
+      "D": [
+        "c669785-d976-4a1b-8c49-20668051790b"
+      ],
+      "C": []
+    },
+    "他在高盛": {
+      "D": [
+        "他在高盛"
+      ],
+      "C": []
+    },
+    "负责保证金文档团队的后端服务开发": {
+      "D": [
+        "负责保证金文档团队的后端服务开发"
+      ],
+      "C": []
+    },
+    "之前参与过": {
+      "D": [
+        "之前参与过"
+      ],
+      "C": []
+    },
+    "熟悉": {
+      "D": [
+        "熟悉"
+      ],
+      "C": []
+    },
+    "郭育奇的经历": {
+      "D": [
+        "郭育奇的经历"
+      ],
+      "C": []
+    },
+    "视频协作工具的开发": {
+      "D": [
+        "视频协作工具的开发"
+      ],
+      "C": []
+    },
+    "gcode": {
+      "D": [
+        "GCode"
+      ],
+      "C": []
+    },
+    "担任分析师软件开发工程师": {
+      "D": [
+        "担任分析师软件开发工程师"
+      ],
+      "C": []
+    },
+    "实时聊天应用和": {
+      "D": [
+        "实时聊天应用和"
+      ],
+      "C": []
+    },
+    "f60d9e8-6425-4ab8-826b-ab9c1ce5f5ec": {
+      "D": [
+        "f60d9e8-6425-4ab8-826b-ab9c1ce5f5ec"
+      ],
+      "C": []
+    },
+    "alibaba": {
+      "D": [
+        "Alibaba"
+      ],
+      "C": []
+    },
+    "视频协作工具": {
+      "D": [
+        "视频协作工具"
+      ],
+      "C": []
+    },
+    "实现实时消息传递": {
+      "D": [
+        "实现实时消息传递"
+      ],
+      "C": []
+    },
+    "基于": {
+      "D": [
+        "基于"
+      ],
+      "C": []
+    },
+    "分析师软件开发工程师": {
+      "D": [
+        "分析师软件开发工程师"
+      ],
+      "C": []
+    },
+    "相关经历": {
+      "D": [
+        "相关经历"
+      ],
+      "C": []
+    },
+    "部署经验": {
+      "D": [
+        "部署经验"
+      ],
+      "C": []
+    },
+    "郭育奇的经历中文版": {
+      "D": [
+        "郭育奇的经历中文版"
+      ],
+      "C": []
+    },
+    "使用": {
+      "D": [
+        "使用"
+      ],
+      "C": []
+    },
+    "alibaba cloud": {
+      "D": [
+        "Alibaba Cloud"
+      ],
+      "C": []
+    },
+    "负责保证金文档微服务的设计与开发": {
+      "D": [
+        "负责保证金文档微服务的设计与开发"
+      ],
+      "C": []
+    },
+    "实时聊天应用开发": {
+      "D": [
+        "实时聊天应用开发"
+      ],
+      "C": []
+    },
+    "f01f-6329-48d4-ad47-4a5a9c6c06f6": {
+      "D": [
+        "f01f-6329-48d4-ad47-4a5a9c6c06f6"
+      ],
+      "C": []
+    },
+    "been": {
+      "D": [
+        "been"
+      ],
+      "C": []
+    },
+    "years": {
+      "D": [
+        "years"
+      ],
+      "C": []
+    },
+    "professional": {
+      "D": [
+        "professional"
+      ],
+      "C": []
+    },
+    "approximately": {
+      "D": [
+        "approximately"
+      ],
+      "C": []
+    },
+    "f7a-c9ab-4149-b830-a06c7f0435a8": {
+      "D": [
+        "f7a-c9ab-4149-b830-a06c7f0435a8"
+      ],
+      "C": []
+    },
+    "他喜欢披萨和烤肉": {
+      "D": [
+        "他喜欢披萨和烤肉"
+      ],
+      "C": []
+    },
+    "郭育奇喜欢的食物": {
+      "D": [
+        "郭育奇喜欢的食物"
+      ],
+      "C": []
+    },
+    "偶尔也喜欢尝试寿司和意大利面": {
+      "D": [
+        "偶尔也喜欢尝试寿司和意大利面"
+      ],
+      "C": []
+    },
+    "b49dce29-897d-4bc7-9173-44b8ed473219": {
+      "D": [
+        "b49dce29-897d-4bc7-9173-44b8ed473219"
+      ],
+      "C": []
+    },
+    "database systems": {
+      "D": [
+        "Database Systems"
+      ],
+      "C": []
+    },
+    "algorithms": {
+      "D": [
+        "Algorithms"
+      ],
+      "C": []
+    },
+    "b6659e45-b079-45a4-bc51-c9d46b5df1f3": {
+      "D": [
+        "b6659e45-b079-45a4-bc51-c9d46b5df1f3"
+      ],
+      "C": []
+    },
+    "雪城大学": {
+      "D": [
+        "雪城大学"
+      ],
+      "C": []
+    },
+    "形式方法": {
+      "D": [
+        "形式方法"
+      ],
+      "C": []
+    },
+    "利物浦大学": {
+      "D": [
+        "利物浦大学"
+      ],
+      "C": []
+    },
+    "数据库系统和形式方法": {
+      "D": [
+        "数据库系统和形式方法"
+      ],
+      "C": []
+    },
+    "数据挖掘": {
+      "D": [
+        "数据挖掘"
+      ],
+      "C": []
+    },
+    "专注于算法": {
+      "D": [
+        "专注于算法"
+      ],
+      "C": []
+    },
+    "计算机科学": {
+      "D": [
+        "计算机科学"
+      ],
+      "C": []
+    },
+    "机器学习和云计算": {
+      "D": [
+        "机器学习和云计算"
+      ],
+      "C": []
+    },
+    "学士": {
+      "D": [
+        "学士"
+      ],
+      "C": []
+    },
+    "郭育奇的学校": {
+      "D": [
+        "郭育奇的学校"
+      ],
+      "C": []
+    },
+    "信息与计算科学": {
+      "D": [
+        "信息与计算科学"
+      ],
+      "C": []
+    },
+    "专注于高级软件设计": {
+      "D": [
+        "专注于高级软件设计"
+      ],
+      "C": []
+    },
+    "教育经历": {
+      "D": [
+        "教育经历"
+      ],
+      "C": []
+    },
+    "b6dab447-a92b-405a-8306-40a10ee1ade2": {
+      "D": [
+        "b6dab447-a92b-405a-8306-40a10ee1ade2"
+      ],
+      "C": []
+    },
+    "他在高盛工作": {
+      "D": [
+        "他在高盛工作"
+      ],
+      "C": []
+    },
+    "郭育奇在哪里上班": {
+      "D": [
+        "郭育奇在哪里上班"
+      ],
+      "C": []
+    },
+    "ab870fe9-f26a-4079-9ca6-bc37d938662e": {
+      "D": [
+        "ab870fe9-f26a-4079-9ca6-bc37d938662e"
+      ],
+      "C": []
+    },
+    "他在美国一家知名金融机构工作": {
+      "D": [
+        "他在美国一家知名金融机构工作"
+      ],
+      "C": []
+    },
+    "郭育奇在哪个国家上班": {
+      "D": [
+        "郭育奇在哪个国家上班"
+      ],
+      "C": []
+    },
+    "c23-1534-4c61-91a9-513c39af75cd": {
+      "D": [
+        "c23-1534-4c61-91a9-513c39af75cd"
+      ],
+      "C": []
+    },
+    "他有什么技能": {
+      "D": [
+        "他有什么技能"
+      ],
+      "C": []
+    },
+    "与阿里云部署": {
+      "D": [
+        "与阿里云部署"
+      ],
+      "C": []
+    },
+    "以及": {
+      "D": [
+        "以及"
+      ],
+      "C": []
+    },
+    "他擅长": {
+      "D": [
+        "他擅长"
+      ],
+      "C": []
+    },
+    "微服务开发": {
+      "D": [
+        "微服务开发"
+      ],
+      "C": []
+    },
+    "流程自动化": {
+      "D": [
+        "流程自动化"
+      ],
+      "C": []
+    },
+    "数据库": {
+      "D": [
+        "数据库"
+      ],
+      "C": []
+    },
+    "消息系统": {
+      "D": [
+        "消息系统"
+      ],
+      "C": []
+    },
+    "前端": {
+      "D": [
+        "前端"
+      ],
+      "C": []
+    },
+    "c6748c-ee29-4ef7-ad0f-d03d339b4c83": {
+      "D": [
+        "c6748c-ee29-4ef7-ad0f-d03d339b4c83"
+      ],
+      "C": []
+    },
+    "assistant": {
+      "D": [
+        "Assistant"
+      ],
+      "C": []
+    },
+    "assist": {
+      "D": [
+        "assist"
+      ],
+      "C": []
+    },
+    "blog": {
+      "D": [
+        "Blog",
+        "blog"
+      ],
+      "C": []
+    },
+    "am": {
+      "D": [
+        "am"
+      ],
+      "C": []
+    },
+    "background.": {
+      "D": [
+        "background."
+      ],
+      "C": []
+    },
+    "blog assistant": {
+      "D": [
+        "Blog Assistant"
+      ],
+      "C": []
+    },
+    "educational": {
+      "D": [
+        "educational"
+      ],
+      "C": []
+    },
+    "skills": {
+      "D": [
+        "skills"
+      ],
+      "C": []
+    },
+    "current role": {
+      "D": [
+        "Current Role"
+      ],
+      "C": []
+    },
+    "h2": {
+      "D": [
+        "h2"
+      ],
+      "C": []
+    },
+    "section": {
+      "D": [
+        "section"
+      ],
+      "C": []
+    },
+    "b7c5603-0be0-4464-b020-76e22e831ee5": {
+      "D": [
+        "b7c5603-0be0-4464-b020-76e22e831ee5"
+      ],
+      "C": []
+    },
+    "郭育奇风趣幽默吗": {
+      "D": [
+        "郭育奇风趣幽默吗"
+      ],
+      "C": []
+    },
+    "花见花开": {
+      "D": [
+        "花见花开"
+      ],
+      "C": []
+    },
+    "人见人爱": {
+      "D": [
+        "人见人爱"
+      ],
+      "C": []
+    },
+    "bd6b2e-7568-4ca1-ac67-fe20c246b48b": {
+      "D": [
+        "bd6b2e-7568-4ca1-ac67-fe20c246b48b"
+      ],
+      "C": []
+    },
+    "yes": {
+      "D": [
+        "Yes"
+      ],
+      "C": []
+    },
+    "li": {
+      "D": [
+        "li"
+      ],
+      "C": []
+    },
+    "href": {
+      "D": [
+        "href"
+      ],
+      "C": []
+    },
+    "hub profile": {
+      "D": [
+        "Hub Profile"
+      ],
+      "C": []
+    },
+    "github.com/yuqiguo/talknest": {
+      "D": [
+        "github.com/yuqiguo/TalkNest"
+      ],
+      "C": []
+    },
+    "github.com/yuqiguo": {
+      "D": [
+        "github.com/yuqiguo"
+      ],
+      "C": []
+    },
+    "ul": {
+      "D": [
+        "ul"
+      ],
+      "C": []
+    },
+    "b5710-6569-4193-acbf-96de4423af21": {
+      "D": [
+        "b5710-6569-4193-acbf-96de4423af21"
+      ],
+      "C": []
+    },
+    "郭育奇的英文名叫什么": {
+      "D": [
+        "郭育奇的英文名叫什么"
+      ],
+      "C": []
+    },
+    "相关条目": {
+      "D": [
+        "相关条目"
+      ],
+      "C": []
+    },
+    "郭育奇有女朋友吗郭育奇在哪个国家上班郭育奇的学校郭育奇在哪里上班郭育奇会做饭吗郭育奇在哪工作郭育奇喜欢的颜色郭育奇的经历中文版详情请见博客": {
+      "D": [
+        "郭育奇有女朋友吗郭育奇在哪个国家上班郭育奇的学校郭育奇在哪里上班郭育奇会做饭吗郭育奇在哪工作郭育奇喜欢的颜色郭育奇的经历中文版详情请见博客"
+      ],
+      "C": []
+    },
+    "bbfad62-41a4-4b63-a135-0a33ee17ab34": {
+      "D": [
+        "bbfad62-41a4-4b63-a135-0a33ee17ab34"
+      ],
+      "C": []
+    },
+    "郭育奇会什么技能": {
+      "D": [
+        "郭育奇会什么技能"
+      ],
+      "C": []
+    },
+    "d27157-e5b5-4fb4-8945-cf11e151e0dd": {
+      "D": [
+        "d27157-e5b5-4fb4-8945-cf11e151e0dd"
+      ],
+      "C": []
+    },
+    "单身可撩": {
+      "D": [
+        "单身可撩"
+      ],
+      "C": []
+    },
+    "bf4d4c0-e1e3-4c8b-b7e3-9cfa27d62c90": {
+      "D": [
+        "bf4d4c0-e1e3-4c8b-b7e3-9cfa27d62c90"
+      ],
+      "C": []
+    },
+    "郭育奇擅长什么": {
+      "D": [
+        "郭育奇擅长什么"
+      ],
+      "C": []
+    },
+    "ca5fdc4-b8d6-496d-ae5e-5901e7964c23": {
+      "D": [
+        "ca5fdc4-b8d6-496d-ae5e-5901e7964c23"
+      ],
+      "C": []
+    },
+    "你觉得哪个最好玩": {
+      "D": [
+        "你觉得哪个最好玩"
+      ],
+      "C": []
+    },
+    "你横穿美国的经历中": {
+      "D": [
+        "你横穿美国的经历中"
+      ],
+      "C": []
+    },
+    "详情请见博客": {
+      "D": [
+        "详情请见博客"
+      ],
+      "C": []
+    },
+    "www.yuqi.site/life-blog/1": {
+      "D": [
+        "www.yuqi.site/life-blog/1"
+      ],
+      "C": []
+    },
+    "e-07": {
+      "D": [
+        "e-07"
+      ],
+      "C": []
+    },
+    "df92dbc-ff5c-48d0-b9d7-a8127488e087": {
+      "D": [
+        "df92dbc-ff5c-48d0-b9d7-a8127488e087"
+      ],
+      "C": []
+    },
+    "a4e4fd-e3f4-405d-b313-9b2039478a5f": {
+      "D": [
+        "a4e4fd-e3f4-405d-b313-9b2039478a5f"
+      ],
+      "C": []
+    },
+    "a46fec1-ce40-4301-ae88-931ec62bfc41": {
+      "D": [
+        "a46fec1-ce40-4301-ae88-931ec62bfc41"
+      ],
+      "C": []
+    },
+    "a4af5-0b6f-4ac2-931b-7a73e424de8a": {
+      "D": [
+        "a4af5-0b6f-4ac2-931b-7a73e424de8a"
+      ],
+      "C": []
+    },
+    "郭育奇喜欢干活吗": {
+      "D": [
+        "郭育奇喜欢干活吗"
+      ],
+      "C": []
+    },
+    "社畜一枚": {
+      "D": [
+        "社畜一枚"
+      ],
+      "C": []
+    },
+    "a-2fab-4f7c-97a4-ee9c32e8c149": {
+      "D": [
+        "a-2fab-4f7c-97a4-ee9c32e8c149"
+      ],
+      "C": []
+    },
+    "郭育奇会什么": {
+      "D": [
+        "郭育奇会什么"
+      ],
+      "C": []
+    },
+    "dcbda8e-08ad-4f8a-894c-06ebf3708854": {
+      "D": [
+        "dcbda8e-08ad-4f8a-894c-06ebf3708854"
+      ],
+      "C": []
+    },
+    "e84429-8435-4856-b949-3e768ff796a7": {
+      "D": [
+        "e84429-8435-4856-b949-3e768ff796a7"
+      ],
+      "C": []
+    },
+    "郭育奇小时候是不是特别调皮捣蛋": {
+      "D": [
+        "郭育奇小时候是不是特别调皮捣蛋"
+      ],
+      "C": []
+    },
+    "有谁小时候不调皮捣蛋呢": {
+      "D": [
+        "有谁小时候不调皮捣蛋呢"
+      ],
+      "C": []
+    },
+    "f5d09-12b7-4dab-994d-8bf12d792f08": {
+      "D": [
+        "f5d09-12b7-4dab-994d-8bf12d792f08"
+      ],
+      "C": []
+    },
+    "language": {
+      "D": [
+        "language"
+      ],
+      "C": []
+    },
+    "proficient": {
+      "D": [
+        "proficient"
+      ],
+      "C": []
+    },
+    "python.": {
+      "D": [
+        "Python."
+      ],
+      "C": []
+    },
+    "f21901-e311-4277-a716-71ea1d1b91b5": {
+      "D": [
+        "f21901-e311-4277-a716-71ea1d1b91b5"
+      ],
+      "C": []
+    },
+    "郭育奇的老家是哪里": {
+      "D": [
+        "郭育奇的老家是哪里"
+      ],
+      "C": []
+    },
+    "甘肃": {
+      "D": [
+        "甘肃"
+      ],
+      "C": []
+    },
+    "ad0d3ee-59b2-4b27-a692-55e57357a019": {
+      "D": [
+        "ad0d3ee-59b2-4b27-a692-55e57357a019"
+      ],
+      "C": []
+    },
+    "郭育奇最喜欢去哪旅游": {
+      "D": [
+        "郭育奇最喜欢去哪旅游"
+      ],
+      "C": []
+    },
+    "cbb4b5-8622-4bc3-b4b9-54b7844f2a0b": {
+      "D": [
+        "cbb4b5-8622-4bc3-b4b9-54b7844f2a0b"
+      ],
+      "C": []
+    },
+    "会做饭吗": {
+      "D": [
+        "会做饭吗"
+      ],
+      "C": []
+    },
+    "bf89d3-9c38-4a2b-860c-f61f35c191f3": {
+      "D": [
+        "bf89d3-9c38-4a2b-860c-f61f35c191f3"
+      ],
+      "C": []
+    },
+    "体重是多少": {
+      "D": [
+        "体重是多少"
+      ],
+      "C": []
+    },
+    "郭育奇身高是多少": {
+      "D": [
+        "郭育奇身高是多少"
+      ],
+      "C": []
+    },
+    "身长腿短的人型柯基": {
+      "D": [
+        "身长腿短的人型柯基"
+      ],
+      "C": []
+    },
+    "本人体型": {
+      "D": [
+        "本人体型"
+      ],
+      "C": []
+    },
+    "a5473bd-05ab-4b0a-9e2b-9e896b6d9ffb": {
+      "D": [
+        "a5473bd-05ab-4b0a-9e2b-9e896b6d9ffb"
+      ],
+      "C": []
+    },
+    "你是谁": {
+      "D": [
+        "你是谁"
+      ],
+      "C": []
+    },
+    "项目": {
+      "D": [
+        "项目"
+      ],
+      "C": []
+    },
+    "我是": {
+      "D": [
+        "我是"
+      ],
+      "C": []
+    },
+    "的博客助手": {
+      "D": [
+        "的博客助手"
+      ],
+      "C": []
+    },
+    "教育背景的问题": {
+      "D": [
+        "教育背景的问题"
+      ],
+      "C": []
+    },
+    "专门回答关于他的博客": {
+      "D": [
+        "专门回答关于他的博客"
+      ],
+      "C": []
+    },
+    "技能或专业": {
+      "D": [
+        "技能或专业"
+      ],
+      "C": []
+    },
+    "bfa81c5-c3c5-49a2-927d-1406d4aa3d8d": {
+      "D": [
+        "bfa81c5-c3c5-49a2-927d-1406d4aa3d8d"
+      ],
+      "C": []
+    },
+    "他的专业背景": {
+      "D": [
+        "他的专业背景"
+      ],
+      "C": []
+    },
+    "和分布式系统": {
+      "D": [
+        "和分布式系统"
+      ],
+      "C": []
+    },
+    "集中在": {
+      "D": [
+        "集中在"
+      ],
+      "C": []
+    },
+    "micro": {
+      "D": [
+        "micro"
+      ],
+      "C": []
+    },
+    "e651194-7309-4f80-9cc3-1191c5dd86ab": {
+      "D": [
+        "e651194-7309-4f80-9cc3-1191c5dd86ab"
+      ],
+      "C": []
+    },
+    "ff92857-14f7-4cd6-81c4-65f9122bd436": {
+      "D": [
+        "ff92857-14f7-4cd6-81c4-65f9122bd436"
+      ],
+      "C": []
+    },
+    "雪城大学怎么样": {
+      "D": [
+        "雪城大学怎么样"
+      ],
+      "C": []
+    },
+    "请告诉我": {
+      "D": [
+        "请告诉我"
+      ],
+      "C": []
+    },
+    "关于雪城大学的具体信息不在我的知识范围内": {
+      "D": [
+        "关于雪城大学的具体信息不在我的知识范围内"
+      ],
+      "C": []
+    },
+    "如果你想了解郭育奇在雪城大学的学习经历或相关项目": {
+      "D": [
+        "如果你想了解郭育奇在雪城大学的学习经历或相关项目"
+      ],
+      "C": []
+    },
+    "d6ce-d1b2-4ed2-bfe5-7241e751078e": {
+      "D": [
+        "d6ce-d1b2-4ed2-bfe5-7241e751078e"
+      ],
+      "C": []
+    },
+    "还会做什么菜": {
+      "D": [
+        "还会做什么菜"
+      ],
+      "C": []
+    },
+    "郭育奇的厨艺一般": {
+      "D": [
+        "郭育奇的厨艺一般"
+      ],
+      "C": []
+    },
+    "d888-4397-9361-368467c52908": {
+      "D": [
+        "d888-4397-9361-368467c52908"
+      ],
+      "C": []
+    },
+    "郭育奇年龄有多大": {
+      "D": [
+        "郭育奇年龄有多大"
+      ],
+      "C": []
+    },
+    "出生于": {
+      "D": [
+        "出生于"
+      ],
+      "C": []
+    },
+    "ce79cc-5d8f-40cb-b8a0-9a8e7932ea18": {
+      "D": [
+        "ce79cc-5d8f-40cb-b8a0-9a8e7932ea18"
+      ],
+      "C": []
+    },
+    "我问的是本科": {
+      "D": [
+        "我问的是本科"
+      ],
+      "C": []
+    },
+    "获得信息与计算科学的学士学位": {
+      "D": [
+        "获得信息与计算科学的学士学位"
+      ],
+      "C": []
+    },
+    "郭育奇在利物浦大学": {
+      "D": [
+        "郭育奇在利物浦大学"
+      ],
+      "C": []
+    },
+    "c6b68a-efc7-4bb0-a7ef-331aec92e681": {
+      "D": [
+        "c6b68a-efc7-4bb0-a7ef-331aec92e681"
+      ],
+      "C": []
+    },
+    "郭育奇是正式工吗": {
+      "D": [
+        "郭育奇是正式工吗"
+      ],
+      "C": []
+    },
+    "bceec03-4f8b-4cec-b226-dab92a7267e8": {
+      "D": [
+        "bceec03-4f8b-4cec-b226-dab92a7267e8"
+      ],
+      "C": []
+    },
+    "focusing": {
+      "D": [
+        "focusing"
+      ],
+      "C": []
+    },
+    "ccada1-434a-4456-96fc-af3eaf34f0c2": {
+      "D": [
+        "ccada1-434a-4456-96fc-af3eaf34f0c2"
+      ],
+      "C": []
+    },
+    "future": {
+      "D": [
+        "future"
+      ],
+      "C": []
+    },
+    "plan": {
+      "D": [
+        "plan"
+      ],
+      "C": []
+    },
+    "jobsee": {
+      "D": [
+        "JobSee"
+      ],
+      "C": []
+    },
+    "details.": {
+      "D": [
+        "details."
+      ],
+      "C": []
+    },
+    "items": {
+      "D": [
+        "items"
+      ],
+      "C": []
+    },
+    "currentcurastone": {
+      "D": [
+        "CurrentCuraStone"
+      ],
+      "C": []
+    },
+    "my": {
+      "D": [
+        "my"
+      ],
+      "C": []
+    },
+    "fbe3b8-a698-4b8c-8061-3772f4598dce": {
+      "D": [
+        "fbe3b8-a698-4b8c-8061-3772f4598dce"
+      ],
+      "C": []
+    },
+    "郭育奇喜欢的颜色": {
+      "D": [
+        "郭育奇喜欢的颜色"
+      ],
+      "C": []
+    },
+    "他个人偏好沉稳的蓝色和绿色": {
+      "D": [
+        "他个人偏好沉稳的蓝色和绿色"
+      ],
+      "C": []
+    },
+    "c8c451a-1866-424c-9226-2fa9b9df8017": {
+      "D": [
+        "c8c451a-1866-424c-9226-2fa9b9df8017"
+      ],
+      "C": []
+    },
+    "介绍郭育奇": {
+      "D": [
+        "介绍郭育奇"
+      ],
+      "C": []
+    },
+    "担任软件工程师": {
+      "D": [
+        "担任软件工程师"
+      ],
+      "C": []
+    },
+    "郭育奇目前就职于美国高盛": {
+      "D": [
+        "郭育奇目前就职于美国高盛"
+      ],
+      "C": []
+    },
+    "毕业于美国雪城大学": {
+      "D": [
+        "毕业于美国雪城大学"
+      ],
+      "C": []
+    },
+    "dd8a37d-54b7-4429-a92e-02d99fbaf4b1": {
+      "D": [
+        "dd8a37d-54b7-4429-a92e-02d99fbaf4b1"
+      ],
+      "C": []
+    },
+    "mainly": {
+      "D": [
+        "mainly"
+      ],
+      "C": []
+    },
+    "analysis.": {
+      "D": [
+        "analysis."
+      ],
+      "C": []
+    },
+    "developing": {
+      "D": [
+        "developing"
+      ],
+      "C": []
+    },
+    "a2e189fe-c940-47db-aa88-b60a31006c9e": {
+      "D": [
+        "a2e189fe-c940-47db-aa88-b60a31006c9e"
+      ],
+      "C": []
+    },
+    "automation.": {
+      "D": [
+        "automation."
+      ],
+      "C": []
+    },
+    "a30a6821-f6ef-4dcf-ae1c-d5feae9775fd": {
+      "D": [
+        "a30a6821-f6ef-4dcf-ae1c-d5feae9775fd"
+      ],
+      "C": []
+    },
+    "strong": {
+      "D": [
+        "strong"
+      ],
+      "C": []
+    },
+    "c6bb9b09-3210-4a19-ad06-5ad494b99c04": {
+      "D": [
+        "c6bb9b09-3210-4a19-ad06-5ad494b99c04"
+      ],
+      "C": []
+    },
+    "郭育奇有女朋友吗": {
+      "D": [
+        "郭育奇有女朋友吗"
+      ],
+      "C": []
+    },
+    "c8a7c54a-64a4-4118-bc67-bc34ee6eeeaa": {
+      "D": [
+        "c8a7c54a-64a4-4118-bc67-bc34ee6eeeaa"
+      ],
+      "C": []
+    },
+    "u.s.": {
+      "D": [
+        "U.S."
+      ],
+      "C": []
+    },
+    "highlighting": {
+      "D": [
+        "highlighting"
+      ],
+      "C": []
+    },
+    "received": {
+      "D": [
+        "received"
+      ],
+      "C": []
+    },
+    "process.": {
+      "D": [
+        "process."
+      ],
+      "C": []
+    },
+    "competitive": {
+      "D": [
+        "competitive"
+      ],
+      "C": []
+    },
+    "employment": {
+      "D": [
+        "employment"
+      ],
+      "C": []
+    },
+    "interview": {
+      "D": [
+        "interview"
+      ],
+      "C": []
+    },
+    "aspects": {
+      "D": [
+        "aspects"
+      ],
+      "C": []
+    },
+    "graduates.": {
+      "D": [
+        "graduates."
+      ],
+      "C": []
+    },
+    "graduate": {
+      "D": [
+        "graduate"
+      ],
+      "C": []
+    },
+    "experiences": {
+      "D": [
+        "experiences"
+      ],
+      "C": []
+    },
+    "others": {
+      "D": [
+        "others"
+      ],
+      "C": []
+    },
+    "hunting": {
+      "D": [
+        "hunting"
+      ],
+      "C": []
+    },
+    "seeking": {
+      "D": [
+        "seeking"
+      ],
+      "C": []
+    },
+    "especially": {
+      "D": [
+        "especially"
+      ],
+      "C": []
+    },
+    "companies": {
+      "D": [
+        "companies"
+      ],
+      "C": []
+    },
+    "challenges": {
+      "D": [
+        "challenges"
+      ],
+      "C": []
+    },
+    "industry.": {
+      "D": [
+        "industry."
+      ],
+      "C": []
+    },
+    "c9a205ad-7a8c-472e-a971-97d6a310c7e3": {
+      "D": [
+        "c9a205ad-7a8c-472e-a971-97d6a310c7e3"
+      ],
+      "C": []
+    },
+    "professional/educational": {
+      "D": [
+        "professional/educational"
+      ],
+      "C": []
+    },
+    "questions": {
+      "D": [
+        "questions"
+      ],
+      "C": []
+    },
+    "ask": {
+      "D": [
+        "ask"
+      ],
+      "C": []
+    },
+    "topics": {
+      "D": [
+        "topics"
+      ],
+      "C": []
+    },
+    "those": {
+      "D": [
+        "those"
+      ],
+      "C": []
+    },
+    "d2207aac-8e42-470c-91f0-e06024903b15": {
+      "D": [
+        "d2207aac-8e42-470c-91f0-e06024903b15"
+      ],
+      "C": []
+    },
+    "他还有哪些经历": {
+      "D": [
+        "他还有哪些经历"
+      ],
+      "C": []
+    },
+    "d99b81cd-59e6-4533-ac28-6d006dc268c7": {
+      "D": [
+        "d99b81cd-59e6-4533-ac28-6d006dc268c7"
+      ],
+      "C": []
+    },
+    "你现在的工作主要负责什么部分": {
+      "D": [
+        "你现在的工作主要负责什么部分"
+      ],
+      "C": []
+    },
+    "infra": {
+      "D": [
+        "infra"
+      ],
+      "C": []
+    },
+    "后端": {
+      "D": [
+        "后端"
+      ],
+      "C": []
+    },
+    "开发": {
+      "D": [
+        "开发"
+      ],
+      "C": []
+    },
+    "e6f53367-1e4e-4bb2-b65b-34bb12fd68d0": {
+      "D": [
+        "e6f53367-1e4e-4bb2-b65b-34bb12fd68d0"
+      ],
+      "C": []
+    },
+    "e9d9b982-99ec-45a5-8fce-c18ab9e18312": {
+      "D": [
+        "e9d9b982-99ec-45a5-8fce-c18ab9e18312"
+      ],
+      "C": []
+    },
+    "good": {
+      "D": [
+        "good"
+      ],
+      "C": []
+    },
+    "skilled": {
+      "D": [
+        "skilled"
+      ],
+      "C": []
+    },
+    "frontend": {
+      "D": [
+        "frontend"
+      ],
+      "C": []
+    },
+    "eafb0d1a-4af9-4b70-82ed-404187fbb91c": {
+      "D": [
+        "eafb0d1a-4af9-4b70-82ed-404187fbb91c"
+      ],
+      "C": []
+    },
+    "郭育奇喜欢干什么": {
+      "D": [
+        "郭育奇喜欢干什么"
+      ],
+      "C": []
+    },
+    "郭育奇的经历中文版郭育奇的学校郭育奇在哪工作详情请见博客": {
+      "D": [
+        "郭育奇的经历中文版郭育奇的学校郭育奇在哪工作详情请见博客"
+      ],
+      "C": []
+    },
+    "郭育奇喜欢的食物郭育奇喜欢的颜色郭育奇会做饭吗郭育奇有女朋友吗郭育奇会什么技能": {
+      "D": [
+        "郭育奇喜欢的食物郭育奇喜欢的颜色郭育奇会做饭吗郭育奇有女朋友吗郭育奇会什么技能"
+      ],
+      "C": []
+    },
+    "eb8fb538-f199-4eba-89e1-03137e58ae1c": {
+      "D": [
+        "eb8fb538-f199-4eba-89e1-03137e58ae1c"
+      ],
+      "C": []
+    },
+    "f5b1e4d4-5131-499c-a75d-f8f2ad6189e8": {
+      "D": [
+        "f5b1e4d4-5131-499c-a75d-f8f2ad6189e8"
+      ],
+      "C": []
+    },
+    "characteristics": {
+      "D": [
+        "characteristics"
+      ],
+      "C": []
+    },
+    "scaling": {
+      "D": [
+        "scaling"
+      ],
+      "C": []
+    },
+    "needs.": {
+      "D": [
+        "needs."
+      ],
+      "C": []
+    },
+    "typically": {
+      "D": [
+        "typically"
+      ],
+      "C": []
+    },
+    "modularity": {
+      "D": [
+        "Modularity"
+      ],
+      "C": []
+    },
+    "configuration.": {
+      "D": [
+        "configuration."
+      ],
+      "C": []
+    },
+    "stand-alone": {
+      "D": [
+        "stand-alone"
+      ],
+      "C": []
+    },
+    "microservices.": {
+      "D": [
+        "microservices."
+      ],
+      "C": []
+    },
+    "mechanism": {
+      "D": [
+        "mechanism"
+      ],
+      "C": []
+    },
+    "ecosystem.": {
+      "D": [
+        "ecosystem."
+      ],
+      "C": []
+    },
+    "refers": {
+      "D": [
+        "refers"
+      ],
+      "C": []
+    },
+    "maintained": {
+      "D": [
+        "maintained"
+      ],
+      "C": []
+    },
+    "libraries": {
+      "D": [
+        "libraries"
+      ],
+      "C": []
+    },
+    "cloud services": {
+      "D": [
+        "Cloud Services"
+      ],
+      "C": []
+    },
+    "collection": {
+      "D": [
+        "collection"
+      ],
+      "C": []
+    },
+    "allowing": {
+      "D": [
+        "allowing"
+      ],
+      "C": []
+    },
+    "module": {
+      "D": [
+        "module"
+      ],
+      "C": []
+    },
+    "production-grade": {
+      "D": [
+        "production-grade"
+      ],
+      "C": []
+    },
+    "include": {
+      "D": [
+        "include"
+      ],
+      "C": []
+    },
+    "facilitate": {
+      "D": [
+        "facilitate"
+      ],
+      "C": []
+    },
+    "easily": {
+      "D": [
+        "easily"
+      ],
+      "C": []
+    },
+    "dynamically.": {
+      "D": [
+        "dynamically."
+      ],
+      "C": []
+    },
+    "separate": {
+      "D": [
+        "separate"
+      ],
+      "C": []
+    },
+    "independently.": {
+      "D": [
+        "independently."
+      ],
+      "C": []
+    },
+    "maintainable": {
+      "D": [
+        "maintainable"
+      ],
+      "C": []
+    },
+    "designing": {
+      "D": [
+        "designing"
+      ],
+      "C": []
+    },
+    "independent": {
+      "D": [
+        "independent"
+      ],
+      "C": []
+    },
+    "minimal": {
+      "D": [
+        "minimal"
+      ],
+      "C": []
+    },
+    "approach": {
+      "D": [
+        "approach"
+      ],
+      "C": []
+    },
+    "overall": {
+      "D": [
+        "Overall"
+      ],
+      "C": []
+    },
+    "scalable": {
+      "D": [
+        "scalable"
+      ],
+      "C": []
+    },
+    "range": {
+      "D": [
+        "range"
+      ],
+      "C": []
+    },
+    "scaling.": {
+      "D": [
+        "scaling."
+      ],
+      "C": []
+    },
+    "larger": {
+      "D": [
+        "larger"
+      ],
+      "C": []
+    },
+    "scaled": {
+      "D": [
+        "scaled"
+      ],
+      "C": []
+    },
+    "expose": {
+      "D": [
+        "expose"
+      ],
+      "C": []
+    },
+    "themselves": {
+      "D": [
+        "themselves"
+      ],
+      "C": []
+    },
+    "packaged": {
+      "D": [
+        "packaged"
+      ],
+      "C": []
+    },
+    "clients.": {
+      "D": [
+        "clients."
+      ],
+      "C": []
+    },
+    "context": {
+      "D": [
+        "context"
+      ],
+      "C": []
+    },
+    "f6f1122b-2c82-4a86-9661-cb846422fe32": {
+      "D": [
+        "f6f1122b-2c82-4a86-9661-cb846422fe32"
+      ],
+      "C": []
+    },
+    "郭育奇是哪里人": {
+      "D": [
+        "郭育奇是哪里人"
+      ],
+      "C": []
+    },
+    "甘肃兰州": {
+      "D": [
+        "甘肃兰州"
+      ],
+      "C": []
+    },
+    "f80dc4fd-ad31-4446-ac64-3a565829bde2": {
+      "D": [
+        "f80dc4fd-ad31-4446-ac64-3a565829bde2"
+      ],
+      "C": []
+    },
+    "郭育奇喜欢什么样的女孩": {
+      "D": [
+        "郭育奇喜欢什么样的女孩"
+      ],
+      "C": []
+    },
+    "不要太作": {
+      "D": [
+        "不要太作"
+      ],
+      "C": []
+    },
+    "剩下的都可以聊": {
+      "D": [
+        "剩下的都可以聊"
+      ],
+      "C": []
+    },
+    "有责任心": {
+      "D": [
+        "有责任心"
+      ],
+      "C": []
+    }
+  }
+}
