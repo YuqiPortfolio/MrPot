@@ -2,7 +2,6 @@ package com.example.datalake.mrpot.processor;
 
 import com.example.datalake.mrpot.model.Intent;
 import com.example.datalake.mrpot.model.ProcessingContext;
-import com.example.datalake.mrpot.model.PromptTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,9 +54,6 @@ public class IntentClassifierProcessor implements TextProcessor {
 
     private final Map<String, Set<String>> expandedLexicon;
     private final List<Rule> rules;
-
-    // Pluggable template resolver; replace with ES-backed implementation if needed
-    private final TemplateFinder templateFinder = new InMemoryTemplateFinder();
 
     public IntentClassifierProcessor(ResourceLoader resourceLoader) {
         this.expandedLexicon = loadLexicon(resourceLoader, "keywords_map.json");
@@ -125,17 +121,9 @@ public class IntentClassifierProcessor implements TextProcessor {
         tags.add("intent:" + predicted.name().toLowerCase(Locale.ROOT));
         ctx.setTags(tags);
 
-        // 5) optional template lookup
-        Optional<PromptTemplate> tpl = templateFinder.findTopByIntentAndLanguage(
-                predicted.name().toLowerCase(Locale.ROOT),
-                Optional.ofNullable(ctx.getIndexLanguage()).orElse("en")
-        );
-        tpl.ifPresent(ctx::setTemplate);
-
-        // 6) step log
+        // 5) step log
         String note = "intent=" + predicted +
                 (matchedRule != null ? (", rule=" + matchedRule) : "") +
-                (tpl.isPresent() ? (", template=" + tpl.get().getId()) : "") +
                 ", tags=" + new ArrayList<>(tags);
         ctx.addStep(NAME, note);
 
@@ -358,25 +346,4 @@ public class IntentClassifierProcessor implements TextProcessor {
         final String debugName;
     }
 
-    // -------- Template lookup (stub) --------
-    interface TemplateFinder {
-        Optional<PromptTemplate> findTopByIntentAndLanguage(String intent, String lang);
-    }
-
-    static class InMemoryTemplateFinder implements TemplateFinder {
-        private final Map<String, PromptTemplate> mem = new HashMap<>();
-        InMemoryTemplateFinder() {
-            PromptTemplate demo = new PromptTemplate();
-            demo.setId("demo-chatbot-en");
-            demo.setLanguage("en");
-            demo.setIntent("chatbot");
-            demo.setSystem("You are an assistant that answers based only on customer dataset.");
-            demo.setUserTemplate("User said: {{input}}");
-            mem.put("chatbot#en", demo);
-        }
-        @Override
-        public Optional<PromptTemplate> findTopByIntentAndLanguage(String intent, String lang) {
-            return Optional.ofNullable(mem.get(intent + "#" + lang));
-        }
-    }
 }

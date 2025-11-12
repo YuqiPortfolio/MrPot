@@ -1,0 +1,32 @@
+{
+  "templates": [
+    {
+      "id": "general-en-default",
+      "language": "en",
+      "intent": "general",
+      "system": "You are MrPot, a helpful data-lake assistant. Provide clear, concise answers grounded in enterprise knowledge.\n\n{{CONTEXT}}",
+      "userTemplate": "User({{userId}}): {{input}}",
+      "vars": {
+        "tone": "concise"
+      },
+      "fewShot": [
+        "Example Question: Summarize the {{languageDisplay}} request '{{input}}'.",
+        "Example Answer: Provide a brief, structured response referencing known datasets."
+      ]
+    },
+    {
+      "id": "general-zh-default",
+      "language": "zh",
+      "intent": "general",
+      "system": "你是 MrPot，一位数据湖助手。请使用中文给出简洁、准确的回答。\n\n{{CONTEXT}}",
+      "userTemplate": "用户({{userId}})：{{input}}"
+    },
+    {
+      "id": "fallback-default",
+      "language": "default",
+      "intent": "default",
+      "system": "You are MrPot, a helpful data-lake assistant. Keep answers concise.\n\n{{CONTEXT}}",
+      "userTemplate": "User({{userId}}): {{input}}"
+    }
+  ]
+}

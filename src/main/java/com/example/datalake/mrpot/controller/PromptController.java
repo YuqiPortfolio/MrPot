@@ -5,6 +5,7 @@ import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
+import com.example.datalake.mrpot.processor.PromptTemplateProcessor;
 import com.example.datalake.mrpot.service.PromptPipeline;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,16 +40,25 @@ public class PromptController {
     }
 
     private PrepareResponse toResponse(ProcessingContext ctx) {
-        String sysPrompt = """
-                You are MrPot, a helpful data-lake assistant. Keep answers concise.
-                """.trim();
-
         String normalized = ctx.getNormalized() == null || ctx.getNormalized().isBlank()
                 ? ctx.getRawInput()
                 : ctx.getNormalized();
-        String userLabel = ctx.getUserId() == null ? "anonymous" : ctx.getUserId();
-        String userPrompt = "User(" + userLabel + "): " + (normalized == null ? "" : normalized);
-        String finalPrompt = sysPrompt + "\n---\n" + userPrompt;
+
+        String sysPrompt = ctx.getSystemPrompt();
+        if (sysPrompt == null || sysPrompt.isBlank()) {
+            sysPrompt = PromptTemplateProcessor.DEFAULT_SYSTEM_PROMPT;
+        }
+
+        String userPrompt = ctx.getUserPrompt();
+        if (userPrompt == null || userPrompt.isBlank()) {
+            String userLabel = ctx.getUserId() == null ? "anonymous" : ctx.getUserId();
+            userPrompt = "User(" + userLabel + "): " + (normalized == null ? "" : normalized);
+        }
+
+        String finalPrompt = ctx.getFinalPrompt();
+        if (finalPrompt == null || finalPrompt.isBlank()) {
+            finalPrompt = sysPrompt + "\n---\n" + userPrompt;
+        }
 
         Language language = ctx.getLanguage();
         String langDisplay = language == null ? null :
