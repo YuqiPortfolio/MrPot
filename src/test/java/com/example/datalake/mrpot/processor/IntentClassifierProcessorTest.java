@@ -165,4 +165,17 @@ class IntentClassifierProcessorTest {
         assertEquals(Intent.UNKNOWN, out.getIntent());
         assertTrue(out.getTags().contains("intent:unknown"));
     }
+
+    @Test
+    void greeting_shouldBeDetectedWithoutRules() {
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+        ProcessingContext ctx = new ProcessingContext();
+        ctx.setIndexLanguage("en");
+        ctx.setIndexText("Hello there!");
+
+        ProcessingContext out = p.process(ctx).block();
+        assertNotNull(out);
+        assertEquals(Intent.GREETING, out.getIntent());
+        assertTrue(out.getTags().contains("intent:greeting"));
+    }
 }

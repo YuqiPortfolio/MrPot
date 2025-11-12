@@ -30,6 +30,25 @@ public class IntentClassifierProcessor implements TextProcessor {
 
     // Matches either a Latin token ([a-z0-9+.#-]+) OR a contiguous CJK (Han) run (\\p{IsHan}+)
     private static final Pattern TOKENIZER = Pattern.compile("([a-z0-9+.#-]+)|([\\p{IsHan}]+)");
+    private static final Set<String> GREETING_PHRASES = Set.of(
+            "hi",
+            "hi there",
+            "hello",
+            "hello there",
+            "hey",
+            "hey there",
+            "greetings",
+            "howdy",
+            "hola",
+            "good morning",
+            "good afternoon",
+            "good evening",
+            "good day",
+            "morning",
+            "evening",
+            "你好",
+            "您好"
+    );
 
     private final ObjectMapper om = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -76,7 +95,10 @@ public class IntentClassifierProcessor implements TextProcessor {
         String matchedRule = null;
         int bestScore = Integer.MIN_VALUE;
 
-        if (!rules.isEmpty()) {
+        if (isGreetingText(text)) {
+            predicted = Intent.GREETING;
+            matchedRule = "builtin:greeting";
+        } else if (!rules.isEmpty()) {
             for (Rule r : rules) {
                 int score = 0;
 
@@ -165,6 +187,27 @@ public class IntentClassifierProcessor implements TextProcessor {
         Set<String> syn = expandedLexicon.get(kw);
         if (syn != null) for (String s : syn) if (tokenSet.contains(s)) return true;
         return false;
+    }
+
+    private boolean isGreetingText(String text) {
+        if (text == null) {
+            return false;
+        }
+        String trimmed = text.trim();
+        if (trimmed.isEmpty()) {
+            return false;
+        }
+
+        String lower = trimmed.toLowerCase(Locale.ROOT);
+        StringBuilder cleaned = new StringBuilder(lower.length());
+        for (int i = 0; i < lower.length(); i++) {
+            char c = lower.charAt(i);
+            if ((c >= 'a' && c <= 'z') || Character.isWhitespace(c) || c == '\u4f60' || c == '\u597d' || c == '\u60a8') {
+                cleaned.append(c);
+            }
+        }
+        String normalized = cleaned.toString().replaceAll("\\s+", " ").trim();
+        return GREETING_PHRASES.contains(normalized);
     }
 
     // ---------------- Rules & Lexicon Loading ----------------
