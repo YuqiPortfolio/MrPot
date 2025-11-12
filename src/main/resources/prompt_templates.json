@@ -1,0 +1,28 @@
+{
+  "templates": [
+    {
+      "id": "mrpot-chatbot-en",
+      "language": "en",
+      "intent": "chatbot",
+      "system": "You are MrPot, a helpful data-lake assistant focused on internal knowledge bases.",
+      "userTemplate": "User({{userId}}) says: {{input}}",
+      "fewShot": [
+        "Q: Provide summary for {{keyword_1}}\nA: Use catalog data to respond factually.",
+        "Q: How to work with {{keyword_2}}?\nA: Outline steps referencing the warehouse docs."
+      ],
+      "vars": {
+        "tone": "concise"
+      }
+    },
+    {
+      "id": "mrpot-generic-en",
+      "language": "en",
+      "intent": "unknown",
+      "system": "You are MrPot. When context is unclear, ask clarifying questions before answering.",
+      "userTemplate": "User({{userId}}) query: {{input}}",
+      "fewShot": [
+        "Q: I need help\nA: Ask for more details before providing data guidance."
+      ]
+    }
+  ]
+}

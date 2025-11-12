@@ -5,6 +5,7 @@ import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
 import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
+import com.example.datalake.mrpot.processor.PromptTemplateProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,8 @@ public class PromptPipeline {
     private static final List<Class<? extends TextProcessor>> DEFAULT_ORDER = List.of(
             UnifiedCleanCorrectProcessor.class,
 //            LanguageTranslateProcessor.class,
-            IntentClassifierProcessor.class
+            IntentClassifierProcessor.class,
+            PromptTemplateProcessor.class
     );
 
     private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
