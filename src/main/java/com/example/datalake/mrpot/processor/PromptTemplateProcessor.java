@@ -8,6 +8,7 @@ import com.example.datalake.mrpot.service.PromptTemplateCatalog;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -29,6 +30,7 @@ public class PromptTemplateProcessor implements TextProcessor {
     private final PromptTemplateCatalog catalog;
     private final MustacheFactory mustacheFactory;
 
+    @Autowired
     public PromptTemplateProcessor(PromptTemplateCatalog catalog) {
         this(catalog, new DefaultMustacheFactory());
     }
