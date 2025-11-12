@@ -146,6 +146,13 @@
             <artifactId>google-cloud-translate</artifactId>
         </dependency>
 
+        <!-- Template engine for prompt rendering -->
+        <dependency>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+            <version>0.9.11</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
