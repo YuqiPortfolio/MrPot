@@ -5,6 +5,8 @@ import com.example.datalake.mrpot.model.ProcessingContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,9 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IntentClassifierProcessorTest {
 
+    private final ResourceLoader loader = new DefaultResourceLoader();
+
     @AfterEach
     void clearProps() {
         System.clearProperty("intent.rules");
+        System.clearProperty("keywords.map.path");
     }
 
     @Test
@@ -34,7 +39,7 @@ class IntentClassifierProcessorTest {
         Files.writeString(rules, json, StandardCharsets.UTF_8);
         System.setProperty("intent.rules", rules.toString());
 
-        IntentClassifierProcessor p = new IntentClassifierProcessor();
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
         ProcessingContext ctx = new ProcessingContext();
         ctx.setIndexLanguage("en");
         ctx.setIndexText("What's a realistic OTD for a 2024 RAV4 in Utah?");
@@ -59,7 +64,7 @@ class IntentClassifierProcessorTest {
         Files.writeString(rules, json, StandardCharsets.UTF_8);
         System.setProperty("intent.rules", rules.toString());
 
-        IntentClassifierProcessor p = new IntentClassifierProcessor();
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
         ProcessingContext ctx = new ProcessingContext();
         ctx.setIndexLanguage("en");
         ctx.setIndexText("Plan a two-day Zion National Park itinerary with easy hikes.");
@@ -84,7 +89,7 @@ class IntentClassifierProcessorTest {
         Files.writeString(rules, json, StandardCharsets.UTF_8);
         System.setProperty("intent.rules", rules.toString());
 
-        IntentClassifierProcessor p = new IntentClassifierProcessor();
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
         ProcessingContext ctx = new ProcessingContext();
         ctx.setIndexLanguage("en");
         ctx.setIndexText("How to build SSE streaming with LangChain4j in Spring Boot?");
@@ -108,7 +113,7 @@ class IntentClassifierProcessorTest {
         Files.writeString(rules, json, StandardCharsets.UTF_8);
         System.setProperty("intent.rules", rules.toString());
 
-        IntentClassifierProcessor p = new IntentClassifierProcessor();
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
         ProcessingContext ctx = new ProcessingContext();
         ctx.setIndexLanguage("en");
         ctx.setIndexText("How can I maximize my tax refund for 2025 filing?");
@@ -132,7 +137,7 @@ class IntentClassifierProcessorTest {
         Files.writeString(rules, json, StandardCharsets.UTF_8);
         System.setProperty("intent.rules", rules.toString());
 
-        IntentClassifierProcessor p = new IntentClassifierProcessor();
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
         ProcessingContext ctx = new ProcessingContext();
         ctx.setIndexLanguage("en");
         // tokenizer will produce bigram "software engineer"
@@ -144,10 +149,13 @@ class IntentClassifierProcessorTest {
     }
 
     @Test
-    void unknown_whenNoRulesLoaded(@TempDir Path tmp) {
-        System.clearProperty("intent.rules"); // 不提供任何规则
+    void unknown_whenNoRulesLoaded(@TempDir Path tmp) throws IOException {
+        // Make this deterministic by pointing to an empty rules file
+        Path rules = tmp.resolve("intent_rules.json");
+        Files.writeString(rules, "{\"rules\":[]}", StandardCharsets.UTF_8);
+        System.setProperty("intent.rules", rules.toString());
 
-        IntentClassifierProcessor p = new IntentClassifierProcessor();
+        IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
         ProcessingContext ctx = new ProcessingContext();
         ctx.setIndexLanguage("en");
         ctx.setIndexText("Random query that should not match any intent.");
