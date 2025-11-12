@@ -19,8 +19,8 @@ class PromptTemplateProcessorTest {
     @Test
     void fillsTemplateAndEnrichesPrompts() {
         PromptTemplate template = new PromptTemplate();
-        template.setId("login-en");
-        template.setIntent("login");
+        template.setId("general-en");
+        template.setIntent("general");
         template.setLanguage("en");
         template.setSystem("Assist with {{intent}} issues.");
         template.setUserTemplate("User({{userId}}) says: {{input}} (lang={{language}})");
@@ -33,7 +33,7 @@ class PromptTemplateProcessorTest {
         ctx.setRawInput("Please help me sign in to the data lake platform");
         ctx.setNormalized("Sign in to the data lake platform account");
         ctx.setLanguage(new Language("en", "English", 0.99, null));
-        ctx.setIntent(Intent.LOGIN);
+        ctx.setIntent(Intent.GENERAL);
         ctx.setUserId("alice");
         ctx.setSessionId("sess-1");
         ctx.setNow(Instant.parse("2024-01-01T00:00:00Z"));
@@ -45,7 +45,7 @@ class PromptTemplateProcessorTest {
         assertThat(result.getTemplate()).isSameAs(template);
 
         assertThat(result.getSystemPrompt())
-                .contains("Assist with login issues.")
+                .contains("Assist with general issues.")
                 .contains("Top keywords: auth, critical, data lake platform, account, data, lake, platform, sign");
 
         assertThat(result.getUserPrompt())
@@ -53,7 +53,7 @@ class PromptTemplateProcessorTest {
 
         assertThat(result.getFinalPrompt())
                 .contains("Examples:")
-                .contains("- Example for login using auth")
+                .contains("- Example for general using auth")
                 .contains("- Contact support@example.com if blocked.")
                 .contains("---\nUser(alice) says: Sign in to the data lake platform account (lang=en)");
 

@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 public class PromptTemplateProcessor implements TextProcessor {
 
     private static final String NAME = "prompt-template";
-    private static final String DEFAULT_SYSTEM_PROMPT = "You are MrPot, a helpful data-lake assistant. Keep answers concise.";
+    private static final String DEFAULT_SYSTEM_PROMPT = "You are MrPot, a assistant focused on internal knowledge bases.";
     private static final String DEFAULT_USER_TEMPLATE = "User({{userId}}): {{input}}";
     private static final int MAX_KEYWORDS = 8;
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{\\{\\s*([a-zA-Z0-9_.-]+)\\s*}}", Pattern.MULTILINE);
