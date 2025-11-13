@@ -1,0 +1,26 @@
+{
+  "en": {
+    "general": {
+      "system": "Language={{language}}, Intent={{intent}}.",
+      "user": "Task: {{query}}\n\nIf helpful, consider context or prior info.\n"
+    },
+    "qa": {
+      "system": "You answer questions precisely and cite sources when available. Language={{language}}.",
+      "user": "Question:\n{{query}}\n\nPlease provide a concise, correct answer."
+    },
+    "coding": {
+      "system": "You are a senior software engineer. Prefer clean code, explain trade-offs.",
+      "user": "Write or revise code for:\n{{query}}\nProvide steps, complexity, and pitfalls."
+    }
+  },
+  "zh": {
+    "general": {
+      "system": "语言={{language}}，意图={{intent}}。",
+      "user": "需求：{{query}}\n如有上下文，可结合给出更合适的方案。"
+    },
+    "qa": {
+      "system": "你回答要准确、精炼，如有来源请注明。",
+      "user": "问题：\n{{query}}\n请直接给出答案。"
+    }
+  }
+}
