@@ -6,6 +6,7 @@ import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
 import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
+import com.example.datalake.mrpot.validator.ProcessingValidator;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -30,8 +31,9 @@ public class PromptPipeline {
     );
 
     private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
+    private final Map<ProcessingValidator.Stage, List<ProcessingValidator>> validatorsByStage;
 
-    public PromptPipeline(List<TextProcessor> processors) {
+    public PromptPipeline(List<TextProcessor> processors, List<ProcessingValidator> validators) {
         // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
         this.processorsByType = processors.stream()
                 .collect(Collectors.toMap(
@@ -39,6 +41,13 @@ public class PromptPipeline {
                         Function.identity(),
                         (left, right) -> left,
                         LinkedHashMap::new
+                ));
+        List<ProcessingValidator> safeValidators = validators == null ? List.of() : validators;
+        this.validatorsByStage = safeValidators.stream()
+                .collect(Collectors.groupingBy(
+                        ProcessingValidator::stage,
+                        LinkedHashMap::new,
+                        Collectors.toCollection(ArrayList::new)
                 ));
     }
 
@@ -51,9 +60,23 @@ public class PromptPipeline {
         if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
         if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
 
-        Mono<ProcessingContext> pipeline = Mono.just(ctx);
+        Mono<ProcessingContext> pipeline = Mono.just(ctx)
+                .flatMap(c -> applyValidators(c, ProcessingValidator.Stage.PRE_CHAIN));
         for (TextProcessor processor : buildOrderedChain()) {
             pipeline = pipeline.flatMap(processor::process);
+        }
+        return pipeline.flatMap(c -> applyValidators(c, ProcessingValidator.Stage.PRE_LLM));
+    }
+
+    private Mono<ProcessingContext> applyValidators(ProcessingContext ctx, ProcessingValidator.Stage stage) {
+        List<ProcessingValidator> validators = validatorsByStage.get(stage);
+        if (validators == null || validators.isEmpty()) {
+            return Mono.just(ctx);
+        }
+
+        Mono<ProcessingContext> pipeline = Mono.just(ctx);
+        for (ProcessingValidator validator : validators) {
+            pipeline = pipeline.flatMap(validator::validate);
         }
         return pipeline;
     }
