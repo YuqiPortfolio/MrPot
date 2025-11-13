@@ -2,14 +2,10 @@
 package com.example.datalake.mrpot.service;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
+import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
 import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
-import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,75 +14,73 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class PromptPipeline {
+  // Explicit, deterministic order for the first three processors
+  private static final List<Class<? extends TextProcessor>> DEFAULT_ORDER =
+      List.of(UnifiedCleanCorrectProcessor.class,
+          //            LanguageTranslateProcessor.class,
+          IntentClassifierProcessor.class);
 
-    // Explicit, deterministic order for the first three processors
-    private static final List<Class<? extends TextProcessor>> DEFAULT_ORDER = List.of(
-            UnifiedCleanCorrectProcessor.class,
-//            LanguageTranslateProcessor.class,
-            IntentClassifierProcessor.class
-    );
+  private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
 
-    private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
+  public PromptPipeline(List<TextProcessor> processors) {
+    // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
+    this.processorsByType = processors.stream().collect(Collectors.toMap(
+        p -> getConcreteType(p), Function.identity(), (left, right) -> left, LinkedHashMap::new));
+  }
 
-    public PromptPipeline(List<TextProcessor> processors) {
-        // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
-        this.processorsByType = processors.stream()
-                .collect(Collectors.toMap(
-                        p -> getConcreteType(p),
-                        Function.identity(),
-                        (left, right) -> left,
-                        LinkedHashMap::new
-                ));
+  public Mono<ProcessingContext> run(PrepareRequest request) {
+    ProcessingContext ctx = new ProcessingContext()
+                                .setUserId(request.getUserId())
+                                .setSessionId(request.getSessionId())
+                                .setRawInput(request.getQuery());
+
+    if (ctx.getEntities() == null)
+      ctx.setEntities(new LinkedHashMap<>());
+    if (ctx.getOutline() == null)
+      ctx.setOutline(new LinkedHashMap<>());
+
+    Mono<ProcessingContext> pipeline = Mono.just(ctx);
+    for (TextProcessor processor : buildOrderedChain()) {
+      pipeline = pipeline.flatMap(processor::process);
+    }
+    return pipeline;
+  }
+
+  private List<TextProcessor> buildOrderedChain() {
+    Set<TextProcessor> seen = new LinkedHashSet<>();
+    List<TextProcessor> ordered = new ArrayList<>();
+
+    // 1) Add processors in DEFAULT_ORDER if present
+    for (Class<? extends TextProcessor> type : DEFAULT_ORDER) {
+      TextProcessor processor = processorsByType.get(type);
+      if (processor != null && seen.add(processor)) {
+        ordered.add(processor);
+      }
     }
 
-    public Mono<ProcessingContext> run(PrepareRequest request) {
-        ProcessingContext ctx = new ProcessingContext()
-                .setUserId(request.getUserId())
-                .setSessionId(request.getSessionId())
-                .setRawInput(request.getQuery());
-
-        if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
-        if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
-
-        Mono<ProcessingContext> pipeline = Mono.just(ctx);
-        for (TextProcessor processor : buildOrderedChain()) {
-            pipeline = pipeline.flatMap(processor::process);
-        }
-        return pipeline;
+    // 2) Add any remaining processors (in registration order)
+    for (TextProcessor processor : processorsByType.values()) {
+      if (seen.add(processor)) {
+        ordered.add(processor);
+      }
     }
 
-    private List<TextProcessor> buildOrderedChain() {
-        Set<TextProcessor> seen = new LinkedHashSet<>();
-        List<TextProcessor> ordered = new ArrayList<>();
+    return ordered;
+  }
 
-        // 1) Add processors in DEFAULT_ORDER if present
-        for (Class<? extends TextProcessor> type : DEFAULT_ORDER) {
-            TextProcessor processor = processorsByType.get(type);
-            if (processor != null && seen.add(processor)) {
-                ordered.add(processor);
-            }
-        }
-
-        // 2) Add any remaining processors (in registration order)
-        for (TextProcessor processor : processorsByType.values()) {
-            if (seen.add(processor)) {
-                ordered.add(processor);
-            }
-        }
-
-        return ordered;
+  @SuppressWarnings("unchecked")
+  private static Class<? extends TextProcessor> getConcreteType(TextProcessor p) {
+    Class<?> target = AopUtils.getTargetClass(p);
+    // If AOP gives a proxy that still isn’t assignable (rare), fall back to runtime class
+    if (target == null || !TextProcessor.class.isAssignableFrom(target)) {
+      target = p.getClass();
     }
-
-    @SuppressWarnings("unchecked")
-    private static Class<? extends TextProcessor> getConcreteType(TextProcessor p) {
-        Class<?> target = AopUtils.getTargetClass(p);
-        // If AOP gives a proxy that still isn’t assignable (rare), fall back to runtime class
-        if (target == null || !TextProcessor.class.isAssignableFrom(target)) {
-            target = p.getClass();
-        }
-        return (Class<? extends TextProcessor>) target;
-    }
+    return (Class<? extends TextProcessor>) target;
+  }
 }

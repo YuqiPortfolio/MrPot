@@ -1,9 +1,8 @@
 package com.example.datalake.mrpot.model;
 
+import java.time.Instant;
 import lombok.*;
 import lombok.experimental.Accessors;
-
-import java.time.Instant;
 
 @Data
 @Builder
@@ -11,7 +10,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Accessors(chain = true, fluent = false)
 public class StepLog {
-    private String name;
-    private String note;
-    private Instant at;
+  private String name;
+  private String note;
+  private Instant at;
 }
