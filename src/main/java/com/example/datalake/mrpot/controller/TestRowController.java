@@ -1,4 +1,5 @@
 package com.example.datalake.mrpot.controller;
+
 import com.example.datalake.mrpot.dao.TestRowRepository;
 import com.example.datalake.mrpot.dto.TestRowDto;
 import com.example.datalake.mrpot.model.TestRow;
@@ -15,14 +16,14 @@ import java.util.List;
 @Tag(name = "Test Table", description = "CRUD over public.\"Test\"")
 public class TestRowController {
 
-    @Autowired
-    private TestRowRepository repository;
+  @Autowired
+  private TestRowRepository repository;
 
-    @Operation(summary = "Get all rows in public.\"Test\"")
-    @GetMapping
-    public List<TestRowDto> findAll() {
-        return repository.findAll().stream()
-                .map(e -> new TestRowDto(e.getId(), e.getName()))
-                .toList();
-    }
+  @Operation(summary = "Get all rows in public.\"Test\"")
+  @GetMapping
+  public List<TestRowDto> findAll() {
+    return repository.findAll().stream()
+        .map(e -> new TestRowDto(e.getId(), e.getName()))
+        .toList();
+  }
 }
