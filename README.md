@@ -2,12 +2,20 @@
 
 ## Code Formatting
 
-This project uses the Google Java Style. You can reformat all production and
-test sources with the following command (requires `clang-format`, which is
-preinstalled in the development container):
+This project uses the Google Java Style. To reformat all production and test
+sources, run the [Spotless](https://github.com/diffplug/spotless) plugin via the
+Maven wrapper:
 
 ```bash
-find src -name '*.java' -print0 | xargs -0 clang-format -style=Google -i
+./mvnw spotless:apply
 ```
 
 Run this before committing to keep the formatting consistent.
+
+## Build and Test
+
+Use the Maven wrapper to compile the project and execute the unit test suite:
+
+```bash
+./mvnw clean verify
+```
