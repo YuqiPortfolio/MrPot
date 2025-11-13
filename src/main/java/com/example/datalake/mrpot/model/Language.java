@@ -12,16 +12,16 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Builder
 public class Language {
-    private String isoCode;
-    private String displayName;
-    private double confidence;
-    private String script;
+  private String isoCode;
+  private String displayName;
+  private double confidence;
+  private String script;
 
-    public static Language und() {
-        return new Language("und", "Undetermined", 0.0, null);
-    }
+  public static Language und() {
+    return new Language("und", "Undetermined", 0.0, null);
+  }
 
-    public boolean is(String code) {
-        return code != null && code.equalsIgnoreCase(this.isoCode);
-    }
+  public boolean is(String code) {
+    return code != null && code.equalsIgnoreCase(this.isoCode);
+  }
 }

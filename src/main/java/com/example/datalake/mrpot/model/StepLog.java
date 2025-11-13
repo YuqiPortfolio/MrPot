@@ -11,7 +11,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Accessors(chain = true, fluent = false)
 public class StepLog {
-    private String name;
-    private String note;
-    private Instant at;
+  private String name;
+  private String note;
+  private Instant at;
 }

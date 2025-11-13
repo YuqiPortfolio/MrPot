@@ -10,8 +10,8 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true, fluent = false)
 public class PrepareRequest {
-    private String userId;
-    private String sessionId;
-    @NotBlank
-    private String query;
+  private String userId;
+  private String sessionId;
+  @NotBlank
+  private String query;
 }

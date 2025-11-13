@@ -9,6 +9,6 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true, fluent = false)
 public class StepEvent {
-    private String step;
-    private String note;
+  private String step;
+  private String note;
 }
