@@ -6,6 +6,7 @@ import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
 import com.example.datalake.mrpot.service.PromptPipeline;
+import com.example.datalake.mrpot.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,9 @@ public class PromptController {
       description = "Runs the configured text processors on the payload and returns the resulting context.")
   public Mono<ResponseEntity<PrepareResponse>> prepare(@RequestBody PrepareRequest req) {
     return promptPipeline.run(req)
-        .map(ctx -> ResponseEntity.ok(toResponse(ctx)));
+        .map(ctx -> ResponseEntity.ok(toResponse(ctx)))
+        .onErrorResume(ValidationException.class, ex ->
+            Mono.just(ResponseEntity.badRequest().body(toErrorResponse(ex))));
   }
 
   private PrepareResponse toResponse(ProcessingContext ctx) {
@@ -83,6 +86,14 @@ public class PromptController {
         .entities(entities)
         .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
         .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
+        .errors(List.of())
+        .build();
+  }
+
+  private PrepareResponse toErrorResponse(ValidationException ex) {
+    return PrepareResponse.builder()
+        .notices(List.of())
+        .errors(List.copyOf(ex.getReasons()))
         .build();
   }
 
