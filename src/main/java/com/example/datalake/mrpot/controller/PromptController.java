@@ -6,6 +6,7 @@ import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
 import com.example.datalake.mrpot.service.PromptPipeline;
+import com.example.datalake.mrpot.util.PromptRenderUtils;
 import com.example.datalake.mrpot.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,20 +49,13 @@ public class PromptController {
   }
 
   private PrepareResponse toResponse(ProcessingContext ctx) {
-    String sysPrompt = ctx.getSystemPrompt();
-    if (sysPrompt == null || sysPrompt.isBlank()) {
-      sysPrompt = """
-                  You are MrPot, a helpful data-lake assistant. Keep answers concise.
-                  """.trim();
-      ctx.setSystemPrompt(sysPrompt);
-    }
+    String sysPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+    String userPrompt = PromptRenderUtils.ensureUserPrompt(ctx);
+    String finalPrompt = PromptRenderUtils.ensureFinalPrompt(ctx);
 
     String normalized = ctx.getNormalized() == null || ctx.getNormalized().isBlank()
         ? ctx.getRawInput()
         : ctx.getNormalized();
-    String userLabel = ctx.getUserId() == null ? "anonymous" : ctx.getUserId();
-    String userPrompt = "User(" + userLabel + "): " + (normalized == null ? "" : normalized);
-    String finalPrompt = sysPrompt + "\n---\n" + userPrompt;
 
     Language language = ctx.getLanguage();
     String langDisplay = language == null ? null :

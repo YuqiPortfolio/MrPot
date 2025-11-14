@@ -5,6 +5,10 @@ import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
 import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
+import com.example.datalake.mrpot.processor.CommonResponseProcessor;
+import com.example.datalake.mrpot.processor.PromptCacheLookupProcessor;
+import com.example.datalake.mrpot.processor.PromptCacheRecordProcessor;
+import com.example.datalake.mrpot.processor.PromptTemplateProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.validation.ValidationContext;
 import com.example.datalake.mrpot.validation.ValidationException;
@@ -12,6 +16,7 @@ import com.example.datalake.mrpot.validation.ValidationService;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import com.example.datalake.mrpot.util.PromptRenderUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,13 +33,13 @@ public class PromptPipeline {
   // Explicit, deterministic order for the first three processors
   private static final List<Class<? extends TextProcessor>> DEFAULT_ORDER = List.of(
       UnifiedCleanCorrectProcessor.class,
+      IntentClassifierProcessor.class,
+      CommonResponseProcessor.class,
+      PromptCacheLookupProcessor.class,
 //            LanguageTranslateProcessor.class,
-      IntentClassifierProcessor.class
+      PromptTemplateProcessor.class,
+      PromptCacheRecordProcessor.class
   );
-
-  private static final String BASE_SYSTEM_PROMPT = """
-          You are MrPot, a helpful data-lake assistant. Keep answers concise.
-          """.trim();
 
   private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
   private final ValidationService validationService;
@@ -54,7 +59,7 @@ public class PromptPipeline {
   public Mono<ProcessingContext> run(PrepareRequest request) {
     ValidationContext validationContext;
     try {
-      validationContext = validationService.validate(request.getQuery(), BASE_SYSTEM_PROMPT);
+      validationContext = validationService.validate(request.getQuery(), PromptRenderUtils.baseSystemPrompt());
     } catch (ValidationException ex) {
       return Mono.error(ex);
     }
@@ -71,7 +76,13 @@ public class PromptPipeline {
 
     Mono<ProcessingContext> pipeline = Mono.just(ctx);
     for (TextProcessor processor : buildOrderedChain()) {
-      pipeline = pipeline.flatMap(processor::process);
+      final TextProcessor stage = processor;
+      pipeline = pipeline.flatMap(current -> {
+        if (current.isCacheHit() && shouldBypassAfterCache(stage)) {
+          return Mono.just(current.addStep(stage.name(), "bypass-cache"));
+        }
+        return stage.process(current);
+      });
     }
     return pipeline;
   }
@@ -106,5 +117,9 @@ public class PromptPipeline {
       target = p.getClass();
     }
     return (Class<? extends TextProcessor>) target;
+  }
+
+  private boolean shouldBypassAfterCache(TextProcessor processor) {
+    return processor instanceof PromptTemplateProcessor;
   }
 }
