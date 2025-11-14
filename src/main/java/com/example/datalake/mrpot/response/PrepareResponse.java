@@ -23,4 +23,5 @@ public class PrepareResponse {
   private Map<String, ?> entities;
 
   private List<StepLog> steps;
+  private List<String> notices;
 }

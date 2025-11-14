@@ -6,6 +6,9 @@ import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
 import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
+import com.example.datalake.mrpot.validation.ValidationContext;
+import com.example.datalake.mrpot.validation.ValidationException;
+import com.example.datalake.mrpot.validation.ValidationService;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -29,9 +32,14 @@ public class PromptPipeline {
       IntentClassifierProcessor.class
   );
 
-  private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
+  private static final String BASE_SYSTEM_PROMPT = """
+          You are MrPot, a helpful data-lake assistant. Keep answers concise.
+          """.trim();
 
-  public PromptPipeline(List<TextProcessor> processors) {
+  private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
+  private final ValidationService validationService;
+
+  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService) {
     // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
     this.processorsByType = processors.stream()
         .collect(Collectors.toMap(
@@ -40,13 +48,23 @@ public class PromptPipeline {
             (left, right) -> left,
             LinkedHashMap::new
         ));
+    this.validationService = validationService;
   }
 
   public Mono<ProcessingContext> run(PrepareRequest request) {
+    ValidationContext validationContext;
+    try {
+      validationContext = validationService.validate(request.getQuery(), BASE_SYSTEM_PROMPT);
+    } catch (ValidationException ex) {
+      return Mono.error(ex);
+    }
+
     ProcessingContext ctx = new ProcessingContext()
         .setUserId(request.getUserId())
         .setSessionId(request.getSessionId())
-        .setRawInput(request.getQuery());
+        .setRawInput(validationContext.getProcessedInput())
+        .setSystemPrompt(validationContext.getSystemPrompt())
+        .setValidationNotices(new ArrayList<>(validationContext.getNotices()));
 
     if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
     if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());

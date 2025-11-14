@@ -39,9 +39,13 @@ public class PromptController {
   }
 
   private PrepareResponse toResponse(ProcessingContext ctx) {
-    String sysPrompt = """
-                You are MrPot, a helpful data-lake assistant. Keep answers concise.
-                """.trim();
+    String sysPrompt = ctx.getSystemPrompt();
+    if (sysPrompt == null || sysPrompt.isBlank()) {
+      sysPrompt = """
+                  You are MrPot, a helpful data-lake assistant. Keep answers concise.
+                  """.trim();
+      ctx.setSystemPrompt(sysPrompt);
+    }
 
     String normalized = ctx.getNormalized() == null || ctx.getNormalized().isBlank()
         ? ctx.getRawInput()
@@ -78,6 +82,7 @@ public class PromptController {
         .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
         .entities(entities)
         .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
+        .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
         .build();
   }
 
