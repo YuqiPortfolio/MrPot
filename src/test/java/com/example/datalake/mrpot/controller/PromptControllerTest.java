@@ -33,4 +33,23 @@ class PromptControllerTest {
         .containsExactly("User input must not be blank.");
     assertThat(response.getBody().getNotices()).isEmpty();
   }
+
+  @Test
+  void prepareReturnsUnexpectedErrors() {
+    PromptPipeline pipeline = mock(PromptPipeline.class);
+    PrepareRequest request = new PrepareRequest().setQuery("question");
+
+    when(pipeline.run(request)).thenReturn(Mono.error(new IllegalStateException("boom")));
+
+    PromptController controller = new PromptController(pipeline);
+
+    ResponseEntity<PrepareResponse> response = controller.prepare(request).block();
+
+    assertThat(response).isNotNull();
+    assertThat(response.getStatusCodeValue()).isEqualTo(500);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getErrors())
+        .containsExactly("Unexpected error: boom");
+    assertThat(response.getBody().getNotices()).isEmpty();
+  }
 }
