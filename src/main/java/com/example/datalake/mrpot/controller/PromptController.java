@@ -6,9 +6,11 @@ import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
 import com.example.datalake.mrpot.service.PromptPipeline;
+import com.example.datalake.mrpot.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/prompt")
 @Tag(name = "Demo Streaming API", description = "Response answer and SSE ")
@@ -35,13 +38,23 @@ public class PromptController {
       description = "Runs the configured text processors on the payload and returns the resulting context.")
   public Mono<ResponseEntity<PrepareResponse>> prepare(@RequestBody PrepareRequest req) {
     return promptPipeline.run(req)
-        .map(ctx -> ResponseEntity.ok(toResponse(ctx)));
+        .map(ctx -> ResponseEntity.ok(toResponse(ctx)))
+        .onErrorResume(ValidationException.class, ex ->
+            Mono.just(ResponseEntity.badRequest().body(toErrorResponse(ex))))
+        .onErrorResume(ex -> {
+          log.error("Unexpected failure while preparing prompt", ex);
+          return Mono.just(ResponseEntity.internalServerError().body(toUnexpectedErrorResponse(ex)));
+        });
   }
 
   private PrepareResponse toResponse(ProcessingContext ctx) {
-    String sysPrompt = """
-                You are MrPot, a helpful data-lake assistant. Keep answers concise.
-                """.trim();
+    String sysPrompt = ctx.getSystemPrompt();
+    if (sysPrompt == null || sysPrompt.isBlank()) {
+      sysPrompt = """
+                  You are MrPot, a helpful data-lake assistant. Keep answers concise.
+                  """.trim();
+      ctx.setSystemPrompt(sysPrompt);
+    }
 
     String normalized = ctx.getNormalized() == null || ctx.getNormalized().isBlank()
         ? ctx.getRawInput()
@@ -78,6 +91,26 @@ public class PromptController {
         .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
         .entities(entities)
         .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
+        .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
+        .errors(List.of())
+        .build();
+  }
+
+  private PrepareResponse toErrorResponse(ValidationException ex) {
+    return PrepareResponse.builder()
+        .notices(List.of())
+        .errors(List.copyOf(ex.getReasons()))
+        .build();
+  }
+
+  private PrepareResponse toUnexpectedErrorResponse(Throwable ex) {
+    String detail = ex.getMessage();
+    String message = (detail == null || detail.isBlank())
+        ? "Unexpected error occurred."
+        : "Unexpected error: " + detail;
+    return PrepareResponse.builder()
+        .notices(List.of())
+        .errors(List.of(message))
         .build();
   }
 

@@ -45,6 +45,7 @@ public class ProcessingContext {
 
   // audit trail
   private List<StepLog> steps = new ArrayList<>();
+  private List<String> validationNotices = new ArrayList<>();
 
   public ProcessingContext addStep(String name, String note) {
     steps.add(new StepLog().setName(name).setNote(note).setAt(Instant.now()));
