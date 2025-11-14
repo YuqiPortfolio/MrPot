@@ -4,8 +4,10 @@ import com.example.datalake.mrpot.model.Language;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
+import com.example.datalake.mrpot.response.PrepareEnvelope;
 import com.example.datalake.mrpot.response.PrepareResponse;
 import com.example.datalake.mrpot.service.PromptPipeline;
+import com.example.datalake.mrpot.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,22 +30,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PromptController {
 
+  private static final String DEFAULT_SYSTEM_PROMPT = """
+          You are MrPot, a helpful data-lake assistant. Keep answers concise.
+          """.trim();
+
   private final PromptPipeline promptPipeline;
 
   @PostMapping("/prepare")
   @Operation(summary = "Prepare a session using the processing pipeline",
       description = "Runs the configured text processors on the payload and returns the resulting context.")
-  public Mono<ResponseEntity<PrepareResponse>> prepare(@RequestBody PrepareRequest req) {
+  public Mono<ResponseEntity<PrepareEnvelope>> prepare(@RequestBody PrepareRequest req) {
     return promptPipeline.run(req)
-        .map(ctx -> ResponseEntity.ok(toResponse(ctx)));
+        .map(ctx -> ResponseEntity.ok(PrepareEnvelope.of(toResponse(ctx))))
+        .onErrorResume(ValidationException.class, ex ->
+            Mono.just(ResponseEntity.badRequest().body(PrepareEnvelope.of(toErrorResponse(req, ex)))));
   }
 
   private PrepareResponse toResponse(ProcessingContext ctx) {
     String sysPrompt = ctx.getSystemPrompt();
     if (sysPrompt == null || sysPrompt.isBlank()) {
-      sysPrompt = """
-                  You are MrPot, a helpful data-lake assistant. Keep answers concise.
-                  """.trim();
+      sysPrompt = DEFAULT_SYSTEM_PROMPT;
       ctx.setSystemPrompt(sysPrompt);
     }
 
@@ -83,6 +89,33 @@ public class PromptController {
         .entities(entities)
         .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
         .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
+        .errors(List.of())
+        .build();
+  }
+
+  private PrepareResponse toErrorResponse(PrepareRequest request, ValidationException ex) {
+    String normalized = request.getQuery();
+    String userLabel = request.getUserId() == null ? "anonymous" : request.getUserId();
+    String userPrompt = "User(" + userLabel + "): " + (normalized == null ? "" : normalized);
+    String finalPrompt = DEFAULT_SYSTEM_PROMPT + "\n---\n" + userPrompt;
+
+    Map<String, Object> entities = new LinkedHashMap<>();
+    entities.put("userId", request.getUserId());
+    entities.put("sessionId", request.getSessionId());
+    entities.put("query", request.getQuery());
+    entities.put("normalized", normalized);
+
+    return PrepareResponse.builder()
+        .systemPrompt(DEFAULT_SYSTEM_PROMPT)
+        .userPrompt(userPrompt)
+        .finalPrompt(finalPrompt)
+        .language(null)
+        .intent(null)
+        .tags(List.of())
+        .entities(entities)
+        .steps(List.of())
+        .notices(List.of())
+        .errors(List.copyOf(ex.getReasons()))
         .build();
   }
 

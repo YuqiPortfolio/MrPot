@@ -24,4 +24,5 @@ public class PrepareResponse {
 
   private List<StepLog> steps;
   private List<String> notices;
+  private List<String> errors;
 }
