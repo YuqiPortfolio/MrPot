@@ -10,6 +10,7 @@ import com.example.datalake.mrpot.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/prompt")
 @Tag(name = "Demo Streaming API", description = "Response answer and SSE ")
@@ -38,7 +40,11 @@ public class PromptController {
     return promptPipeline.run(req)
         .map(ctx -> ResponseEntity.ok(toResponse(ctx)))
         .onErrorResume(ValidationException.class, ex ->
-            Mono.just(ResponseEntity.badRequest().body(toErrorResponse(ex))));
+            Mono.just(ResponseEntity.badRequest().body(toErrorResponse(ex))))
+        .onErrorResume(ex -> {
+          log.error("Unexpected failure while preparing prompt", ex);
+          return Mono.just(ResponseEntity.internalServerError().body(toUnexpectedErrorResponse(ex)));
+        });
   }
 
   private PrepareResponse toResponse(ProcessingContext ctx) {
@@ -94,6 +100,17 @@ public class PromptController {
     return PrepareResponse.builder()
         .notices(List.of())
         .errors(List.copyOf(ex.getReasons()))
+        .build();
+  }
+
+  private PrepareResponse toUnexpectedErrorResponse(Throwable ex) {
+    String detail = ex.getMessage();
+    String message = (detail == null || detail.isBlank())
+        ? "Unexpected error occurred."
+        : "Unexpected error: " + detail;
+    return PrepareResponse.builder()
+        .notices(List.of())
+        .errors(List.of(message))
         .build();
   }
 
