@@ -84,6 +84,7 @@ public class PromptController {
         .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
         .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
         .entities(entities)
+        .kbMatches(ctx.getKnowledgeBaseMatches() == null ? List.of() : List.copyOf(ctx.getKnowledgeBaseMatches()))
         .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
         .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
         .errors(List.of())
