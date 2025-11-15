@@ -1,11 +1,14 @@
 package com.example.datalake.mrpot.response;
 
+import com.example.datalake.mrpot.model.KnowledgeBaseMatch;
 import com.example.datalake.mrpot.model.StepLog;
-import lombok.*;
-import lombok.experimental.Accessors;
-
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @Builder
@@ -21,6 +24,7 @@ public class PrepareResponse {
   private String intent;
   private List<String> tags;
   private Map<String, ?> entities;
+  private List<KnowledgeBaseMatch> kbMatches;
 
   private List<StepLog> steps;
   private List<String> notices;
