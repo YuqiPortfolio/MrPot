@@ -64,6 +64,19 @@ public class PromptCacheLookupProcessor implements TextProcessor {
       return null;
     }
     String lang = PromptRenderUtils.languageCode(ctx);
-    return lang + "::" + base.trim();
+    String scope = userScope(ctx);
+    return lang + "::" + scope + "::" + base.trim();
+  }
+
+  private String userScope(ProcessingContext ctx) {
+    String userId = ctx.getUserId();
+    if (userId != null && !userId.isBlank()) {
+      return "user:" + userId.trim();
+    }
+    String sessionId = ctx.getSessionId();
+    if (sessionId != null && !sessionId.isBlank()) {
+      return "session:" + sessionId.trim();
+    }
+    return "anon";
   }
 }
