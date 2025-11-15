@@ -58,6 +58,10 @@ public class PromptTemplateProcessor implements TextProcessor {
 
   @Override
   public Mono<ProcessingContext> process(ProcessingContext ctx) {
+    if (ctx.isCommonResponse()) {
+      return Mono.just(ctx.addStep(name(), "skip-common"));
+    }
+
     return Mono.fromSupplier(() -> {
       ensureTemplatesLoaded();
 

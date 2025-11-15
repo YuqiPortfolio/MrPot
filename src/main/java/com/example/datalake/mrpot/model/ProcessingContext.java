@@ -47,6 +47,12 @@ public class ProcessingContext {
   private List<StepLog> steps = new ArrayList<>();
   private List<String> validationNotices = new ArrayList<>();
 
+  // caching + short-circuit controls
+  private String cacheKey;
+  private boolean cacheHit;
+  private int cacheFrequency;
+  private boolean commonResponse;
+
   public ProcessingContext addStep(String name, String note) {
     steps.add(new StepLog().setName(name).setNote(note).setAt(Instant.now()));
     return this;
