@@ -1,12 +1,17 @@
 package com.example.datalake.mrpot.model;
 
+import com.example.datalake.mrpot.model.KnowledgeBaseMatch;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.time.Instant;
-import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -46,6 +51,9 @@ public class ProcessingContext {
   // audit trail
   private List<StepLog> steps = new ArrayList<>();
   private List<String> validationNotices = new ArrayList<>();
+
+  // retrieval augmentation
+  private List<KnowledgeBaseMatch> knowledgeBaseMatches = new ArrayList<>();
 
   // caching + short-circuit controls
   private String cacheKey;

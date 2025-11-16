@@ -2,13 +2,14 @@
 package com.example.datalake.mrpot.service;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
-import com.example.datalake.mrpot.processor.TextProcessor;
-import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
-import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
 import com.example.datalake.mrpot.processor.CommonResponseProcessor;
+import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
+import com.example.datalake.mrpot.processor.KnowledgeBaseEnrichmentProcessor;
 import com.example.datalake.mrpot.processor.PromptCacheLookupProcessor;
 import com.example.datalake.mrpot.processor.PromptCacheRecordProcessor;
 import com.example.datalake.mrpot.processor.PromptTemplateProcessor;
+import com.example.datalake.mrpot.processor.TextProcessor;
+import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.validation.ValidationContext;
 import com.example.datalake.mrpot.validation.ValidationException;
@@ -38,6 +39,7 @@ public class PromptPipeline {
       PromptCacheLookupProcessor.class,
 //            LanguageTranslateProcessor.class,
       PromptTemplateProcessor.class,
+      KnowledgeBaseEnrichmentProcessor.class,
       PromptCacheRecordProcessor.class
   );
 
@@ -120,6 +122,7 @@ public class PromptPipeline {
   }
 
   private boolean shouldBypassAfterCache(TextProcessor processor) {
-    return processor instanceof PromptTemplateProcessor;
+    return processor instanceof PromptTemplateProcessor
+        || processor instanceof KnowledgeBaseEnrichmentProcessor;
   }
 }
