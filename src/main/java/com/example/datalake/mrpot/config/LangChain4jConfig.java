@@ -1,6 +1,6 @@
 package com.example.datalake.mrpot.config;
 
-import dev.langchain4j.model.embedding.onnx.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
