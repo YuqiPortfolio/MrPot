@@ -20,11 +20,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LangChain4jRagService {
 
+    private static final int MAX_KB_DOCS = 2;
+    private static final int MAX_DOC_CHARS = 1200;   // truncate each doc
+
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
-        // 1) 选一个 “用户文本” 作为检索条件（优先 finalPrompt/userPrompt）
+        // 1) pick "user text" for retrieval (userPrompt > finalPrompt > rawInput)
         String userText = ctx.getUserPrompt();
         if (userText == null || userText.isBlank()) {
             userText = ctx.getFinalPrompt();
@@ -36,48 +39,68 @@ public class LangChain4jRagService {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
         }
 
-        // 2) 查 Supabase kb_documents
-        List<KbDocument> docs = kbSearchService.searchByUserText(userText);
+        // 2) search Supabase kb_documents
+        List<KbDocument> matchedDocs = kbSearchService.search(userText, ctx.getKeywords());
+        List<KbDocument> docs = matchedDocs.stream()
+                .limit(MAX_KB_DOCS)
+                .toList();
+
         if (docs.isEmpty()) {
             log.debug("No kb_documents matched for text='{}'", userText);
         }
 
-        // 3) 拼成 context block
+        // 3) build context block (truncated)
         String kbContext = docs.stream()
-                .map(KbDocument::getContent)
+                .map(doc -> truncate(doc.getContent(), MAX_DOC_CHARS))
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        // 记录一下用到哪些文档 id，便于调试 / 展示
+        if (kbContext.isBlank()) {
+            kbContext = "(no relevant knowledge base content found)";
+        }
+
+        // record doc ids
         ctx.setLlmDocIds(docs.stream().map(KbDocument::getId).toList());
 
-        // 4) system prompt：用你已有的 PromptRenderUtils
+        // 4) base system prompt from your pipeline
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
 
-        // 5) 最终送给 LLM 的 prompt
+        // 5) short final prompt
         String finalPromptForLlm = """
-                %s
+%s
 
-                You must answer STRICTLY based on the following knowledge base.
-                If the answer is not contained there, say you don't know.
+You also have some knowledge base snippets (they may be incomplete):
 
-                ### Knowledge Base
-                %s
+%s
 
-                ### User Input
-                %s
-                """.formatted(
-                systemPrompt != null ? systemPrompt : "",
-                kbContext.isBlank() ? "(no relevant kb_documents found)" : kbContext,
-                userText
-        );
+Use BOTH:
+- your general world knowledge and reasoning, and
+- the knowledge base above.
+
+If they ever conflict, treat the knowledge base as the source of truth.
+Do **not** invent facts that contradict the knowledge base.
+Only say "I don't know" when the answer cannot be reasonably inferred
+from your general knowledge and the knowledge base.
+
+Question (same language in your answer):
+%s
+
+Answer briefly, in the same language as the question:
+""".formatted(systemPrompt, kbContext, userText);
 
         log.debug("LangChain4jRagService: finalPromptForLlm=\n{}", finalPromptForLlm);
 
-        // 6) 同步调用 ChatModel（封在 Mono.fromCallable 里）
+        // 6) sync call wrapped in Mono
         return Mono.fromCallable(() -> {
             String answer = chatModel.chat(finalPromptForLlm);
             ctx.setLlmAnswer(answer);
-            return ctx.addStep("langchain4j-rag", "ok docs=" + docs.size());
+            return ctx.addStep("langchain4j-rag",
+                    "ok docs=" + docs.size() + "/matched=" + matchedDocs.size());
         });
+    }
+
+    private static String truncate(String text, int maxChars) {
+        if (text == null) return "";
+        if (text.length() <= maxChars) return text;
+        return text.substring(0, maxChars) + "...";
     }
 }

@@ -30,6 +30,7 @@ public class IntentClassifierProcessor implements TextProcessor {
 
   // Matches either a Latin token ([a-z0-9+.#-]+) OR a contiguous CJK (Han) run (\\p{IsHan}+)
   private static final Pattern TOKENIZER = Pattern.compile("([a-z0-9+.#-]+)|([\\p{IsHan}]+)");
+  private static final Pattern HAN_CHAR = Pattern.compile("[\\p{IsHan}]");
   private static final Set<String> GREETING_PHRASES = Set.of(
       "hi",
       "hi there",
@@ -89,6 +90,9 @@ public class IntentClassifierProcessor implements TextProcessor {
         tags.add(canonical);
       }
     });
+
+    // 2.1) capture keywords for downstream search/template enrichment
+    ctx.setKeywords(deriveKeywords(tokenSet, tags));
 
     // 3) score rules
     Intent predicted = Intent.UNKNOWN;
@@ -208,6 +212,28 @@ public class IntentClassifierProcessor implements TextProcessor {
     }
     String normalized = cleaned.toString().replaceAll("\\s+", " ").trim();
     return GREETING_PHRASES.contains(normalized);
+  }
+
+  private List<String> deriveKeywords(Set<String> tokenSet, Set<String> tags) {
+    LinkedHashSet<String> ordered = new LinkedHashSet<>();
+
+    for (String token : tokenSet) {
+      if (token == null) continue;
+      String t = token.trim();
+      if (t.isEmpty()) continue;
+      if (t.length() < 2 && !HAN_CHAR.matcher(t).find()) continue; // skip tiny Latin noise
+      ordered.add(t);
+    }
+
+    for (String tag : tags) {
+      if (tag == null || tag.isBlank()) continue;
+      ordered.add(tag.toLowerCase(Locale.ROOT));
+    }
+
+    // keep it small/stable for search and logging
+    return ordered.stream()
+        .limit(20)
+        .toList();
   }
 
   // ---------------- Rules & Lexicon Loading ----------------

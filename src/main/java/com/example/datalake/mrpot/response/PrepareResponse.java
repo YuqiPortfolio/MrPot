@@ -16,6 +16,7 @@ public class PrepareResponse {
   private String systemPrompt;
   private String userPrompt;
   private String finalPrompt;
+  private String answer;
 
   private String language;
   private String intent;

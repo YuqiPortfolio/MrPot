@@ -29,6 +29,9 @@ public class ProcessingContext {
   private Map<String, List<String>> outline = new LinkedHashMap<>();
   private double changeRatio;
 
+  // derived features
+  private List<String> keywords = new ArrayList<>();
+
   // Language
   private String indexText;
   private String indexLanguage = "en";

@@ -76,7 +76,9 @@ public class PromptTemplateProcessor implements TextProcessor {
       }
 
       // Build variable bag from context
-      Map<String, Object> vars = buildVarsFromContext(ctx, lang, intent);
+      List<String> keywords = readKeywords(ctx);
+      List<String> topKeywords = topKeywords(keywords, DEFAULT_TOP_K);
+      Map<String, Object> vars = buildVarsFromContext(ctx, lang, intent, keywords, topKeywords);
 
       // Render system/user
       String oldSystem = tryGetString(ctx, "getSystemPrompt", "systemPrompt");
@@ -87,10 +89,8 @@ public class PromptTemplateProcessor implements TextProcessor {
       String newUser   = render(tpl.user,   vars);
 
       // Enrich with keywords (append in a consistent, minimal way)
-      List<String> keywords = readKeywords(ctx);
-      if (!keywords.isEmpty()) {
-        List<String> top = topKeywords(keywords, DEFAULT_TOP_K);
-        String joined = String.join(", ", top);
+      if (!topKeywords.isEmpty()) {
+        String joined = String.join(", ", topKeywords);
 
         if (isBlank(newSystem)) newSystem = "";
         if (isBlank(newUser))   newUser   = safeReadUserText(ctx);
@@ -100,7 +100,7 @@ public class PromptTemplateProcessor implements TextProcessor {
         newUser   = appendBlock(newUser,   "Top keywords", joined);
 
         // Expose for downstream processors (if map present)
-        tryPutMeta(ctx, "keywords.top", top);
+        tryPutMeta(ctx, "keywords.top", topKeywords);
       }
 
       // Write back
@@ -162,7 +162,8 @@ public class PromptTemplateProcessor implements TextProcessor {
     return cachedIndex.get(DEFAULT_LANG, DEFAULT_INTENT);
   }
 
-  private Map<String, Object> buildVarsFromContext(ProcessingContext ctx, String lang, String intent) {
+  private Map<String, Object> buildVarsFromContext(ProcessingContext ctx, String lang, String intent,
+                                                   List<String> keywords, List<String> topKeywords) {
     Map<String, Object> v = new LinkedHashMap<>();
 
     String indexText = tryGetString(ctx, "getIndexText", "indexText");
@@ -181,9 +182,8 @@ public class PromptTemplateProcessor implements TextProcessor {
     v.put("user_prompt",   tryGetString(ctx, "getUserPrompt", "userPrompt"));
 
     // keywords
-    List<String> keywords = readKeywords(ctx);
     v.put("keywords", keywords);
-    v.put("top_keywords", topKeywords(keywords, DEFAULT_TOP_K));
+    v.put("top_keywords", topKeywords);
 
     // room for more (use metadata map if available)
     Object domain = tryGetMeta(ctx, "domain");
