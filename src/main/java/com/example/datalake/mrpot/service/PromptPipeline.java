@@ -2,13 +2,7 @@
 package com.example.datalake.mrpot.service;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
-import com.example.datalake.mrpot.processor.TextProcessor;
-import com.example.datalake.mrpot.processor.UnifiedCleanCorrectProcessor;
-import com.example.datalake.mrpot.processor.IntentClassifierProcessor;
-import com.example.datalake.mrpot.processor.CommonResponseProcessor;
-import com.example.datalake.mrpot.processor.PromptCacheLookupProcessor;
-import com.example.datalake.mrpot.processor.PromptCacheRecordProcessor;
-import com.example.datalake.mrpot.processor.PromptTemplateProcessor;
+import com.example.datalake.mrpot.processor.*;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.validation.ValidationContext;
 import com.example.datalake.mrpot.validation.ValidationException;
@@ -32,16 +26,17 @@ public class PromptPipeline {
 
   // Explicit, deterministic order for the first three processors
   private static final List<Class<? extends TextProcessor>> DEFAULT_ORDER = List.of(
-      UnifiedCleanCorrectProcessor.class,
-      IntentClassifierProcessor.class,
-      CommonResponseProcessor.class,
-      PromptCacheLookupProcessor.class,
-//            LanguageTranslateProcessor.class,
-      PromptTemplateProcessor.class,
-      PromptCacheRecordProcessor.class
+          UnifiedCleanCorrectProcessor.class,
+          IntentClassifierProcessor.class,
+          CommonResponseProcessor.class,
+          PromptCacheLookupProcessor.class,
+          PromptTemplateProcessor.class,
+          LangChain4jRagProcessor.class,
+          PromptCacheRecordProcessor.class
   );
 
-  private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
+
+    private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
   private final ValidationService validationService;
 
   public PromptPipeline(List<TextProcessor> processors, ValidationService validationService) {
