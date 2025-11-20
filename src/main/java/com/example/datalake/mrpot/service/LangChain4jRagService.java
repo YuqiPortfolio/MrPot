@@ -75,24 +75,19 @@ public class LangChain4jRagService {
         String finalPromptForLlm = """
 %s
 
-You also have some knowledge base snippets (they may be incomplete):
-
+Context (may be incomplete):
 %s
 
-Use BOTH:
-- your general world knowledge and reasoning, and
-- the knowledge base above.
+Use both your general knowledge and this context.
+If they conflict, follow the context.
+If the answer cannot be inferred, reply "I don't know".
 
-If they ever conflict, treat the knowledge base as the source of truth.
-Do **not** invent facts that contradict the knowledge base.
-Only say "I don't know" when the answer cannot be reasonably inferred
-from your general knowledge and the knowledge base.
-
-Question (same language in your answer):
+Question (reply in the same language):
 %s
 
-Answer briefly, in the same language as the question:
+Answer briefly:
 """.formatted(systemPrompt, kbContext, userText);
+
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 

@@ -24,7 +24,8 @@ public class SupabaseKbSearchService implements KbSearchService {
     private static final int MAX_DOC_CANDIDATES = 20;
 
     // 每篇文档最多给多少字符的 snippet（局部预算）
-    private static final int MAX_SNIPPET_PER_DOC = 600;
+    // 改小一点，让 [DOC n] 更精简
+    private static final int MAX_SNIPPET_PER_DOC = 260;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -78,7 +79,7 @@ public class SupabaseKbSearchService implements KbSearchService {
 
             String snippetText = extractSnippetFromContent(content, keywords, perDocBudget);
             snippetText = normalizeWhitespace(snippetText);
-            if (snippetText.isBlank()) continue;
+            if (snippetText.isBlank()) continue; // 如果没有关键词命中，直接跳过
 
             KbSnippet snippet = KbSnippet.builder()
                     .docId(doc.getId())
@@ -116,11 +117,10 @@ public class SupabaseKbSearchService implements KbSearchService {
 
         Map<String, Object> params = new HashMap<>();
 
-        // 用 query 做一个模糊匹配
-        sql.append(" AND content ILIKE :q ");
+        // (content ILIKE query OR content ILIKE kw1 OR ...)
+        sql.append(" AND ( content ILIKE :q ");
         params.put("q", "%" + trimmedQuery + "%");
 
-        // keywords OR 匹配
         int kwIndex = 0;
         for (String kw : keywords) {
             if (kw == null || kw.isBlank()) continue;
@@ -128,6 +128,7 @@ public class SupabaseKbSearchService implements KbSearchService {
             sql.append(" OR content ILIKE :").append(key).append(" ");
             params.put(key, "%" + kw.trim() + "%");
         }
+        sql.append(") ");
 
         sql.append(" ORDER BY id DESC LIMIT :limit");
         params.put("limit", limit);
@@ -168,51 +169,88 @@ public class SupabaseKbSearchService implements KbSearchService {
 
     /**
      * 从整篇 content 中抽一个 snippet：
-     * - 优先围绕第一个关键词命中的位置；
-     * - 如果没有命中任何关键词，则取开头的一段。
+     * - 仅当至少有一个关键词在 content 中命中时才返回片段；
+     * - 如果没有命中任何关键词（或 keywords 为空），直接返回 ""；
+     * - 命中时围绕第一个匹配位置截一段，并按句子边界做柔和截断。
      */
     private String extractSnippetFromContent(String content,
                                              List<String> keywords,
                                              int maxChars) {
         if (content == null) return "";
-        if (content.length() <= maxChars) {
-            return content;
+        String text = content.strip();
+        if (text.isEmpty()) return "";
+        if (maxChars <= 0) return "";
+
+        if (keywords == null || keywords.isEmpty()) {
+            // 要求：如果没有 keywords，直接不返回 snippet
+            return "";
         }
 
-        String lower = content.toLowerCase(Locale.ROOT);
+        String lower = text.toLowerCase(Locale.ROOT);
         int bestIdx = -1;
 
-        if (keywords != null && !keywords.isEmpty()) {
-            for (String kw : keywords) {
-                if (kw == null || kw.isBlank()) continue;
-                String kwLower = kw.toLowerCase(Locale.ROOT).trim();
-                if (kwLower.isEmpty()) continue;
+        // 找到第一个匹配的关键词位置（最靠前的）
+        for (String kw : keywords) {
+            if (kw == null || kw.isBlank()) continue;
+            String kwLower = kw.toLowerCase(Locale.ROOT).trim();
+            if (kwLower.isEmpty()) continue;
 
-                int idx = lower.indexOf(kwLower);
-                if (idx >= 0 && (bestIdx == -1 || idx < bestIdx)) {
-                    bestIdx = idx;
-                }
+            int idx = lower.indexOf(kwLower);
+            if (idx >= 0 && (bestIdx == -1 || idx < bestIdx)) {
+                bestIdx = idx;
             }
         }
 
-        // 没有任何关键词命中：直接用开头一段
+        // 如果没有任何关键词命中：直接返回空字符串
         if (bestIdx == -1) {
-            return content.substring(0, maxChars) + "...";
+            return "";
         }
 
+        // 以关键词为中心截取一段内容
         int half = maxChars / 2;
         int start = Math.max(0, bestIdx - half);
-        int end = Math.min(content.length(), start + maxChars);
-
-        if (end - start < maxChars && end == content.length()) {
+        int end = Math.min(text.length(), start + maxChars);
+        if (end - start < maxChars && end == text.length()) {
             start = Math.max(0, end - maxChars);
         }
 
-        String snippet = content.substring(start, end);
-        if (start > 0) snippet = "..." + snippet;
-        if (end < content.length()) snippet = snippet + "...";
+        String rawSnippet = text.substring(start, end);
+        if (start > 0) rawSnippet = "..." + rawSnippet;
+        if (end < text.length()) rawSnippet = rawSnippet + "...";
 
-        return snippet;
+        // 再按句子边界柔和剪裁，保证不超过 maxChars 且读起来自然
+        String clipped = clipToSentenceBoundary(rawSnippet, maxChars);
+        return clipped;
+    }
+
+    /**
+     * 将 snippet 截到最近的句子边界内，避免过长。
+     */
+    private static String clipToSentenceBoundary(String snippet, int maxChars) {
+        if (snippet == null) return "";
+        String s = snippet.strip();
+        if (s.length() <= maxChars) return s;
+
+        String sub = s.substring(0, maxChars);
+        int cut = lastSentenceBoundary(sub);
+        if (cut > 40) { // 避免截得太短
+            sub = sub.substring(0, cut);
+        }
+        return sub.strip() + "...";
+    }
+
+    /**
+     * 寻找最后一个句子结束符号的位置。
+     */
+    private static int lastSentenceBoundary(String text) {
+        if (text == null || text.isEmpty()) return -1;
+        int last = -1;
+        char[] marks = {'.', '?', '!', '。', '？', '！', '\n'};
+        for (char m : marks) {
+            int idx = text.lastIndexOf(m);
+            if (idx > last) last = idx;
+        }
+        return (last == -1) ? -1 : last + 1;
     }
 
     private static String normalizeWhitespace(String s) {

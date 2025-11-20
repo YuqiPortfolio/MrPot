@@ -55,6 +55,13 @@ public class IntentClassifierProcessor implements TextProcessor {
             "您好"
     );
 
+    // 中文代词/语气词 + 一些英文代词，避免被当成关键词
+    private static final Set<String> STOPWORDS = Set.of(
+            "他", "她", "你", "我", "它", "我们", "你们", "他们", "她们", "它们",
+            "吗", "呢", "啊", "吧", "了", "的",
+            "he", "she", "you", "i", "we", "they", "it", "me", "him", "her", "them", "us"
+    );
+
     private final ObjectMapper om = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -174,14 +181,15 @@ public class IntentClassifierProcessor implements TextProcessor {
         String note = "intent=" + predicted +
                 (matchedRule != null ? (", rule=" + matchedRule) : "") +
                 (tpl.isPresent() ? (", template=" + tpl.get().getId()) : "") +
-                ", tags=" + new ArrayList<>(tags);
+                ", tags=" + new ArrayList<>(tags) +
+                ", keywords=" + ctx.getKeywords();
         ctx.addStep(NAME, note);
 
         return Mono.just(ctx);
     }
 
     // ----------------------------------------------------
-    // 分词逻辑：英文单词 + 汉字串 + 汉字 n-gram
+    // 分词逻辑：英文单词 + 汉字串 + 汉字 uni/bi/tri-gram
     // ----------------------------------------------------
     private List<String> tokenize(String raw) {
         if (raw == null || raw.isBlank()) {
@@ -191,8 +199,8 @@ public class IntentClassifierProcessor implements TextProcessor {
         String text = raw.toLowerCase(Locale.ROOT);
         Matcher m = TOKENIZER.matcher(text);
 
-        List<String> words = new ArrayList<>();        // 英文/数字 token + 整段汉字串
-        List<String> hanCharNgrams = new ArrayList<>(); // 汉字单字 + 双字 n-gram
+        List<String> words = new ArrayList<>();         // 英文/数字 token + 整段汉字串
+        List<String> hanCharNgrams = new ArrayList<>(); // 汉字 uni/bi/tri-gram
         boolean matched = false;
 
         while (m.find()) {
@@ -205,12 +213,17 @@ public class IntentClassifierProcessor implements TextProcessor {
             } else if (han != null) {
                 // 整段汉字串作为一个 token
                 words.add(han);
-                // 额外：单字 + 双字 n-gram，增加召回（不引入第三方中文分词）
+                // 单字
                 for (int i = 0; i < han.length(); i++) {
                     hanCharNgrams.add(han.substring(i, i + 1));
                 }
+                // bigram
                 for (int i = 0; i + 1 < han.length(); i++) {
                     hanCharNgrams.add(han.substring(i, i + 2));
+                }
+                // trigram：例如 "芝加" + "加哥" → "芝加哥"
+                for (int i = 0; i + 2 < han.length(); i++) {
+                    hanCharNgrams.add(han.substring(i, i + 3));
                 }
             }
         }
@@ -242,7 +255,7 @@ public class IntentClassifierProcessor implements TextProcessor {
         for (int i = 1; i < words.size(); i++) {
             tokens.add(words.get(i - 1) + " " + words.get(i));
         }
-        // 再加上汉字 n-gram
+        // 再加上汉字 uni/bi/tri-gram
         tokens.addAll(hanCharNgrams);
 
         return tokens;
@@ -287,28 +300,91 @@ public class IntentClassifierProcessor implements TextProcessor {
         return GREETING_PHRASES.contains(normalized);
     }
 
-    // 基于 tokens + tags 构造关键词列表（顺序稳定，最多 20 个）
-    private List<String> deriveKeywords(List<String> tokens, Set<String> tags) {
-        LinkedHashSet<String> ordered = new LinkedHashSet<>();
+    /**
+     * 过滤一个候选关键词：
+     *  - 去掉空字符串
+     *  - 去掉常见代词/语气词（STOPWORDS）
+     *  - 英文 token：长度 < 3 丢弃
+     *  - 汉字 token：长度 < 2 丢弃
+     */
+    private boolean isGoodKeyword(String kw) {
+        if (kw == null) return false;
+        String t = kw.trim().toLowerCase(Locale.ROOT);
+        if (t.isEmpty()) return false;
+        if (STOPWORDS.contains(t)) return false;
 
-        // 先按分词顺序加入（LinkedHashSet 自动去重）
-        for (String token : tokens) {
-            if (token == null) continue;
-            String t = token.trim();
-            if (t.isEmpty()) continue;
-            // 英文长度 <2 的噪音丢弃，但单个汉字允许
-            if (t.length() < 2 && !HAN_CHAR.matcher(t).find()) continue;
-            ordered.add(t);
+        boolean hasHan = HAN_CHAR.matcher(t).find();
+        if (hasHan) {
+            // 汉字长度 < 2 的丢弃
+            if (t.length() < 2) return false;
+        } else {
+            // 英文长度 < 3 的丢弃
+            if (t.length() < 3) return false;
+        }
+        return true;
+    }
+
+    // 基于 keywords_map.json + tokens/tags 抽取关键词：
+    // 1) 只返回 lexicon 里的 canonical term
+    // 2) 按长度降序排序
+    // 3) 最多保留前 5 个
+    private List<String> deriveKeywords(List<String> tokens, Set<String> tags) {
+        if (tokens == null || tokens.isEmpty()) {
+            return List.of();
         }
 
-        // 再把 tag 也合并进来（例如 intent:xxx、lexicon canonical term）
+        Set<String> tokenSet = new HashSet<>();
+        for (String t : tokens) {
+            if (t != null && !t.isBlank()) {
+                tokenSet.add(t.toLowerCase(Locale.ROOT));
+            }
+        }
+
+        LinkedHashSet<String> candidates = new LinkedHashSet<>();
+
+        // 1) 按 lexicon 检索：命中任一同义词 → 取 canonical
+        for (Map.Entry<String, Set<String>> e : expandedLexicon.entrySet()) {
+            String canonical = e.getKey(); // 已经是 lowerCase
+            Set<String> syns = e.getValue();
+            boolean hit = false;
+            for (String s : syns) {
+                if (tokenSet.contains(s)) {
+                    hit = true;
+                    break;
+                }
+            }
+            if (hit && isGoodKeyword(canonical)) {
+                candidates.add(canonical);
+            }
+        }
+
+        // 2) 从 tags 中补充：如果某个 tag 恰好就是 lexicon canonical，也可视作关键词
         for (String tag : tags) {
             if (tag == null || tag.isBlank()) continue;
-            ordered.add(tag.toLowerCase(Locale.ROOT));
+            String t = tag.toLowerCase(Locale.ROOT);
+            if (expandedLexicon.containsKey(t) && isGoodKeyword(t)) {
+                candidates.add(t);
+            }
         }
 
-        return ordered.stream()
-                .limit(20)
+        if (candidates.isEmpty()) {
+            return List.of();
+        }
+
+        // 3) 按长度降序排序（长词优先，例如“芝加哥”优于“芝加”）
+        List<String> sorted = new ArrayList<>(candidates);
+        sorted.sort((a, b) -> {
+            int la = a.length();
+            int lb = b.length();
+            if (la != lb) {
+                return Integer.compare(lb, la); // 长的在前
+            }
+            return a.compareTo(b);
+        });
+
+        // 4) 最多取前 5 个
+        return sorted.stream()
+                .limit(5)
                 .toList();
     }
 
