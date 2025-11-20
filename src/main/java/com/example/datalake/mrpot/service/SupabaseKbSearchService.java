@@ -1,6 +1,7 @@
 package com.example.datalake.mrpot.service;
 
 import com.example.datalake.mrpot.model.KbSnippet;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pgvector.PGvector;
 import dev.langchain4j.data.embedding.Embedding;
@@ -78,9 +79,7 @@ public class SupabaseKbSearchService implements KbSearchService {
 
                         String json = rs.getString("metadata");
                         if (json != null) {
-                            @SuppressWarnings("unchecked")
-                            Map<String, Object> meta = objectMapper.readValue(json, Map.class);
-                            s.setMetadata(meta);
+                            s.setMetadata(deserializeMetadata(json));
                         }
 
                         s.setSimilarity(rs.getDouble("similarity"));
@@ -90,6 +89,17 @@ public class SupabaseKbSearchService implements KbSearchService {
         } catch (Exception e) {
             log.error("Error searching kb_documents with queryText={}", queryText, e);
             return List.of();
+        }
+    }
+
+    private Map<String, Object> deserializeMetadata(String json) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> meta = objectMapper.readValue(json, Map.class);
+            return meta;
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to parse kb_documents.metadata: {}", json, e);
+            return null;
         }
     }
 }
