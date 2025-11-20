@@ -1,63 +1,21 @@
 package com.example.datalake.mrpot.service;
 
-import com.example.datalake.mrpot.dao.KbDocumentRepository;
-import com.example.datalake.mrpot.model.KbDocument;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.example.datalake.mrpot.model.KbSnippet;
 
-import java.util.*;
+import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class KbSearchService {
+public interface KbSearchService {
 
-    private final KbDocumentRepository repository;
-
-    private static final int MAX_RESULTS = 5;
-
-    public List<KbDocument> searchByUserText(String text) {
-        return search(text, Collections.emptyList());
-    }
-
-    public List<KbDocument> search(String text, List<String> keywords) {
-        LinkedHashMap<Long, KbDocument> merged = new LinkedHashMap<>();
-
-        for (String kw : normalizeKeywords(keywords)) {
-            List<KbDocument> docs = repository.findTop5ByContentContainingIgnoreCaseOrderByIdDesc(kw);
-            merge(merged, docs);
-            if (merged.size() >= MAX_RESULTS) break;
-        }
-
-        if (merged.isEmpty() && text != null && !text.isBlank()) {
-            merge(merged, repository.findTop5ByContentContainingIgnoreCaseOrderByIdDesc(text));
-        }
-
-        return merged.values().stream()
-                .limit(MAX_RESULTS)
-                .toList();
-    }
-
-    private List<String> normalizeKeywords(List<String> keywords) {
-        if (keywords == null) {
-            return List.of();
-        }
-        List<String> cleaned = new ArrayList<>(keywords.size());
-        for (String kw : keywords) {
-            if (kw == null) continue;
-            String t = kw.trim();
-            if (!t.isBlank()) {
-                cleaned.add(t);
-            }
-        }
-        return cleaned;
-    }
-
-    private void merge(Map<Long, KbDocument> acc, List<KbDocument> docs) {
-        if (docs == null) return;
-        for (KbDocument doc : docs) {
-            if (doc != null && doc.getId() != null) {
-                acc.putIfAbsent(doc.getId(), doc);
-            }
-        }
-    }
+    /**
+     * 基于 query + keywords 进行检索，返回「短片段」。
+     *
+     * @param query          英文检索文本（来自 ctx.indexText / userPrompt 的英文版本）
+     * @param keywords       上游 Processor 提取的关键词
+     * @param maxSnippets    最多返回多少片段
+     * @param maxTotalChars  所有 snippet 的字符总预算（服务端粗控）
+     */
+    List<KbSnippet> searchSnippets(String query,
+                                   List<String> keywords,
+                                   int maxSnippets,
+                                   int maxTotalChars);
 }
