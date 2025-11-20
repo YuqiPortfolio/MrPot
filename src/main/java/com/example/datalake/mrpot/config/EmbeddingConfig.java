@@ -4,11 +4,13 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Embedding model used for semantic search against kb_documents.embedding.
  */
 @Configuration
+@Profile("!test")
 public class EmbeddingConfig {
 
     @Bean

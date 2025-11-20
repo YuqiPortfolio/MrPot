@@ -9,6 +9,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
@@ -27,6 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@Profile("!test")
 @RequiredArgsConstructor
 public class SupabaseKbSearchService implements KbSearchService {
 
