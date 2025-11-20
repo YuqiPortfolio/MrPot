@@ -4,13 +4,13 @@ import com.pgvector.PGvector;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.postgresql.PGConnection;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Locale;
 
 /**
  * Register pgvector types with the JDBC driver so that
@@ -27,8 +27,17 @@ public class PgvectorConfig {
     @PostConstruct
     public void registerPgvectorTypes() throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
-            if (conn.isWrapperFor(PGConnection.class)) {
-                PGvector.registerTypes(conn.unwrap(PGConnection.class));
+            String driverName = "";
+            try {
+                driverName = conn.getMetaData().getDriverName();
+            } catch (SQLException ignored) {
+                // best-effort detection
+            }
+
+            boolean isPostgres = driverName != null && driverName.toLowerCase(Locale.ROOT).contains("postgresql");
+
+            if (isPostgres) {
+                PGvector.registerTypes(conn);
             } else {
                 log.debug("Skip pgvector type registration for non-PostgreSQL connection: {}", conn.getClass());
             }
