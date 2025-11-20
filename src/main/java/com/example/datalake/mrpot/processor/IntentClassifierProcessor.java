@@ -92,7 +92,7 @@ public class IntentClassifierProcessor implements TextProcessor {
     });
 
     // 2.1) capture keywords for downstream search/template enrichment
-    ctx.setKeywords(deriveKeywords(tokenSet, tags));
+    ctx.setKeywords(deriveKeywords(tokens, tags));
 
     // 3) score rules
     Intent predicted = Intent.UNKNOWN;
@@ -149,13 +149,17 @@ public class IntentClassifierProcessor implements TextProcessor {
   // ---------------- Tokenization (Latin + CJK) ----------------
 
   private List<String> tokenize(String raw) {
+    if (raw == null || raw.isBlank()) return List.of();
+
     String text = raw.toLowerCase(Locale.ROOT);
     Matcher m = TOKENIZER.matcher(text);
 
     List<String> words = new ArrayList<>(); // mixed: latin words and han runs
     List<String> hanCharNgrams = new ArrayList<>();
+    boolean matched = false;
 
     while (m.find()) {
+      matched = true;
       String latin = m.group(1);
       String han = m.group(2);
 
@@ -170,6 +174,25 @@ public class IntentClassifierProcessor implements TextProcessor {
         }
         for (int i = 0; i + 1 < han.length(); i++) {
           hanCharNgrams.add(han.substring(i, i + 2));
+        }
+      }
+    }
+
+    // If regex found nothing (e.g., punctuation-only input), degrade gracefully
+    if (!matched) {
+      if (HAN_CHAR.matcher(text).find()) {
+        for (int i = 0; i < text.length(); i++) {
+          char c = text.charAt(i);
+          String s = String.valueOf(c).trim();
+          if (!s.isEmpty() && HAN_CHAR.matcher(s).find()) {
+            words.add(s);
+          }
+        }
+      } else {
+        for (String part : text.split("\\s+")) {
+          if (!part.isBlank()) {
+            words.add(part);
+          }
         }
       }
     }
@@ -214,10 +237,11 @@ public class IntentClassifierProcessor implements TextProcessor {
     return GREETING_PHRASES.contains(normalized);
   }
 
-  private List<String> deriveKeywords(Set<String> tokenSet, Set<String> tags) {
+  private List<String> deriveKeywords(List<String> tokens, Set<String> tags) {
     LinkedHashSet<String> ordered = new LinkedHashSet<>();
 
-    for (String token : tokenSet) {
+    // preserve the token order (more readable for prompt/debug), while filtering noise
+    for (String token : tokens) {
       if (token == null) continue;
       String t = token.trim();
       if (t.isEmpty()) continue;
@@ -225,9 +249,12 @@ public class IntentClassifierProcessor implements TextProcessor {
       ordered.add(t);
     }
 
+    // append tags (e.g., canonical lexicon terms), but drop intent:* noise
     for (String tag : tags) {
       if (tag == null || tag.isBlank()) continue;
-      ordered.add(tag.toLowerCase(Locale.ROOT));
+      String normalized = tag.toLowerCase(Locale.ROOT);
+      if (normalized.startsWith("intent:")) continue;
+      ordered.add(normalized);
     }
 
     // keep it small/stable for search and logging
