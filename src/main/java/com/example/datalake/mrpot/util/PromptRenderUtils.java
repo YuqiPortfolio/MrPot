@@ -1,7 +1,10 @@
 package com.example.datalake.mrpot.util;
 
+import com.example.datalake.mrpot.model.Intent;
+import com.example.datalake.mrpot.model.Language;
 import com.example.datalake.mrpot.model.ProcessingContext;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -74,5 +77,49 @@ public final class PromptRenderUtils {
       return idxLang.toLowerCase(Locale.ROOT);
     }
     return "en";
+  }
+
+  public static String renderRagPrompt(
+          String systemPrompt,
+          String userText,
+          String kbContext,
+          Language language,
+          Intent intent,
+          List<String> keywords
+  ) {
+    String sys = (systemPrompt == null || systemPrompt.isBlank()) ? BASE_SYSTEM_PROMPT : systemPrompt;
+    String question = Objects.toString(userText, "");
+    String context = Objects.toString(kbContext, "");
+
+    String lang = (language != null && language.getIsoCode() != null && !language.getIsoCode().isBlank())
+            ? language.getIsoCode()
+            : "en";
+
+    String intentLine = intent != null ? "Intent: " + intent.name() + "\n" : "";
+    String keywordLine = (keywords != null && !keywords.isEmpty())
+            ? "Keywords: " + String.join(", ", keywords) + "\n"
+            : "";
+
+    return """
+%s
+
+[Context]
+%s
+
+[Question]
+%s
+
+%s%sGuidelines:
+- Prefer the context; if unsure, answer "I don't know".
+- Reply in language: %s.
+- Keep the answer concise and directly address the question.
+""".formatted(
+            sys,
+            context,
+            question,
+            intentLine,
+            keywordLine,
+            lang
+    );
   }
 }

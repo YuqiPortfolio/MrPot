@@ -1,6 +1,6 @@
 package com.example.datalake.mrpot.service;
 
-import com.example.datalake.mrpot.model.KbDocument;
+import com.example.datalake.mrpot.model.KbSnippet;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
 import dev.langchain4j.model.chat.ChatModel;
@@ -10,97 +10,94 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Use processors' result + kb_documents to call LangChain4j ChatModel.
+ * Use processors' result + kb_documents (in Supabase) to call LangChain4j ChatModel.
+ * This is the RAG layer.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LangChain4jRagService {
 
-    private static final int MAX_KB_DOCS = 2;
-    private static final int MAX_DOC_CHARS = 1200;   // truncate each doc
+    private static final int MAX_SNIPPETS = 8;
+    private static final int MAX_KB_CONTEXT_CHARS = 6000;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
-        // 1) pick "user text" for retrieval (userPrompt > finalPrompt > rawInput)
+        // 1) Pick a "user text" as retrieval query (prefer userPrompt, then finalPrompt)
         String userText = ctx.getUserPrompt();
         if (userText == null || userText.isBlank()) {
             userText = ctx.getFinalPrompt();
         }
+
         if (userText == null || userText.isBlank()) {
-            userText = ctx.getRawInput();
-        }
-        if (userText == null || userText.isBlank()) {
-            return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
-        }
-
-        // 2) search Supabase kb_documents
-        List<KbDocument> matchedDocs = kbSearchService.search(userText, ctx.getKeywords());
-        List<KbDocument> docs = matchedDocs.stream()
-                .limit(MAX_KB_DOCS)
-                .toList();
-
-        if (docs.isEmpty()) {
-            log.debug("No kb_documents matched for text='{}'", userText);
+            // No user text → fall back to plain prompt call
+            String plainPrompt = PromptRenderUtils.ensureFinalPrompt(ctx);
+            return Mono.fromCallable(() -> {
+                String answer = chatModel.chat(plainPrompt);
+                ctx.setLlmAnswer(answer);
+                return ctx.addStep("langchain4j-rag", "no user text, skip kb");
+            });
         }
 
-        // 3) build context block (truncated)
-        String kbContext = docs.stream()
-                .map(doc -> truncate(doc.getContent(), MAX_DOC_CHARS))
+        // 2) Text used for semantic search (usually cleaned/translated text)
+        String queryText = Optional.ofNullable(ctx.getIndexText()).orElse(userText);
+        List<String> keywords = Optional.ofNullable(ctx.getKeywords()).orElse(List.of());
+
+        log.debug("RAG queryText='{}', keywords={}", queryText, keywords);
+
+        // 3) Query Supabase KB via pgvector
+        List<KbSnippet> snippets = kbSearchService.searchSnippets(
+                queryText,
+                keywords,
+                MAX_SNIPPETS
+        );
+
+        // 4) Build KB context string (with max length)
+        String kbContext = snippets.stream()
+                .map(KbSnippet::getContent)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
+        if (kbContext.length() > MAX_KB_CONTEXT_CHARS) {
+            kbContext = kbContext.substring(0, MAX_KB_CONTEXT_CHARS);
+        }
+
         if (kbContext.isBlank()) {
-            kbContext = "(no relevant knowledge base content found)";
+            kbContext = "(no matched knowledge base snippets)";
         }
 
         // record doc ids
-        ctx.setLlmDocIds(docs.stream().map(KbDocument::getId).toList());
+        ctx.setLlmDocIds(snippets.stream().map(KbSnippet::getId).toList());
 
-        // 4) base system prompt from your pipeline
-        String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+        // 5) Render final prompt for LLM using your own helper
+        String finalPromptForLlm = PromptRenderUtils.renderRagPrompt(
+                ctx.getSystemPrompt(),
+                userText,
+                kbContext,
+                ctx.getLanguage(),
+                ctx.getIntent(),
+                keywords
+        );
+        ctx.setFinalPrompt(finalPromptForLlm);
 
-        // 5) short final prompt
-        String finalPromptForLlm = """
-%s
+        // 6) Call LangChain4j ChatModel (blocking call wrapped in Mono)
+        String finalUserText = userText;
+        String finalKbContext = kbContext;
 
-You also have some knowledge base snippets (they may be incomplete):
-
-%s
-
-Use BOTH:
-- your general world knowledge and reasoning, and
-- the knowledge base above.
-
-If they ever conflict, treat the knowledge base as the source of truth.
-Do **not** invent facts that contradict the knowledge base.
-Only say "I don't know" when the answer cannot be reasonably inferred
-from your general knowledge and the knowledge base.
-
-Question (same language in your answer):
-%s
-
-Answer briefly, in the same language as the question:
-""".formatted(systemPrompt, kbContext, userText);
-
-        log.debug("LangChain4jRagService: finalPromptForLlm=\n{}", finalPromptForLlm);
-
-        // 6) sync call wrapped in Mono
         return Mono.fromCallable(() -> {
             String answer = chatModel.chat(finalPromptForLlm);
             ctx.setLlmAnswer(answer);
-            return ctx.addStep("langchain4j-rag",
-                    "ok docs=" + docs.size() + "/matched=" + matchedDocs.size());
+            return ctx.addStep(
+                    "langchain4j-rag",
+                    "ok snippets=" + snippets.size()
+                            + ", kbChars=" + finalKbContext.length()
+                            + ", userTextLen=" + finalUserText.length()
+            );
         });
-    }
-
-    private static String truncate(String text, int maxChars) {
-        if (text == null) return "";
-        if (text.length() <= maxChars) return text;
-        return text.substring(0, maxChars) + "...";
     }
 }

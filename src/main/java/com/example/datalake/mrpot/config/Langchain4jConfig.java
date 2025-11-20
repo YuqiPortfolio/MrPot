@@ -4,7 +4,6 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -26,14 +25,6 @@ public class Langchain4jConfig {
                 .apiKey(props.getApiKey())
                 .modelName(props.getChatModel())
                 .temperature(props.getTemperature())
-                .build();
-    }
-
-    @Bean
-    public EmbeddingModel embeddingModel(Langchain4jOpenAiProperties props) {
-        return OpenAiEmbeddingModel.builder()
-                .apiKey(props.getApiKey())
-                .modelName(props.getEmbeddingModel())
                 .build();
     }
 
