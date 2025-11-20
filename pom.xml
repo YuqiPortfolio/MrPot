@@ -81,7 +81,6 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
         </dependency>
 
         <!-- LangChain4j (versions come from BOM: 1.8.0 / 1.8.0-beta15) -->
