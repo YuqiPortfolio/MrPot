@@ -18,7 +18,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LangChain4jRagService {
 
-    private static final int MAX_SNIPPETS = 3;
+    private static final int MAX_SNIPPETS = 2;
     private static final int MAX_KB_CONTEXT_CHARS = 800;
 
     private final ChatModel chatModel;
@@ -74,6 +74,8 @@ public class LangChain4jRagService {
         // 6) 拼装最终 prompt（单条 string，规模可控）
         String finalPromptForLlm = """
 %s
+Use the following knowledge base (KB) as reference. If the KB contains relevant information, answer based on it.
+If the KB does not contain relevant content, reply: "Sorry, I can only reply to Yuqi Guo's related content."
 
 KB:
 %s
@@ -81,9 +83,8 @@ KB:
 Question (same language):
 %s
 
-Reply briefly.
+Reply briefly and clearly.
 """.formatted(systemPrompt, kbContext, userText);
-
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 

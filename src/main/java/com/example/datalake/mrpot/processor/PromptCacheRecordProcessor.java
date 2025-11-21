@@ -30,11 +30,12 @@ public class PromptCacheRecordProcessor implements TextProcessor {
       return Mono.just(ctx.addStep(name(), "skip-hit freq=" + ctx.getCacheFrequency()));
     }
 
-    String key = CacheKeyUtils.normalizeKey(ctx.getCacheKey());
-    if (key == null) key = CacheKeyUtils.buildKey(ctx);
-    if (key == null || key.isBlank()) {
+    String cacheKey = CacheKeyUtils.normalizeKey(ctx.getCacheKey());
+    if (cacheKey == null) cacheKey = CacheKeyUtils.buildKey(ctx);
+    if (cacheKey == null || cacheKey.isBlank()) {
       return Mono.just(ctx.addStep(name(), "no-key"));
     }
+    final String key = cacheKey;
 
     String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
     String userPrompt = PromptRenderUtils.ensureUserPrompt(ctx);

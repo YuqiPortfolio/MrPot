@@ -12,6 +12,7 @@ import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -38,6 +39,11 @@ public class Langchain4jConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(
+            name = "mrpot.embedding.enabled",
+            havingValue = "true",
+            matchIfMissing = true
+    )
     public EmbeddingStore<TextSegment> embeddingStore(SupabaseProps p) {
         // 注意：这里不再调用 .schema(...)
         return PgVectorEmbeddingStore.builder()
@@ -55,6 +61,10 @@ public class Langchain4jConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(
+            name = "mrpot.embedding.enabled",
+            havingValue = "true"
+    )
     public ContentRetriever contentRetriever(
             EmbeddingStore<TextSegment> store,
             EmbeddingModel embeddingModel
