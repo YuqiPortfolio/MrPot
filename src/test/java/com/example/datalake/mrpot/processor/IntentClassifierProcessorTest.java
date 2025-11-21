@@ -2,6 +2,7 @@ package com.example.datalake.mrpot.processor;
 
 import com.example.datalake.mrpot.model.Intent;
 import com.example.datalake.mrpot.model.ProcessingContext;
+import com.example.datalake.mrpot.dao.KeywordsLexiconDao;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -12,12 +13,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class IntentClassifierProcessorTest {
 
   private final ResourceLoader loader = new DefaultResourceLoader();
+  private final KeywordsLexiconDao emptyLexiconDao = Collections::emptyMap;
 
   @AfterEach
   void clearProps() {
@@ -39,7 +42,7 @@ class IntentClassifierProcessorTest {
     Files.writeString(rules, json, StandardCharsets.UTF_8);
     System.setProperty("intent.rules", rules.toString());
 
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     ctx.setIndexText("What's a realistic OTD for a 2024 RAV4 in Utah?");
@@ -64,7 +67,7 @@ class IntentClassifierProcessorTest {
     Files.writeString(rules, json, StandardCharsets.UTF_8);
     System.setProperty("intent.rules", rules.toString());
 
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     ctx.setIndexText("Plan a two-day Zion National Park itinerary with easy hikes.");
@@ -89,7 +92,7 @@ class IntentClassifierProcessorTest {
     Files.writeString(rules, json, StandardCharsets.UTF_8);
     System.setProperty("intent.rules", rules.toString());
 
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     ctx.setIndexText("How to build SSE streaming with LangChain4j in Spring Boot?");
@@ -113,7 +116,7 @@ class IntentClassifierProcessorTest {
     Files.writeString(rules, json, StandardCharsets.UTF_8);
     System.setProperty("intent.rules", rules.toString());
 
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     ctx.setIndexText("How can I maximize my tax refund for 2025 filing?");
@@ -137,7 +140,7 @@ class IntentClassifierProcessorTest {
     Files.writeString(rules, json, StandardCharsets.UTF_8);
     System.setProperty("intent.rules", rules.toString());
 
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     // tokenizer will produce bigram "software engineer"
@@ -155,7 +158,7 @@ class IntentClassifierProcessorTest {
     Files.writeString(rules, "{\"rules\":[]}", StandardCharsets.UTF_8);
     System.setProperty("intent.rules", rules.toString());
 
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     ctx.setIndexText("Random query that should not match any intent.");
@@ -168,7 +171,7 @@ class IntentClassifierProcessorTest {
 
   @Test
   void greeting_shouldBeDetectedWithoutRules() {
-    IntentClassifierProcessor p = new IntentClassifierProcessor(loader);
+    IntentClassifierProcessor p = new IntentClassifierProcessor(loader, emptyLexiconDao);
     ProcessingContext ctx = new ProcessingContext();
     ctx.setIndexLanguage("en");
     ctx.setIndexText("Hello there!");
