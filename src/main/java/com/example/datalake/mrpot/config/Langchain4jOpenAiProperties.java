@@ -34,4 +34,9 @@ public class Langchain4jOpenAiProperties {
      * Chat model temperature
      */
     private double temperature = 0.2;
+
+    /**
+     * Optional upper bound for model output tokens to control cost/latency.
+     */
+    private Integer maxOutputTokens = 256;
 }
