@@ -25,7 +25,7 @@ public class SupabaseKbSearchService implements KbSearchService {
 
     // 每篇文档最多给多少字符的 snippet（局部预算）
     // 改小一点，让 [DOC n] 更精简
-    private static final int MAX_SNIPPET_PER_DOC = 260;
+    private static final int MAX_SNIPPET_PER_DOC = 220;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -83,9 +83,8 @@ public class SupabaseKbSearchService implements KbSearchService {
 
             KbSnippet snippet = KbSnippet.builder()
                     .docId(doc.getId())
-                    // 暂时没有 title/source 字段，你以后可以从 metadataJson 里解析
-                    .title(null)
-                    .source("kb_documents")
+                    .title(shortTitle(doc))
+                    .source(shortSource(doc))
                     .snippet(snippetText)
                     .score(0.0)
                     .build();
@@ -256,6 +255,21 @@ public class SupabaseKbSearchService implements KbSearchService {
     private static String normalizeWhitespace(String s) {
         if (s == null) return "";
         return s.replaceAll("[\\s\\u00A0]+", " ").trim();
+    }
+
+    private static String shortTitle(KbDocument doc) {
+        String type = safe(doc.getDocType());
+        if (!type.isBlank()) {
+            return type.length() > 24 ? type.substring(0, 24) : type;
+        }
+        return "doc";
+    }
+
+    private static String shortSource(KbDocument doc) {
+        Long id = doc.getId();
+        String ref = (id == null) ? "kb" : "kb#" + id;
+        String type = safe(doc.getDocType());
+        return type.isBlank() ? ref : type + " " + ref;
     }
 
     private static String safe(String s) {

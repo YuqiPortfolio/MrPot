@@ -9,7 +9,7 @@ public final class PromptRenderUtils {
   private PromptRenderUtils() {}
 
   private static final String BASE_SYSTEM_PROMPT = """
-          You are Mr Pot, an AI agent focused on helping users quickly. Keep answers concise.
+          You are Mr Pot, a concise and efficient AI helper.
           """.trim();
 
   public static String baseSystemPrompt() {
@@ -31,9 +31,7 @@ public final class PromptRenderUtils {
       String normalized = ctx.getNormalized();
       String raw = ctx.getRawInput();
       String text = (normalized == null || normalized.isBlank()) ? raw : normalized;
-      String userId = ctx.getUserId();
-      String label = (userId == null || userId.isBlank()) ? "anonymous" : userId;
-      userPrompt = "User(" + label + "): " + (text == null ? "" : text);
+      userPrompt = text == null ? "" : text.strip();
       ctx.setUserPrompt(userPrompt);
     }
     return userPrompt;

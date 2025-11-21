@@ -2,6 +2,7 @@ package com.example.datalake.mrpot.processor;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.service.PromptCacheService;
+import com.example.datalake.mrpot.util.CacheKeyUtils;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,8 @@ public class PromptCacheRecordProcessor implements TextProcessor {
       return Mono.just(ctx.addStep(name(), "skip-hit freq=" + ctx.getCacheFrequency()));
     }
 
-    String key = ctx.getCacheKey();
+    String key = CacheKeyUtils.normalizeKey(ctx.getCacheKey());
+    if (key == null) key = CacheKeyUtils.buildKey(ctx);
     if (key == null || key.isBlank()) {
       return Mono.just(ctx.addStep(name(), "no-key"));
     }
@@ -41,9 +43,13 @@ public class PromptCacheRecordProcessor implements TextProcessor {
       return Mono.just(ctx.addStep(name(), "skip-empty"));
     }
 
-    PromptCacheService.CacheEntry entry = cacheService.store(key, systemPrompt, userPrompt, finalPrompt);
-    ctx.setCacheFrequency(entry.frequency());
-    log.debug("Recorded cache entry for key={} freq={}.", key, entry.frequency());
-    return Mono.just(ctx.addStep(name(), "record freq=" + entry.frequency()));
+    return cacheService.store(key, systemPrompt, userPrompt, finalPrompt)
+        .map(entry -> {
+          ctx.setCacheFrequency(entry.frequency());
+          log.debug("Recorded cache entry for key={} freq={}.", key, entry.frequency());
+          return ctx.addStep(name(), "record freq=" + entry.frequency());
+        })
+        .map(Mono::just)
+        .orElseGet(() -> Mono.just(ctx.addStep(name(), "skip-empty-key")));
   }
 }

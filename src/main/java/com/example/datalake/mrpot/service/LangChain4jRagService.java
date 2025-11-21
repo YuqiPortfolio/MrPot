@@ -19,19 +19,19 @@ import java.util.Objects;
 public class LangChain4jRagService {
 
     private static final int MAX_SNIPPETS = 3;
-    private static final int MAX_KB_CONTEXT_CHARS = 1000;
+    private static final int MAX_KB_CONTEXT_CHARS = 800;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
         // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
-        String userText = ctx.getUserPrompt();
-        if (userText == null || userText.isBlank()) {
-            userText = ctx.getFinalPrompt();
-        }
+        String userText = ctx.getNormalized();
         if (userText == null || userText.isBlank()) {
             userText = ctx.getRawInput();
+        }
+        if (userText == null || userText.isBlank()) {
+            userText = ctx.getUserPrompt();
         }
         if (userText == null || userText.isBlank()) {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
@@ -75,17 +75,13 @@ public class LangChain4jRagService {
         String finalPromptForLlm = """
 %s
 
-Context (may be incomplete):
+KB:
 %s
 
-Use both your general knowledge and this context.
-If they conflict, follow the context.
-If the answer cannot be inferred, reply "I don't know".
-
-Question (reply in the same language):
+Question (same language):
 %s
 
-Answer briefly:
+Reply briefly.
 """.formatted(systemPrompt, kbContext, userText);
 
 
@@ -128,13 +124,13 @@ Answer briefly:
 
             if (snippet.isBlank()) continue;
 
-            String header = "[DOC " + (i + 1) + "]"
+            String header = "[#" + (i + 1) + "]"
                     + (title.isBlank() ? "" : " " + title)
-                    + (source.isBlank() ? "" : " (source=" + source + ")");
+                    + (source.isBlank() ? "" : " " + source);
 
             String block = header + "\n" + snippet;
             if (sb.length() > 0) {
-                block = "\n\n---\n\n" + block;
+                block = "\n\n" + block;
             }
 
             if (block.length() > remaining) {
