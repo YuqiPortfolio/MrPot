@@ -6,6 +6,7 @@ import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
 import com.example.datalake.mrpot.service.PromptPipeline;
+import com.example.datalake.mrpot.service.PromptSessionLoggingService;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
 import com.example.datalake.mrpot.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,13 +34,18 @@ import java.util.UUID;
 public class PromptController {
 
   private final PromptPipeline promptPipeline;
+  private final PromptSessionLoggingService promptSessionLoggingService;
 
   @PostMapping("/prepare")
   @Operation(summary = "Prepare a session using the processing pipeline",
       description = "Runs the configured text processors on the payload and returns the resulting context.")
   public Mono<ResponseEntity<PrepareResponse>> prepare(@RequestBody PrepareRequest req) {
     return promptPipeline.run(req)
-        .map(ctx -> ResponseEntity.ok(toResponse(ctx)))
+        .flatMap(ctx -> Mono.fromCallable(() -> {
+          ensureSessionId(ctx);
+          promptSessionLoggingService.recordSession(ctx);
+          return ResponseEntity.ok(toResponse(ctx));
+        }))
         .onErrorResume(ValidationException.class, ex ->
             Mono.just(ResponseEntity.badRequest().body(toErrorResponse(ex))))
         .onErrorResume(ex -> {
@@ -62,10 +68,6 @@ public class PromptController {
         (language.getDisplayName() != null ? language.getDisplayName() : language.getIsoCode());
 
     String sessionId = ctx.getSessionId();
-    if (sessionId == null || sessionId.isBlank()) {
-      sessionId = UUID.randomUUID().toString();
-      ctx.setSessionId(sessionId);
-    }
 
     Map<String, Object> entities = new LinkedHashMap<>();
     if (ctx.getEntities() != null) {
@@ -89,6 +91,12 @@ public class PromptController {
               .errors(List.of())
               .answer(ctx.getLlmAnswer())
               .build();
+  }
+
+  private void ensureSessionId(ProcessingContext ctx) {
+    if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+      ctx.setSessionId(UUID.randomUUID().toString());
+    }
   }
 
   private PrepareResponse toErrorResponse(ValidationException ex) {
