@@ -18,20 +18,20 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LangChain4jRagService {
 
-    private static final int MAX_SNIPPETS = 3;
-    private static final int MAX_KB_CONTEXT_CHARS = 1000;
+    private static final int MAX_SNIPPETS = 2;
+    private static final int MAX_KB_CONTEXT_CHARS = 800;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
         // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
-        String userText = ctx.getUserPrompt();
-        if (userText == null || userText.isBlank()) {
-            userText = ctx.getFinalPrompt();
-        }
+        String userText = ctx.getNormalized();
         if (userText == null || userText.isBlank()) {
             userText = ctx.getRawInput();
+        }
+        if (userText == null || userText.isBlank()) {
+            userText = ctx.getUserPrompt();
         }
         if (userText == null || userText.isBlank()) {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
@@ -74,20 +74,17 @@ public class LangChain4jRagService {
         // 6) 拼装最终 prompt（单条 string，规模可控）
         String finalPromptForLlm = """
 %s
+Use the following knowledge base (KB) as reference. If the KB contains relevant information, answer based on it.
+If the KB does not contain relevant content, reply: "Sorry, I can only reply to Yuqi Guo's related content."
 
-Context (may be incomplete):
+KB:
 %s
 
-Use both your general knowledge and this context.
-If they conflict, follow the context.
-If the answer cannot be inferred, reply "I don't know".
-
-Question (reply in the same language):
+Question (same language):
 %s
 
-Answer briefly:
+Reply briefly and clearly.
 """.formatted(systemPrompt, kbContext, userText);
-
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 
@@ -128,13 +125,13 @@ Answer briefly:
 
             if (snippet.isBlank()) continue;
 
-            String header = "[DOC " + (i + 1) + "]"
+            String header = "[#" + (i + 1) + "]"
                     + (title.isBlank() ? "" : " " + title)
-                    + (source.isBlank() ? "" : " (source=" + source + ")");
+                    + (source.isBlank() ? "" : " " + source);
 
             String block = header + "\n" + snippet;
             if (sb.length() > 0) {
-                block = "\n\n---\n\n" + block;
+                block = "\n\n" + block;
             }
 
             if (block.length() > remaining) {

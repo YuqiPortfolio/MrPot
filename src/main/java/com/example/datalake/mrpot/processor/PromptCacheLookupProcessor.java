@@ -2,7 +2,7 @@ package com.example.datalake.mrpot.processor;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.service.PromptCacheService;
-import com.example.datalake.mrpot.util.PromptRenderUtils;
+import com.example.datalake.mrpot.util.CacheKeyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class PromptCacheLookupProcessor implements TextProcessor {
       return Mono.just(ctx.addStep(name(), "skip-common"));
     }
 
-    String key = buildKey(ctx);
+    String key = CacheKeyUtils.buildKey(ctx);
     ctx.setCacheKey(key);
     if (key == null || key.isBlank()) {
       return Mono.just(ctx.addStep(name(), "no-key"));
@@ -54,29 +54,5 @@ public class PromptCacheLookupProcessor implements TextProcessor {
 
     log.debug("Cache hit for key={} freq={}.", key, entry.frequency());
     return Mono.just(ctx.addStep(name(), "hit freq=" + entry.frequency()));
-  }
-
-  private String buildKey(ProcessingContext ctx) {
-    String normalized = ctx.getNormalized();
-    String raw = ctx.getRawInput();
-    String base = (normalized == null || normalized.isBlank()) ? raw : normalized;
-    if (base == null || base.isBlank()) {
-      return null;
-    }
-    String lang = PromptRenderUtils.languageCode(ctx);
-    String scope = userScope(ctx);
-    return lang + "::" + scope + "::" + base.trim();
-  }
-
-  private String userScope(ProcessingContext ctx) {
-    String userId = ctx.getUserId();
-    if (userId != null && !userId.isBlank()) {
-      return "user:" + userId.trim();
-    }
-    String sessionId = ctx.getSessionId();
-    if (sessionId != null && !sessionId.isBlank()) {
-      return "session:" + sessionId.trim();
-    }
-    return "anon";
   }
 }

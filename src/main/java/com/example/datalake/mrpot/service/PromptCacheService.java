@@ -1,5 +1,6 @@
 package com.example.datalake.mrpot.service;
 
+import com.example.datalake.mrpot.util.CacheKeyUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,23 +14,26 @@ public class PromptCacheService {
   private final ConcurrentMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
 
   public Optional<CacheEntry> hitIfPresent(String key) {
-    if (key == null || key.isBlank()) {
+    String normalizedKey = CacheKeyUtils.normalizeKey(key);
+    if (normalizedKey == null) {
       return Optional.empty();
     }
-    return Optional.ofNullable(cache.computeIfPresent(key, (k, entry) -> entry.hit()));
+    return Optional.ofNullable(cache.computeIfPresent(normalizedKey, (k, entry) -> entry.hit()));
   }
 
-  public CacheEntry store(String key, String systemPrompt, String userPrompt, String finalPrompt) {
-    if (key == null || key.isBlank()) {
-      return new CacheEntry("", systemPrompt, userPrompt, finalPrompt, 1, Instant.now(), Instant.now());
+  public Optional<CacheEntry> store(String key, String systemPrompt, String userPrompt, String finalPrompt) {
+    String normalizedKey = CacheKeyUtils.normalizeKey(key);
+    if (normalizedKey == null) {
+      return Optional.empty();
     }
     Instant now = Instant.now();
-    return cache.compute(key, (k, existing) -> {
+    CacheEntry entry = cache.compute(normalizedKey, (k, existing) -> {
       if (existing == null) {
         return new CacheEntry(k, systemPrompt, userPrompt, finalPrompt, 1, now, now);
       }
       return existing.update(systemPrompt, userPrompt, finalPrompt);
     });
+    return Optional.ofNullable(entry);
   }
 
   public record CacheEntry(
