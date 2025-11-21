@@ -3,6 +3,7 @@ package com.example.datalake.mrpot.processor;
 import com.example.datalake.mrpot.model.Intent;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.model.PromptTemplate;
+import com.example.datalake.mrpot.dao.KeywordsLexiconDao;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,8 +75,9 @@ public class IntentClassifierProcessor implements TextProcessor {
     // 模板查找器（这里给一个内存版 demo，将来可替换成 ES / DB 查询）
     private final TemplateFinder templateFinder = new InMemoryTemplateFinder();
 
-    public IntentClassifierProcessor(ResourceLoader resourceLoader) {
-        this.expandedLexicon = loadLexicon(resourceLoader, "keywords_map.json");
+    public IntentClassifierProcessor(ResourceLoader resourceLoader,
+                                     KeywordsLexiconDao keywordsLexiconDao) {
+        this.expandedLexicon = loadLexicon(keywordsLexiconDao);
         this.rules = loadRules(resourceLoader, "intent_rules.json");
     }
 
@@ -411,43 +413,14 @@ public class IntentClassifierProcessor implements TextProcessor {
         }
     }
 
-    private Map<String, Set<String>> loadLexicon(ResourceLoader rl, String classpathName) {
-        Map<String, Set<String>> out = new LinkedHashMap<>();
-        try (InputStream in = openForRead(
-                rl,
-                classpathName,
-                "keywords.map.path",  // -Dkeywords.map.path=...
-                "KEYWORDS_MAP_PATH",  // env KEYWORDS_MAP_PATH=...
-                "src/main/resources/" + classpathName
-        )) {
-            if (in == null) {
-                log.info("[{}] No lexicon found for {}", NAME, classpathName);
-                return out;
-            }
-            LexiconBundle bundle = om.readValue(in, LexiconBundle.class);
-            if (bundle.terms != null) {
-                for (Map.Entry<String, TermEntry> e : bundle.terms.entrySet()) {
-                    String canonical = e.getKey().toLowerCase(Locale.ROOT);
-                    Set<String> syns = new LinkedHashSet<>();
-                    // canonical 自己也作为一个同义词
-                    syns.add(canonical);
-                    if (e.getValue() != null) {
-                        if (e.getValue().D != null) {
-                            e.getValue().D.forEach(s -> addLower(syns, s));
-                        }
-                        if (e.getValue().C != null) {
-                            e.getValue().C.forEach(s -> addLower(syns, s));
-                        }
-                    }
-                    out.put(canonical, syns);
-                }
-            }
-            log.info("[{}] Loaded lexicon {}, terms={}", NAME, classpathName, out.size());
-            return out;
-        } catch (Exception e) {
-            log.warn("[{}] Failed to load lexicon {} – {}", NAME, classpathName, e.toString());
-            return out;
+    private Map<String, Set<String>> loadLexicon(KeywordsLexiconDao keywordsLexiconDao) {
+        if (keywordsLexiconDao == null) {
+            log.info("[{}] No keywords lexicon DAO provided; defaulting to empty lexicon", NAME);
+            return Collections.emptyMap();
         }
+        Map<String, Set<String>> lexicon = keywordsLexiconDao.loadLexicon();
+        log.info("[{}] Loaded lexicon from database, terms={}", NAME, lexicon.size());
+        return lexicon;
     }
 
     /**
@@ -555,17 +528,6 @@ public class IntentClassifierProcessor implements TextProcessor {
         public List<String> all;
         public List<String> none;
         public List<String> tagsBoost;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    static class LexiconBundle {
-        public Map<String, TermEntry> terms;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    static class TermEntry {
-        public List<String> D; // dataset 自动抽取的词
-        public List<String> C; // 手工/精修的上下文同义词
     }
 
     // 内部规则结构（运行时用这个）
