@@ -19,7 +19,8 @@ import java.util.Objects;
 public class LangChain4jRagService {
 
     private static final int MAX_SNIPPETS = 2;
-    private static final int MAX_KB_CONTEXT_CHARS = 800;
+    private static final int MAX_KB_CONTEXT_CHARS = 600;
+    private static final int MAX_USER_TEXT_CHARS = 320;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
@@ -33,6 +34,7 @@ public class LangChain4jRagService {
         if (userText == null || userText.isBlank()) {
             userText = ctx.getUserPrompt();
         }
+        userText = clipForModel(userText, MAX_USER_TEXT_CHARS);
         if (userText == null || userText.isBlank()) {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
         }
@@ -74,16 +76,12 @@ public class LangChain4jRagService {
         // 6) 拼装最终 prompt（单条 string，规模可控）
         String finalPromptForLlm = """
 %s
-Use the following knowledge base (KB) as reference. If the KB contains relevant information, answer based on it.
-If the KB does not contain relevant content, reply: "Sorry, I can only reply to Yuqi Guo's related content."
-
+Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
 KB:
 %s
-
-Question (same language):
+Question:
 %s
-
-Reply briefly and clearly.
+Keep it concise.
 """.formatted(systemPrompt, kbContext, userText);
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
@@ -144,6 +142,15 @@ Reply briefly and clearly.
         }
 
         return sb.toString();
+    }
+
+    private static String clipForModel(String text, int maxChars) {
+        if (text == null) return null;
+        String trimmed = text.strip();
+        if (trimmed.length() <= maxChars) {
+            return trimmed;
+        }
+        return trimmed.substring(0, maxChars) + "...";
     }
 
     private static String normalizeWhitespace(String s) {
