@@ -25,7 +25,7 @@ public class SupabaseKbSearchService implements KbSearchService {
 
     // 每篇文档最多给多少字符的 snippet（局部预算）
     // 改小一点，让 [DOC n] 更精简
-    private static final int MAX_SNIPPET_PER_DOC = 220;
+    private static final int MAX_SNIPPET_PER_DOC = 180;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 

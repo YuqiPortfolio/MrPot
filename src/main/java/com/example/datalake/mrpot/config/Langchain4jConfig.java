@@ -27,6 +27,7 @@ public class Langchain4jConfig {
                 .apiKey(props.getApiKey())
                 .modelName(props.getChatModel())
                 .temperature(props.getTemperature())
+                .maxTokens(props.getMaxOutputTokens())
                 .build();
     }
 
