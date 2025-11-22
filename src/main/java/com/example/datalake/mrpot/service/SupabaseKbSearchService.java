@@ -25,7 +25,7 @@ public class SupabaseKbSearchService implements KbSearchService {
 
     // 每篇文档最多给多少字符的 snippet（局部预算）
     // 改小一点，让 [DOC n] 更精简
-    private static final int MAX_SNIPPET_PER_DOC = 180;
+    private static final int MAX_SNIPPET_PER_DOC = 150;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -63,6 +63,11 @@ public class SupabaseKbSearchService implements KbSearchService {
         }
 
         // 3) 在「总预算」内从这些文档中抽片段
+        docs = docs.stream()
+                .sorted(Comparator.comparingInt((KbDocument d) -> scoreDocument(d, query, keywords)).reversed()
+                        .thenComparing(KbDocument::getId, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+
         int remaining = maxTotalChars;
         List<KbSnippet> result = new ArrayList<>();
 
@@ -94,6 +99,44 @@ public class SupabaseKbSearchService implements KbSearchService {
         }
 
         return result;
+    }
+
+    private int scoreDocument(KbDocument doc, String query, List<String> keywords) {
+        String content = safe(doc.getContent()).toLowerCase(Locale.ROOT);
+        if (content.length() > 4000) {
+            content = content.substring(0, 4000);
+        }
+
+        int score = 0;
+        String trimmedQuery = query == null ? "" : query.toLowerCase(Locale.ROOT).trim();
+        if (!trimmedQuery.isEmpty()) {
+            score += countOccurrences(content, trimmedQuery) * 2;
+            for (String token : trimmedQuery.split("\\s+")) {
+                if (token.length() > 3) {
+                    score += countOccurrences(content, token);
+                }
+            }
+        }
+
+        for (String kw : keywords) {
+            if (kw == null || kw.isBlank()) continue;
+            String k = kw.toLowerCase(Locale.ROOT).trim();
+            if (k.isEmpty()) continue;
+            score += countOccurrences(content, k) * 5;
+        }
+
+        return score;
+    }
+
+    private static int countOccurrences(String haystack, String needle) {
+        if (haystack.isEmpty() || needle.isEmpty()) return 0;
+        int idx = 0;
+        int count = 0;
+        while ((idx = haystack.indexOf(needle, idx)) >= 0) {
+            count++;
+            idx += needle.length();
+        }
+        return count;
     }
 
     /**
@@ -186,40 +229,64 @@ public class SupabaseKbSearchService implements KbSearchService {
         }
 
         String lower = text.toLowerCase(Locale.ROOT);
-        int bestIdx = -1;
-
-        // 找到第一个匹配的关键词位置（最靠前的）
-        for (String kw : keywords) {
-            if (kw == null || kw.isBlank()) continue;
-            String kwLower = kw.toLowerCase(Locale.ROOT).trim();
-            if (kwLower.isEmpty()) continue;
-
-            int idx = lower.indexOf(kwLower);
-            if (idx >= 0 && (bestIdx == -1 || idx < bestIdx)) {
-                bestIdx = idx;
-            }
-        }
-
-        // 如果没有任何关键词命中：直接返回空字符串
-        if (bestIdx == -1) {
+        List<Integer> positions = keywordPositions(lower, keywords);
+        if (positions.isEmpty()) {
             return "";
         }
 
-        // 以关键词为中心截取一段内容
-        int half = maxChars / 2;
-        int start = Math.max(0, bestIdx - half);
-        int end = Math.min(text.length(), start + maxChars);
-        if (end - start < maxChars && end == text.length()) {
-            start = Math.max(0, end - maxChars);
+        int bestStart = 0;
+        int bestEnd = 0;
+        int bestScore = -1;
+
+        for (int pos : positions) {
+            int half = maxChars / 2;
+            int start = Math.max(0, pos - half);
+            int end = Math.min(text.length(), start + maxChars);
+            if (end - start < maxChars && end == text.length()) {
+                start = Math.max(0, end - maxChars);
+            }
+
+            String windowLower = lower.substring(start, end);
+            int windowScore = keywordHitCount(windowLower, keywords);
+            if (windowScore > bestScore || (windowScore == bestScore && start < bestStart)) {
+                bestScore = windowScore;
+                bestStart = start;
+                bestEnd = end;
+            }
         }
 
-        String rawSnippet = text.substring(start, end);
-        if (start > 0) rawSnippet = "..." + rawSnippet;
-        if (end < text.length()) rawSnippet = rawSnippet + "...";
+        String rawSnippet = text.substring(bestStart, bestEnd);
+        if (bestStart > 0) rawSnippet = "..." + rawSnippet;
+        if (bestEnd < text.length()) rawSnippet = rawSnippet + "...";
 
-        // 再按句子边界柔和剪裁，保证不超过 maxChars 且读起来自然
         String clipped = clipToSentenceBoundary(rawSnippet, maxChars);
         return clipped;
+    }
+
+    private static List<Integer> keywordPositions(String lower, List<String> keywords) {
+        List<Integer> positions = new ArrayList<>();
+        for (String kw : keywords) {
+            if (kw == null || kw.isBlank()) continue;
+            String k = kw.toLowerCase(Locale.ROOT).trim();
+            if (k.isEmpty()) continue;
+            int idx = 0;
+            while ((idx = lower.indexOf(k, idx)) >= 0) {
+                positions.add(idx);
+                idx += k.length();
+            }
+        }
+        return positions;
+    }
+
+    private static int keywordHitCount(String text, List<String> keywords) {
+        int score = 0;
+        for (String kw : keywords) {
+            if (kw == null || kw.isBlank()) continue;
+            String k = kw.toLowerCase(Locale.ROOT).trim();
+            if (k.isEmpty()) continue;
+            score += countOccurrences(text, k);
+        }
+        return score;
     }
 
     /**
