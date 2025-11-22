@@ -37,9 +37,8 @@ public class SupabaseKbSearchService implements KbSearchService {
         if (query == null || query.isBlank()) {
             return Collections.emptyList();
         }
-        if (keywords == null) {
-            keywords = Collections.emptyList();
-        }
+        final List<String> effectiveKeywords =
+                (keywords == null) ? Collections.emptyList() : keywords;
 
         log.debug("SupabaseKbSearchService.searchSnippets query='{}', keywords={}, maxSnippets={}, maxTotalChars={}",
                 query, keywords, maxSnippets, maxTotalChars);
@@ -50,7 +49,7 @@ public class SupabaseKbSearchService implements KbSearchService {
         );
 
         // 1) 用 query + keywords 查候选文档
-        List<KbDocument> docs = searchCandidates(query, keywords, docLimit);
+        List<KbDocument> docs = searchCandidates(query, effectiveKeywords, docLimit);
 
         // 2) 如果还空，做 fallback：拿最近几篇文档兜底
         if (docs.isEmpty()) {
@@ -64,7 +63,7 @@ public class SupabaseKbSearchService implements KbSearchService {
 
         // 3) 在「总预算」内从这些文档中抽片段
         docs = docs.stream()
-                .sorted(Comparator.comparingInt((KbDocument d) -> scoreDocument(d, query, keywords)).reversed()
+                .sorted(Comparator.comparingInt((KbDocument d) -> scoreDocument(d, query, effectiveKeywords)).reversed()
                         .thenComparing(KbDocument::getId, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
 
@@ -82,7 +81,7 @@ public class SupabaseKbSearchService implements KbSearchService {
             int perDocBudget = Math.min(MAX_SNIPPET_PER_DOC, remaining);
             if (perDocBudget <= 0) break;
 
-            String snippetText = extractSnippetFromContent(content, keywords, perDocBudget);
+            String snippetText = extractSnippetFromContent(content, effectiveKeywords, perDocBudget);
             snippetText = normalizeWhitespace(snippetText);
             if (snippetText.isBlank()) continue; // 如果没有关键词命中，直接跳过
 
