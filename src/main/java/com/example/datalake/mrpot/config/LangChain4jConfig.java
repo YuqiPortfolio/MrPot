@@ -1,6 +1,6 @@
 package com.example.datalake.mrpot.config;
 
-import dev.langchain4j.model.chat.streaming.StreamingChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
