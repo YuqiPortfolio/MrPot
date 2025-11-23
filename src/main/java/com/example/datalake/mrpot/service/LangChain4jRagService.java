@@ -3,15 +3,25 @@ package com.example.datalake.mrpot.service;
 import com.example.datalake.mrpot.model.KbSnippet;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.memory.chat.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
 @Service
@@ -21,30 +31,38 @@ public class LangChain4jRagService {
     private static final int MAX_SNIPPETS = 2;
     private static final int MAX_KB_CONTEXT_CHARS = 600;
     private static final int MAX_USER_TEXT_CHARS = 320;
+    private static final int MAX_HISTORY_MESSAGES = 20;
+    private static final int MAX_HISTORY_CHARS = 1200;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
+    private final ConcurrentMap<String, ChatMemory> chatMemories = new ConcurrentHashMap<>();
+
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
-        // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
-        String userText = ctx.getNormalized();
+        return preparePrompt(ctx)
+                .flatMap(this::runChat)
+                .thenReturn(ctx);
+    }
+
+    public Flux<String> streamWithMemory(ProcessingContext ctx) {
+        return preparePrompt(ctx)
+                .flatMapMany(prompt -> runChat(prompt)
+                        .map(this::chunkAnswer)
+                        .flatMapMany(Flux::fromIterable));
+    }
+
+    private Mono<LlmPrompt> preparePrompt(ProcessingContext ctx) {
+        String sessionId = ensureSessionId(ctx);
+        String userText = resolveUserText(ctx);
+
         if (userText == null || userText.isBlank()) {
-            userText = ctx.getRawInput();
-        }
-        if (userText == null || userText.isBlank()) {
-            userText = ctx.getUserPrompt();
-        }
-        userText = clipForModel(userText, MAX_USER_TEXT_CHARS);
-        if (userText == null || userText.isBlank()) {
-            return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
+            return Mono.just(new LlmPrompt(ctx.addStep("langchain4j-rag", "skip-empty-text"),
+                    sessionId, "", "", "skip-empty-text", chatMemory(sessionId), true));
         }
 
-        List<String> keywords = ctx.getKeywords();
-        if (keywords == null) {
-            keywords = Collections.emptyList();
-        }
+        List<String> keywords = ctx.getKeywords() == null ? Collections.emptyList() : ctx.getKeywords();
 
-        // 2) 调用「片段检索」而不是整篇文档
         List<KbSnippet> snippets = kbSearchService.searchSnippets(
                 userText,
                 keywords,
@@ -56,7 +74,6 @@ public class LangChain4jRagService {
             log.debug("No kb snippets matched for text='{}'", userText);
         }
 
-        // 3) 记录涉及到的 docId（去重）
         List<Long> docIds = snippets.stream()
                 .map(KbSnippet::getDocId)
                 .filter(Objects::nonNull)
@@ -64,41 +81,124 @@ public class LangChain4jRagService {
                 .toList();
         ctx.setLlmDocIds(docIds);
 
-        // 4) 在全局预算内组装 KB 上下文
         String kbContext = buildKbContext(snippets, MAX_KB_CONTEXT_CHARS);
         if (kbContext.isBlank()) {
             kbContext = "(no relevant knowledge base content found)";
         }
 
-        // 5) 拿系统 prompt（由前面 Processor 链构建）
+        ChatMemory memory = chatMemory(sessionId);
+        String history = renderHistory(memory);
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
 
-        // 6) 拼装最终 prompt（单条 string，规模可控）
         String finalPromptForLlm = """
 %s
+Recent conversation:
+%s
+
 Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
 KB:
 %s
 Question:
 %s
 Keep it concise.
-""".formatted(systemPrompt, kbContext, userText);
+""".formatted(systemPrompt, history, kbContext, userText);
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 
-        final String stepInfo = "ok snippets=" + snippets.size()
+        String stepInfo = "ok snippets=" + snippets.size()
                 + ", docs=" + docIds.size()
                 + ", kbChars=" + kbContext.length();
 
-        final String promptForLlm = finalPromptForLlm;
-        final ProcessingContext ctxRef = ctx;
+        return Mono.just(new LlmPrompt(ctx, sessionId, userText, finalPromptForLlm, stepInfo, memory, false));
+    }
 
-        // 7) 调 LangChain4j（同步封装成 Mono）
+    private Mono<String> runChat(LlmPrompt prompt) {
+        if (prompt.skip()) {
+            return Mono.fromCallable(() -> {
+                prompt.ctx().addStep("langchain4j-rag", prompt.stepInfo());
+                return "";
+            });
+        }
+
         return Mono.fromCallable(() -> {
-            String answer = chatModel.chat(promptForLlm);
-            ctxRef.setLlmAnswer(answer);
-            return ctxRef.addStep("langchain4j-rag", stepInfo);
+            String answer = chatModel.chat(prompt.finalPrompt());
+            finalizeConversation(prompt, answer);
+            return answer;
         });
+    }
+
+    private void finalizeConversation(LlmPrompt prompt, String answer) {
+        prompt.memory().add(UserMessage.from(prompt.userText()));
+        prompt.memory().add(AiMessage.from(answer));
+
+        prompt.ctx().setLlmAnswer(answer);
+        prompt.ctx().addStep("langchain4j-rag", prompt.stepInfo());
+    }
+
+    private List<String> chunkAnswer(String answer) {
+        if (answer == null || answer.isEmpty()) {
+            return List.of();
+        }
+        return List.of(answer.split("(?<=\\s)"));
+    }
+
+    private String resolveUserText(ProcessingContext ctx) {
+        String userText = ctx.getNormalized();
+        if (userText == null || userText.isBlank()) {
+            userText = ctx.getRawInput();
+        }
+        if (userText == null || userText.isBlank()) {
+            userText = ctx.getUserPrompt();
+        }
+        return clipForModel(userText, MAX_USER_TEXT_CHARS);
+    }
+
+    private String ensureSessionId(ProcessingContext ctx) {
+        if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+            String sessionId = java.util.UUID.randomUUID().toString();
+            ctx.setSessionId(sessionId);
+            return sessionId;
+        }
+        return ctx.getSessionId();
+    }
+
+    private ChatMemory chatMemory(String sessionId) {
+        return chatMemories.computeIfAbsent(sessionId, id -> MessageWindowChatMemory.withMaxMessages(MAX_HISTORY_MESSAGES));
+    }
+
+    private String renderHistory(ChatMemory memory) {
+        List<ChatMessage> messages = memory.messages();
+        if (messages == null || messages.isEmpty()) {
+            return "(no previous turns)";
+        }
+
+        StringJoiner joiner = new StringJoiner("\n");
+        for (ChatMessage message : messages) {
+            joiner.add(renderMessage(message));
+            if (joiner.length() >= MAX_HISTORY_CHARS) {
+                break;
+            }
+        }
+
+        String history = joiner.toString();
+        if (history.length() > MAX_HISTORY_CHARS) {
+            return history.substring(history.length() - MAX_HISTORY_CHARS);
+        }
+        return history;
+    }
+
+    private String renderMessage(ChatMessage message) {
+        String role;
+        if (message instanceof UserMessage) {
+            role = "User";
+        } else if (message instanceof AiMessage) {
+            role = "Assistant";
+        } else if (message instanceof SystemMessage) {
+            role = "System";
+        } else {
+            role = "Message";
+        }
+        return role + ": " + message;
     }
 
     /**
@@ -160,5 +260,16 @@ Keep it concise.
 
     private static String safe(String s) {
         return s == null ? "" : s;
+    }
+
+    private record LlmPrompt(
+            ProcessingContext ctx,
+            String sessionId,
+            String userText,
+            String finalPrompt,
+            String stepInfo,
+            ChatMemory memory,
+            boolean skip
+    ) {
     }
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
+import com.example.datalake.mrpot.service.LangChain4jRagService;
 import com.example.datalake.mrpot.service.PromptPipeline;
 import com.example.datalake.mrpot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -17,12 +18,13 @@ class PromptControllerTest {
   @Test
   void prepareReturnsValidationErrors() {
     PromptPipeline pipeline = mock(PromptPipeline.class);
+    LangChain4jRagService ragService = mock(LangChain4jRagService.class);
     PrepareRequest request = new PrepareRequest().setQuery("   ");
 
     ValidationException exception = new ValidationException("User input must not be blank.");
     when(pipeline.run(request)).thenReturn(Mono.error(exception));
 
-    PromptController controller = new PromptController(pipeline);
+    PromptController controller = new PromptController(pipeline, ragService);
 
     ResponseEntity<PrepareResponse> response = controller.prepare(request).block();
 
@@ -37,11 +39,12 @@ class PromptControllerTest {
   @Test
   void prepareReturnsUnexpectedErrors() {
     PromptPipeline pipeline = mock(PromptPipeline.class);
+    LangChain4jRagService ragService = mock(LangChain4jRagService.class);
     PrepareRequest request = new PrepareRequest().setQuery("question");
 
     when(pipeline.run(request)).thenReturn(Mono.error(new IllegalStateException("boom")));
 
-    PromptController controller = new PromptController(pipeline);
+    PromptController controller = new PromptController(pipeline, ragService);
 
     ResponseEntity<PrepareResponse> response = controller.prepare(request).block();
 

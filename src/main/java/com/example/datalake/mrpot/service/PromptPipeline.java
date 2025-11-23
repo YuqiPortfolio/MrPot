@@ -66,6 +66,10 @@ public class PromptPipeline {
         .setSystemPrompt(validationContext.getSystemPrompt())
         .setValidationNotices(new ArrayList<>(validationContext.getNotices()));
 
+    if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+      ctx.setSessionId(java.util.UUID.randomUUID().toString());
+    }
+
     if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
     if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
 

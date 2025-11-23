@@ -2,9 +2,9 @@ package com.example.datalake.mrpot.controller;
 
 import com.example.datalake.mrpot.model.Language;
 import com.example.datalake.mrpot.model.ProcessingContext;
-import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
+import com.example.datalake.mrpot.service.LangChain4jRagService;
 import com.example.datalake.mrpot.service.PromptPipeline;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
 import com.example.datalake.mrpot.validation.ValidationException;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import java.util.UUID;
 public class PromptController {
 
   private final PromptPipeline promptPipeline;
+  private final LangChain4jRagService ragService;
 
   @PostMapping("/prepare")
   @Operation(summary = "Prepare a session using the processing pipeline",
@@ -80,6 +80,7 @@ public class PromptController {
               .systemPrompt(sysPrompt)
               .userPrompt(userPrompt)
               .finalPrompt(finalPrompt)
+              .sessionId(sessionId)
               .language(langDisplay)
               .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
               .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
@@ -109,33 +110,64 @@ public class PromptController {
         .build();
   }
 
-  @Operation(summary = "Stream step events (dummy SSE)",
-      description = "Streams 5 dummy StepEvent items, 1 per second, as text/event-stream.")
-  @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<StepEvent>> stream(@RequestParam("q") String query,
-                                                   @RequestParam(value = "userId", required = false) String userId,
-                                                   @RequestParam(value = "sessionId", required = false) String sessionId) {
-    List<String> steps = List.of(
-        "parse-query",
-        "detect-intent",
-        "extract-entities",
-        "plan-execution",
-        "finalize"
-    );
-
-    return Flux.interval(Duration.ofSeconds(1))
-        .take(steps.size())
-        .map(i -> {
-          StepEvent event = StepEvent.builder()
-              .step(steps.get(i.intValue()))
-              .note("Processed step " + (i + 1) + " for query '" + query + "'")
-              .build();
-
-          return ServerSentEvent.<StepEvent>builder()
-              .id(String.valueOf(i))
-              .event("step-event")
-              .data(event)
-              .build();
+  @Operation(summary = "Stream a chat response with contextual memory",
+      description = "Runs the prompt pipeline, feeds the result into LangChain4j with chat memory, and streams the answer as SSE.")
+  @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Flux<ServerSentEvent<Map<String, Object>>> stream(@RequestBody PrepareRequest req) {
+    return promptPipeline.run(req)
+        .flatMapMany(this::toStream)
+        .onErrorResume(ValidationException.class, ex -> Flux.just(
+            buildSse("error", Map.of("errors", List.copyOf(ex.getReasons())))))
+        .onErrorResume(ex -> {
+          log.error("Unexpected failure while streaming prompt", ex);
+          String detail = ex.getMessage();
+          String message = (detail == null || detail.isBlank())
+              ? "Unexpected error occurred."
+              : detail;
+          return Flux.just(buildSse("error", Map.of("errors", List.of(message))));
         });
+  }
+
+  private Flux<ServerSentEvent<Map<String, Object>>> toStream(ProcessingContext ctx) {
+    String sessionId = ctx.getSessionId();
+    String language = ctx.getLanguage() == null ? null : ctx.getLanguage().getIsoCode();
+
+    Map<String, Object> start = new LinkedHashMap<>();
+    start.put("sessionId", sessionId);
+    start.put("language", language);
+    start.put("intent", ctx.getIntent() == null ? null : ctx.getIntent().name());
+    start.put("steps", ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()));
+
+    StringBuilder answerCollector = new StringBuilder();
+
+    Flux<ServerSentEvent<Map<String, Object>>> stream = ragService.streamWithMemory(ctx)
+        .doOnNext(answerCollector::append)
+        .map(token -> buildSse("token", Map.of("content", token)));
+
+    Flux<ServerSentEvent<Map<String, Object>>> completed = Flux.defer(() -> {
+      String fullAnswer = answerCollector.toString();
+      ctx.setLlmAnswer(fullAnswer);
+
+      Map<String, Object> payload = new LinkedHashMap<>();
+      payload.put("sessionId", sessionId);
+      payload.put("answer", fullAnswer);
+      payload.put("docIds", ctx.getLlmDocIds() == null ? List.of() : ctx.getLlmDocIds());
+      payload.put("steps", ctx.getSteps() == null ? List.of() : ctx.getSteps());
+
+      return Flux.just(buildSse("complete", payload));
+    });
+
+    return Flux.concat(
+        Flux.just(buildSse("start", start)),
+        stream,
+        completed
+    );
+  }
+
+  private ServerSentEvent<Map<String, Object>> buildSse(String event, Map<String, Object> payload) {
+    return ServerSentEvent.<Map<String, Object>>builder()
+        .event(event)
+        .data(payload)
+        .build();
   }
 }
