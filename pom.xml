@@ -84,25 +84,32 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- LangChain4j (versions come from BOM: 1.8.0 / 1.8.0-beta15) -->
+        <!-- ===== LangChain4j ===== -->
+        <!-- Core interfaces: ChatLanguageModel, ChatMemory, ChatMessage, etc. -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j</artifactId>
+            <artifactId>langchain4j-core</artifactId>
         </dependency>
 
-        <!-- LangChain4j OpenAI Chat -->
+        <!-- OpenAI chat model integration -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-open-ai</artifactId>
         </dependency>
 
-        <!-- LangChain4j Embedding Models -->
+        <!-- Optional: Reactor helpers for LangChain4j (if you want reactive wrappers) -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-reactor</artifactId>
+        </dependency>
+
+        <!-- Embedding models (local / non-OpenAI) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-embeddings</artifactId>
         </dependency>
 
-        <!-- LangChain4j pgvector (Postgres + vector) -->
+        <!-- pgvector embedding store -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-pgvector</artifactId>
@@ -151,7 +158,7 @@
             <version>6.4</version>
         </dependency>
 
-        <!-- Guava (optional: if conflicts arise, remove this and let BOM manage) -->
+        <!-- Guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
