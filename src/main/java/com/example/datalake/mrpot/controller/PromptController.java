@@ -76,20 +76,20 @@ public class PromptController {
     entities.put("query", ctx.getRawInput());
     entities.put("normalized", normalized);
 
-      return PrepareResponse.builder()
-              .systemPrompt(sysPrompt)
-              .userPrompt(userPrompt)
-              .finalPrompt(finalPrompt)
-              .sessionId(sessionId)
-              .language(langDisplay)
-              .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
-              .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
-              .entities(entities)
-              .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
-              .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
-              .errors(List.of())
-              .answer(ctx.getLlmAnswer())
-              .build();
+    return PrepareResponse.builder()
+        .systemPrompt(sysPrompt)
+        .userPrompt(userPrompt)
+        .finalPrompt(finalPrompt)
+        .sessionId(sessionId)
+        .language(langDisplay)
+        .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
+        .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
+        .entities(entities)
+        .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
+        .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
+        .errors(List.of())
+        .answer(ctx.getLlmAnswer())
+        .build();
   }
 
   private PrepareResponse toErrorResponse(ValidationException ex) {
@@ -130,6 +130,10 @@ public class PromptController {
 
   private Flux<ServerSentEvent<Map<String, Object>>> toStream(ProcessingContext ctx) {
     String sessionId = ctx.getSessionId();
+    if (sessionId == null || sessionId.isBlank()) {
+      sessionId = UUID.randomUUID().toString();
+      ctx.setSessionId(sessionId);
+    }
     String language = ctx.getLanguage() == null ? null : ctx.getLanguage().getIsoCode();
 
     Map<String, Object> start = new LinkedHashMap<>();

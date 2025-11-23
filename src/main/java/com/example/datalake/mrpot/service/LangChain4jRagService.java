@@ -10,16 +10,17 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.chat.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.output.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,7 +33,6 @@ public class LangChain4jRagService {
     private static final int MAX_KB_CONTEXT_CHARS = 600;
     private static final int MAX_USER_TEXT_CHARS = 320;
     private static final int MAX_HISTORY_MESSAGES = 20;
-    private static final int MAX_HISTORY_CHARS = 1200;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
@@ -58,7 +58,7 @@ public class LangChain4jRagService {
 
         if (userText == null || userText.isBlank()) {
             return Mono.just(new LlmPrompt(ctx.addStep("langchain4j-rag", "skip-empty-text"),
-                    sessionId, "", "", "skip-empty-text", chatMemory(sessionId), true));
+                    sessionId, "", "", "", "skip-empty-text", chatMemory(sessionId), true));
         }
 
         List<String> keywords = ctx.getKeywords() == null ? Collections.emptyList() : ctx.getKeywords();
@@ -87,29 +87,16 @@ public class LangChain4jRagService {
         }
 
         ChatMemory memory = chatMemory(sessionId);
-        String history = renderHistory(memory);
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+        String userPrompt = formatUserPrompt(userText, kbContext);
 
-        String finalPromptForLlm = """
-%s
-Recent conversation:
-%s
-
-Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
-KB:
-%s
-Question:
-%s
-Keep it concise.
-""".formatted(systemPrompt, history, kbContext, userText);
-
-        log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
+        log.debug("LangChain4jRagService: userPrompt len={} chars", userPrompt.length());
 
         String stepInfo = "ok snippets=" + snippets.size()
                 + ", docs=" + docIds.size()
                 + ", kbChars=" + kbContext.length();
 
-        return Mono.just(new LlmPrompt(ctx, sessionId, userText, finalPromptForLlm, stepInfo, memory, false));
+        return Mono.just(new LlmPrompt(ctx, sessionId, systemPrompt, userPrompt, userText, stepInfo, memory, false));
     }
 
     private Mono<String> runChat(LlmPrompt prompt) {
@@ -121,17 +108,25 @@ Keep it concise.
         }
 
         return Mono.fromCallable(() -> {
-            String answer = chatModel.chat(prompt.finalPrompt());
-            finalizeConversation(prompt, answer);
-            return answer;
+            ChatMemory memory = prompt.memory();
+            ensureSystemMessage(memory, prompt.systemPrompt());
+
+            List<ChatMessage> messages = new ArrayList<>(memory.messages());
+            messages.add(UserMessage.from(prompt.userPrompt()));
+
+            Response<AiMessage> response = chatModel.generate(messages);
+            AiMessage answer = response.content();
+
+            finalizeConversation(prompt, prompt.userPrompt(), answer);
+            return answer.text();
         });
     }
 
-    private void finalizeConversation(LlmPrompt prompt, String answer) {
-        prompt.memory().add(UserMessage.from(prompt.userText()));
-        prompt.memory().add(AiMessage.from(answer));
+    private void finalizeConversation(LlmPrompt prompt, String userPrompt, AiMessage answer) {
+        prompt.memory().add(UserMessage.from(userPrompt));
+        prompt.memory().add(answer);
 
-        prompt.ctx().setLlmAnswer(answer);
+        prompt.ctx().setLlmAnswer(answer.text());
         prompt.ctx().addStep("langchain4j-rag", prompt.stepInfo());
     }
 
@@ -166,39 +161,11 @@ Keep it concise.
         return chatMemories.computeIfAbsent(sessionId, id -> MessageWindowChatMemory.withMaxMessages(MAX_HISTORY_MESSAGES));
     }
 
-    private String renderHistory(ChatMemory memory) {
-        List<ChatMessage> messages = memory.messages();
-        if (messages == null || messages.isEmpty()) {
-            return "(no previous turns)";
+    private void ensureSystemMessage(ChatMemory memory, String systemPrompt) {
+        if (systemPrompt == null || systemPrompt.isBlank()) {
+            return;
         }
-
-        StringJoiner joiner = new StringJoiner("\n");
-        for (ChatMessage message : messages) {
-            joiner.add(renderMessage(message));
-            if (joiner.length() >= MAX_HISTORY_CHARS) {
-                break;
-            }
-        }
-
-        String history = joiner.toString();
-        if (history.length() > MAX_HISTORY_CHARS) {
-            return history.substring(history.length() - MAX_HISTORY_CHARS);
-        }
-        return history;
-    }
-
-    private String renderMessage(ChatMessage message) {
-        String role;
-        if (message instanceof UserMessage) {
-            role = "User";
-        } else if (message instanceof AiMessage) {
-            role = "Assistant";
-        } else if (message instanceof SystemMessage) {
-            role = "System";
-        } else {
-            role = "Message";
-        }
-        return role + ": " + message;
+        memory.add(SystemMessage.from(systemPrompt));
     }
 
     /**
@@ -262,11 +229,26 @@ Keep it concise.
         return s == null ? "" : s;
     }
 
+    private String formatUserPrompt(String userText, String kbContext) {
+        String effectiveKb = kbContext == null || kbContext.isBlank()
+                ? "(no relevant knowledge base content found)"
+                : kbContext;
+        return """
+Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content." 
+KB:
+%s
+Question:
+%s
+Keep it concise.
+""".formatted(effectiveKb, userText);
+    }
+
     private record LlmPrompt(
             ProcessingContext ctx,
             String sessionId,
+            String systemPrompt,
+            String userPrompt,
             String userText,
-            String finalPrompt,
             String stepInfo,
             ChatMemory memory,
             boolean skip
