@@ -1,7 +1,6 @@
 package com.example.datalake.mrpot.config;
 
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
@@ -22,7 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 public class Langchain4jConfig {
 
     @Bean
-    public ChatModel chatModel(Langchain4jOpenAiProperties props) {
+    public OpenAiChatModel chatModel(Langchain4jOpenAiProperties props) {
         return OpenAiChatModel.builder()
                 .apiKey(props.getApiKey())
                 .modelName(props.getChatModel())

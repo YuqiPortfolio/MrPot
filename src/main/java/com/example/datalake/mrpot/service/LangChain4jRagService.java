@@ -3,7 +3,14 @@ package com.example.datalake.mrpot.service;
 import com.example.datalake.mrpot.model.KbSnippet;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
-import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.memory.chat.ChatMemory;
+import dev.langchain4j.memory.chat.ChatMemoryStore;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.memory.chat.store.InMemoryChatMemoryStore;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +29,11 @@ public class LangChain4jRagService {
     private static final int MAX_KB_CONTEXT_CHARS = 600;
     private static final int MAX_USER_TEXT_CHARS = 320;
 
-    private final ChatModel chatModel;
+    private static final int MAX_CHAT_HISTORY_MESSAGES = 20;
+
+    private final ChatLanguageModel chatLanguageModel;
     private final KbSearchService kbSearchService;
+    private final ChatMemoryStore chatMemoryStore = new InMemoryChatMemoryStore();
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
         // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
@@ -72,32 +82,44 @@ public class LangChain4jRagService {
 
         // 5) 拿系统 prompt（由前面 Processor 链构建）
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+        String conversationId = ensureSessionId(ctx);
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .id(conversationId)
+                .chatMemoryStore(chatMemoryStore)
+                .maxMessages(MAX_CHAT_HISTORY_MESSAGES)
+                .build();
 
-        // 6) 拼装最终 prompt（单条 string，规模可控）
-        String finalPromptForLlm = """
-%s
-Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
+        if (chatMemory.messages().stream().noneMatch(SystemMessage.class::isInstance)) {
+            chatMemory.add(SystemMessage.from(systemPrompt));
+        }
+
+        String turnPrompt = """
+Use the knowledge base context when relevant. If it is not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
+
 KB:
 %s
+
 Question:
 %s
-Keep it concise.
-""".formatted(systemPrompt, kbContext, userText);
 
-        log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
+Keep the answer concise.
+""".formatted(kbContext, userText);
+        chatMemory.add(UserMessage.from(turnPrompt));
+
+        log.debug("LangChain4jRagService: turnPrompt len={} chars", turnPrompt.length());
 
         final String stepInfo = "ok snippets=" + snippets.size()
                 + ", docs=" + docIds.size()
                 + ", kbChars=" + kbContext.length();
 
-        final String promptForLlm = finalPromptForLlm;
         final ProcessingContext ctxRef = ctx;
 
         // 7) 调 LangChain4j（同步封装成 Mono）
         return Mono.fromCallable(() -> {
-            String answer = chatModel.chat(promptForLlm);
-            ctxRef.setLlmAnswer(answer);
-            return ctxRef.addStep("langchain4j-rag", stepInfo);
+            AiMessage answer = chatLanguageModel.generate(chatMemory.messages()).content();
+            chatMemory.add(answer);
+            ctxRef.setLlmAnswer(answer.text());
+            return ctxRef.addStep("langchain4j-rag", stepInfo + ", history=" + chatMemory.messages().size());
         });
     }
 
@@ -151,6 +173,14 @@ Keep it concise.
             return trimmed;
         }
         return trimmed.substring(0, maxChars) + "...";
+    }
+
+    private static String ensureSessionId(ProcessingContext ctx) {
+        String sessionId = ctx.getSessionId();
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new IllegalArgumentException("sessionId must be provided by the caller for chat memory to work");
+        }
+        return sessionId;
     }
 
     private static String normalizeWhitespace(String s) {

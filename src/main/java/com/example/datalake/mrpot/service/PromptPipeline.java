@@ -66,6 +66,10 @@ public class PromptPipeline {
         .setSystemPrompt(validationContext.getSystemPrompt())
         .setValidationNotices(new ArrayList<>(validationContext.getNotices()));
 
+    if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+      return Mono.error(new ValidationException("sessionId is required"));
+    }
+
     if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
     if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
 

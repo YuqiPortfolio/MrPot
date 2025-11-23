@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -63,8 +62,7 @@ public class PromptController {
 
     String sessionId = ctx.getSessionId();
     if (sessionId == null || sessionId.isBlank()) {
-      sessionId = UUID.randomUUID().toString();
-      ctx.setSessionId(sessionId);
+      throw new IllegalStateException("sessionId should be provided by the client");
     }
 
     Map<String, Object> entities = new LinkedHashMap<>();
