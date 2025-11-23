@@ -14,4 +14,8 @@ public class StepLog {
   private String name;
   private String note;
   private Instant at;
+  /**
+   * Elapsed milliseconds since the ProcessingContext was created when this step was recorded.
+   */
+  private Long elapsedMs;
 }

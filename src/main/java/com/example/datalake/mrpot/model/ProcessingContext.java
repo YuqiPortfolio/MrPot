@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
+import java.time.Duration;
 import java.util.*;
 
 @Data
@@ -45,6 +46,7 @@ public class ProcessingContext {
   private String finalPrompt; // optional combined
   private int charLimit = 8000; // simple guard
   private Instant now = Instant.now();
+  private Instant startedAt = Instant.now();
 
   // audit trail
   private List<StepLog> steps = new ArrayList<>();
@@ -64,10 +66,16 @@ public class ProcessingContext {
     /**
      * Optional: ids of kb_documents used as context, for debugging / UI.
      */
-    private List<Long> llmDocIds = new ArrayList<>();
+  private List<Long> llmDocIds = new ArrayList<>();
 
   public ProcessingContext addStep(String name, String note) {
-    steps.add(new StepLog().setName(name).setNote(note).setAt(Instant.now()));
+    Instant nowInstant = Instant.now();
+    long elapsed = startedAt == null ? 0L : Duration.between(startedAt, nowInstant).toMillis();
+    steps.add(new StepLog()
+        .setName(name)
+        .setNote(note)
+        .setAt(nowInstant)
+        .setElapsedMs(elapsed));
     return this;
   }
 }
