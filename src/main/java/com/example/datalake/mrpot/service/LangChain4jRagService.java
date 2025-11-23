@@ -3,6 +3,11 @@ package com.example.datalake.mrpot.service;
 import com.example.datalake.mrpot.model.KbSnippet;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.memory.chat.ChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +17,8 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,9 +28,11 @@ public class LangChain4jRagService {
     private static final int MAX_SNIPPETS = 2;
     private static final int MAX_KB_CONTEXT_CHARS = 600;
     private static final int MAX_USER_TEXT_CHARS = 320;
+    private static final String NO_HISTORY = "(no prior turns)";
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
+    private final ChatMemoryService chatMemoryService;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
         // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
@@ -70,19 +79,25 @@ public class LangChain4jRagService {
             kbContext = "(no relevant knowledge base content found)";
         }
 
-        // 5) 拿系统 prompt（由前面 Processor 链构建）
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+        String sessionId = ensureSessionId(ctx);
+        ChatMemory chatMemory = chatMemoryService.chatMemory(sessionId);
+        seedSystemPrompt(chatMemory, systemPrompt);
+        String historyBlock = renderHistory(chatMemory);
 
         // 6) 拼装最终 prompt（单条 string，规模可控）
         String finalPromptForLlm = """
 %s
+Conversation history:
+%s
+
 Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
 KB:
 %s
 Question:
 %s
 Keep it concise.
-""".formatted(systemPrompt, kbContext, userText);
+""".formatted(systemPrompt, historyBlock, kbContext, userText);
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 
@@ -97,8 +112,61 @@ Keep it concise.
         return Mono.fromCallable(() -> {
             String answer = chatModel.chat(promptForLlm);
             ctxRef.setLlmAnswer(answer);
+            recordTurn(chatMemory, userText, answer);
             return ctxRef.addStep("langchain4j-rag", stepInfo);
         });
+    }
+
+    private static void seedSystemPrompt(ChatMemory chatMemory, String systemPrompt) {
+        if (systemPrompt == null || systemPrompt.isBlank()) {
+            return;
+        }
+        boolean hasSystem = chatMemory.messages().stream()
+                .anyMatch(msg -> msg instanceof SystemMessage);
+        if (!hasSystem) {
+            chatMemory.add(SystemMessage.from(systemPrompt));
+        }
+    }
+
+    private static void recordTurn(ChatMemory chatMemory, String userText, String answer) {
+        if (chatMemory == null) {
+            return;
+        }
+        if (userText != null && !userText.isBlank()) {
+            chatMemory.add(UserMessage.from(userText));
+        }
+        if (answer != null && !answer.isBlank()) {
+            chatMemory.add(AiMessage.from(answer));
+        }
+    }
+
+    private static String renderHistory(ChatMemory chatMemory) {
+        if (chatMemory == null || chatMemory.messages().isEmpty()) {
+            return NO_HISTORY;
+        }
+        return chatMemory.messages().stream()
+                .filter(msg -> msg instanceof UserMessage || msg instanceof AiMessage)
+                .map(LangChain4jRagService::renderMessage)
+                .collect(Collectors.joining("\n"));
+    }
+
+    private static String renderMessage(ChatMessage message) {
+        if (message instanceof UserMessage userMessage) {
+            return "User: " + safe(userMessage.text());
+        }
+        if (message instanceof AiMessage aiMessage) {
+            return "Assistant: " + safe(aiMessage.text());
+        }
+        return safe(message.text());
+    }
+
+    private static String ensureSessionId(ProcessingContext ctx) {
+        if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+            String generated = UUID.randomUUID().toString();
+            ctx.setSessionId(generated);
+            return generated;
+        }
+        return ctx.getSessionId();
     }
 
     /**

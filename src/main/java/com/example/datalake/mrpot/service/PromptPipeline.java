@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -65,6 +66,10 @@ public class PromptPipeline {
         .setRawInput(validationContext.getProcessedInput())
         .setSystemPrompt(validationContext.getSystemPrompt())
         .setValidationNotices(new ArrayList<>(validationContext.getNotices()));
+
+    if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+      ctx.setSessionId(UUID.randomUUID().toString());
+    }
 
     if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
     if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
