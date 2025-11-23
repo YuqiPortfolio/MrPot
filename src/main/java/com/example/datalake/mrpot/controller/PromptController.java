@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,19 +76,19 @@ public class PromptController {
     entities.put("query", ctx.getRawInput());
     entities.put("normalized", normalized);
 
-      return PrepareResponse.builder()
-              .systemPrompt(sysPrompt)
-              .userPrompt(userPrompt)
-              .finalPrompt(finalPrompt)
-              .language(langDisplay)
-              .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
-              .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
-              .entities(entities)
-              .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
-              .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
-              .errors(List.of())
-              .answer(ctx.getLlmAnswer())
-              .build();
+    return PrepareResponse.builder()
+        .systemPrompt(sysPrompt)
+        .userPrompt(userPrompt)
+        .finalPrompt(finalPrompt)
+        .language(langDisplay)
+        .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
+        .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
+        .entities(entities)
+        .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
+        .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
+        .errors(List.of())
+        .answer(ctx.getLlmAnswer())
+        .build();
   }
 
   private PrepareResponse toErrorResponse(ValidationException ex) {
@@ -109,33 +109,129 @@ public class PromptController {
         .build();
   }
 
-  @Operation(summary = "Stream step events (dummy SSE)",
-      description = "Streams 5 dummy StepEvent items, 1 per second, as text/event-stream.")
-  @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<StepEvent>> stream(@RequestParam("q") String query,
-                                                   @RequestParam(value = "userId", required = false) String userId,
-                                                   @RequestParam(value = "sessionId", required = false) String sessionId) {
-    List<String> steps = List.of(
-        "parse-query",
-        "detect-intent",
-        "extract-entities",
-        "plan-execution",
-        "finalize"
+  @Operation(summary = "Stream processing steps as SSE",
+      description = "Runs the prompt pipeline and streams processor progress to the client.")
+  @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Flux<ServerSentEvent<StepEvent>> stream(@RequestBody PrepareRequest request) {
+    Map<String, Object> startPayload = new LinkedHashMap<>();
+    startPayload.put("query", request.getQuery());
+    startPayload.put("userId", request.getUserId());
+    startPayload.put("sessionId", request.getSessionId());
+
+    Map<String, Object> normalizePayload = new LinkedHashMap<>();
+    normalizePayload.put("rawInput", request.getQuery());
+
+    Flux<ServerSentEvent<StepEvent>> bootstrap = Flux.just(
+        buildEvent("0", "start", "Received request", 0, startPayload),
+        buildEvent("1", "normalize-input", "Normalizing input", 10, normalizePayload)
     );
 
-    return Flux.interval(Duration.ofSeconds(1))
-        .take(steps.size())
-        .map(i -> {
-          StepEvent event = StepEvent.builder()
-              .step(steps.get(i.intValue()))
-              .note("Processed step " + (i + 1) + " for query '" + query + "'")
-              .build();
+    return bootstrap.concatWith(
+        Mono.defer(() -> promptPipeline.run(request))
+            .flatMapMany(ctx -> {
+              List<ServerSentEvent<StepEvent>> events = new ArrayList<>();
+              int idx = 2;
+              int progress = 20;
 
-          return ServerSentEvent.<StepEvent>builder()
-              .id(String.valueOf(i))
-              .event("step-event")
-              .data(event)
-              .build();
-        });
+              String normalized = ctx.getNormalized() == null || ctx.getNormalized().isBlank()
+                  ? ctx.getRawInput()
+                  : ctx.getNormalized();
+
+              Map<String, Object> normalizedPayload = new LinkedHashMap<>();
+              normalizedPayload.put("normalized", normalized);
+
+              events.add(buildEvent(String.valueOf(idx++), "normalized", "Input normalized", progress,
+                  normalizedPayload));
+
+              if (ctx.getKeywords() != null && !ctx.getKeywords().isEmpty()) {
+                progress = Math.min(40, progress + 10);
+                Map<String, Object> keywordPayload = new LinkedHashMap<>();
+                keywordPayload.put("keywords", ctx.getKeywords());
+                events.add(buildEvent(String.valueOf(idx++), "extract-keywords", "Extracted keywords", progress,
+                    keywordPayload));
+              }
+
+              List<StepEvent> processorEvents = new ArrayList<>();
+              if (ctx.getSteps() != null) {
+                for (var step : ctx.getSteps()) {
+                  processorEvents.add(StepEvent.builder()
+                      .step(step.getName())
+                      .note(step.getNote())
+                      .progress(null)
+                      .status("ok")
+                      .build());
+                }
+              }
+
+              if (!processorEvents.isEmpty()) {
+                int processorCount = processorEvents.size();
+                int remainingProgress = 50;
+                int perStep = Math.max(5, remainingProgress / processorCount);
+
+                for (StepEvent event : processorEvents) {
+                  progress = Math.min(90, progress + perStep);
+                  events.add(buildEvent(String.valueOf(idx++), event.getStep(), event.getNote(), progress, Map.of()));
+                }
+              } else {
+                progress = Math.max(progress, 70);
+              }
+
+              progress = Math.min(98, progress + 5);
+              Map<String, Object> finalPayload = new LinkedHashMap<>();
+              finalPayload.put("finalPrompt", PromptRenderUtils.ensureFinalPrompt(ctx));
+
+              events.add(buildEvent(String.valueOf(idx++), "finalize-prompt", "Final prompt generated", progress,
+                  finalPayload));
+
+              Map<String, Object> completePayload = new LinkedHashMap<>();
+              completePayload.put("answer", ctx.getLlmAnswer());
+              completePayload.put("language", ctx.getLanguage() == null ? null : ctx.getLanguage().getDisplayName());
+              completePayload.put("intent", ctx.getIntent() == null ? null : ctx.getIntent().name());
+
+              events.add(buildEvent(String.valueOf(idx), "completed", "Pipeline complete", 100, completePayload));
+
+              return Flux.fromIterable(events);
+            })
+            .onErrorResume(ValidationException.class, ex -> Flux.just(
+                buildErrorEvent("validation-error", ex.getMessage())
+            ))
+            .onErrorResume(ex -> {
+              log.error("Failed to stream prompt pipeline", ex);
+              return Flux.just(buildErrorEvent("unexpected-error", "Unexpected error: " + ex.getMessage()));
+            })
+    );
+  }
+
+  private ServerSentEvent<StepEvent> buildEvent(String id, String step, String note, Integer progress,
+                                                Map<String, Object> payload) {
+    StepEvent event = StepEvent.builder()
+        .step(step)
+        .note(note)
+        .progress(progress)
+        .status("ok")
+        .payload(payload)
+        .build();
+
+    return ServerSentEvent.<StepEvent>builder()
+        .id(id)
+        .event("step-event")
+        .data(event)
+        .build();
+  }
+
+  private ServerSentEvent<StepEvent> buildErrorEvent(String step, String message) {
+    StepEvent event = StepEvent.builder()
+        .step(step)
+        .note(message)
+        .status("error")
+        .progress(null)
+        .payload(Map.of())
+        .build();
+
+    return ServerSentEvent.<StepEvent>builder()
+        .id(step)
+        .event("step-event")
+        .data(event)
+        .build();
   }
 }
