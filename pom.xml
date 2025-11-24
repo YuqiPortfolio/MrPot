@@ -85,10 +85,10 @@
         </dependency>
 
         <!-- ===== LangChain4j ===== -->
-        <!-- Core interfaces: ChatLanguageModel, ChatMemory, ChatMessage, etc. -->
+        <!-- Main module: includes core, InMemoryEmbeddingStore, RAG helpers, etc. -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-core</artifactId>
+            <artifactId>langchain4j</artifactId>
         </dependency>
 
         <!-- OpenAI chat model integration -->
@@ -165,6 +165,7 @@
             <version>33.3.1-jre</version>
         </dependency>
 
+        <!-- CSV -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>

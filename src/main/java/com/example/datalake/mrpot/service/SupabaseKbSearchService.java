@@ -141,15 +141,15 @@ public class SupabaseKbSearchService implements KbSearchService {
     }
 
     private static Long extractDocId(Metadata metadata) {
-        Object id = metadata.get("doc_id");
-        if (id == null) {
-            id = metadata.get("id");
+        String id = Optional.ofNullable(metadata.getString("doc_id"))
+                .orElseGet(() -> metadata.getString("id"));
+
+        if (id == null || id.isBlank()) {
+            return null;
         }
-        if (id instanceof Number n) {
-            return n.longValue();
-        }
+
         try {
-            return id == null ? null : Long.parseLong(id.toString());
+            return Long.parseLong(id.trim());
         } catch (NumberFormatException e) {
             return null;
         }
