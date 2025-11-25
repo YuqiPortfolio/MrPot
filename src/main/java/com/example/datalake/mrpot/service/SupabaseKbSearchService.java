@@ -37,12 +37,10 @@ public class SupabaseKbSearchService implements KbSearchService {
         if (query == null || query.isBlank()) {
             return Collections.emptyList();
         }
-        if (keywords == null) {
-            keywords = Collections.emptyList();
-        }
-
         log.debug("SupabaseKbSearchService.searchSnippets query='{}', keywords={}, maxSnippets={}, maxTotalChars={}",
                 query, keywords, maxSnippets, maxTotalChars);
+
+        List<String> normalizedKeywords = normalizeKeywords(query, keywords);
 
         int docLimit = Math.min(
                 MAX_DOC_CANDIDATES,
@@ -50,7 +48,7 @@ public class SupabaseKbSearchService implements KbSearchService {
         );
 
         // 1) 用 query + keywords 查候选文档
-        List<KbDocument> docs = searchCandidates(query, keywords, docLimit);
+        List<KbDocument> docs = searchCandidates(query, normalizedKeywords, docLimit);
 
         // 2) 如果还空，做 fallback：拿最近几篇文档兜底
         if (docs.isEmpty()) {
@@ -77,7 +75,7 @@ public class SupabaseKbSearchService implements KbSearchService {
             int perDocBudget = Math.min(MAX_SNIPPET_PER_DOC, remaining);
             if (perDocBudget <= 0) break;
 
-            String snippetText = extractSnippetFromContent(content, keywords, perDocBudget);
+            String snippetText = extractSnippetFromContent(content, normalizedKeywords, perDocBudget);
             snippetText = normalizeWhitespace(snippetText);
             if (snippetText.isBlank()) continue; // 如果没有关键词命中，直接跳过
 
@@ -94,6 +92,28 @@ public class SupabaseKbSearchService implements KbSearchService {
         }
 
         return result;
+    }
+
+    private List<String> normalizeKeywords(String query, List<String> keywords) {
+        LinkedHashSet<String> unique = new LinkedHashSet<>();
+        if (keywords != null) {
+            for (String kw : keywords) {
+                if (kw == null) continue;
+                String trimmed = kw.trim();
+                if (!trimmed.isEmpty()) {
+                    unique.add(trimmed);
+                }
+            }
+        }
+
+        if (query != null && !query.isBlank()) {
+            for (String token : query.trim().split("\\s+")) {
+                if (token.length() < 2) continue; // 太短的词命中效果差，忽略
+                unique.add(token);
+            }
+        }
+
+        return new ArrayList<>(unique);
     }
 
     /**
@@ -120,16 +140,19 @@ public class SupabaseKbSearchService implements KbSearchService {
         sql.append(" AND ( content ILIKE :q ");
         params.put("q", "%" + trimmedQuery + "%");
 
+        StringBuilder scoreExpr = new StringBuilder("CASE WHEN content ILIKE :q THEN 2 ELSE 0 END");
+
         int kwIndex = 0;
         for (String kw : keywords) {
             if (kw == null || kw.isBlank()) continue;
             String key = "kw" + kwIndex++;
             sql.append(" OR content ILIKE :").append(key).append(" ");
+            scoreExpr.append(" + CASE WHEN content ILIKE :").append(key).append(" THEN 1 ELSE 0 END");
             params.put(key, "%" + kw.trim() + "%");
         }
         sql.append(") ");
 
-        sql.append(" ORDER BY id DESC LIMIT :limit");
+        sql.append(" ORDER BY (").append(scoreExpr).append(") DESC, id DESC LIMIT :limit");
         params.put("limit", limit);
 
         return jdbcTemplate.query(sql.toString(), params, (rs, rowNum) -> {
@@ -186,22 +209,24 @@ public class SupabaseKbSearchService implements KbSearchService {
         }
 
         String lower = text.toLowerCase(Locale.ROOT);
-        int bestIdx = -1;
+        int bestIdx = Integer.MAX_VALUE;
+        int bestLen = 0;
 
-        // 找到第一个匹配的关键词位置（最靠前的）
+        // 找到最靠前、且更长的匹配关键词位置
         for (String kw : keywords) {
             if (kw == null || kw.isBlank()) continue;
             String kwLower = kw.toLowerCase(Locale.ROOT).trim();
             if (kwLower.isEmpty()) continue;
 
             int idx = lower.indexOf(kwLower);
-            if (idx >= 0 && (bestIdx == -1 || idx < bestIdx)) {
+            if (idx >= 0 && (idx < bestIdx || (idx == bestIdx && kwLower.length() > bestLen))) {
                 bestIdx = idx;
+                bestLen = kwLower.length();
             }
         }
 
         // 如果没有任何关键词命中：直接返回空字符串
-        if (bestIdx == -1) {
+        if (bestIdx == Integer.MAX_VALUE) {
             return "";
         }
 
