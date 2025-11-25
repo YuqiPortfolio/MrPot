@@ -36,7 +36,7 @@ public class Langchain4jConfig {
     public EmbeddingModel embeddingModel(Langchain4jOpenAiProperties props) {
         // Prefer an offline / local embedding model to avoid consuming OpenAI tokens
         if (props.getApiKey() == null || props.getApiKey().isBlank()) {
-            return AllMiniLmL6V2EmbeddingModel.builder().build();
+            return new AllMiniLmL6V2EmbeddingModel();
         }
 
         return OpenAiEmbeddingModel.builder()
