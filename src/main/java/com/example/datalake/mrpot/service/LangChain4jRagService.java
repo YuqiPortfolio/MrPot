@@ -3,6 +3,12 @@ package com.example.datalake.mrpot.service;
 import com.example.datalake.mrpot.model.KbSnippet;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.memory.chat.ChatMemory;
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -21,9 +28,11 @@ public class LangChain4jRagService {
     private static final int MAX_SNIPPETS = 2;
     private static final int MAX_KB_CONTEXT_CHARS = 600;
     private static final int MAX_USER_TEXT_CHARS = 320;
+    private static final int MAX_MEMORY_MESSAGES = 20;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
+    private final ChatMemoryProvider chatMemoryProvider;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
         // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
@@ -38,6 +47,9 @@ public class LangChain4jRagService {
         if (userText == null || userText.isBlank()) {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
         }
+
+        String sessionId = ensureSessionId(ctx);
+        ChatMemory chatMemory = chatMemoryProvider.get(sessionId);
 
         List<String> keywords = ctx.getKeywords();
         if (keywords == null) {
@@ -73,8 +85,11 @@ public class LangChain4jRagService {
         // 5) 拿系统 prompt（由前面 Processor 链构建）
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
 
-        // 6) 拼装最终 prompt（单条 string，规模可控）
+        // 6) 拼装 chat history + 最终 prompt（单条 string，规模可控）
+        String chatHistoryBlock = renderChatHistory(chatMemory.messages());
         String finalPromptForLlm = """
+%s
+Previous conversation (most recent first):
 %s
 Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
 KB:
@@ -82,7 +97,7 @@ KB:
 Question:
 %s
 Keep it concise.
-""".formatted(systemPrompt, kbContext, userText);
+""".formatted(systemPrompt, chatHistoryBlock, kbContext, userText);
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 
@@ -96,6 +111,8 @@ Keep it concise.
         // 7) 调 LangChain4j（同步封装成 Mono）
         return Mono.fromCallable(() -> {
             String answer = chatModel.chat(promptForLlm);
+            chatMemory.add(UserMessage.from(userText));
+            chatMemory.add(AiMessage.from(answer));
             ctxRef.setLlmAnswer(answer);
             return ctxRef.addStep("langchain4j-rag", stepInfo);
         });
@@ -160,5 +177,44 @@ Keep it concise.
 
     private static String safe(String s) {
         return s == null ? "" : s;
+    }
+
+    private String ensureSessionId(ProcessingContext ctx) {
+        if (ctx.getSessionId() == null || ctx.getSessionId().isBlank()) {
+            ctx.setSessionId(UUID.randomUUID().toString());
+        }
+        return ctx.getSessionId();
+    }
+
+    private String renderChatHistory(List<ChatMessage> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return "(no previous messages)";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int start = Math.max(0, messages.size() - MAX_MEMORY_MESSAGES);
+        for (int i = messages.size() - 1; i >= start; i--) {
+            ChatMessage message = messages.get(i);
+            String role;
+            String content;
+
+            if (message instanceof UserMessage userMessage) {
+                role = "User";
+                content = userMessage.text();
+            } else if (message instanceof AiMessage aiMessage) {
+                role = "Assistant";
+                content = aiMessage.text();
+            } else if (message instanceof SystemMessage systemMessage) {
+                role = "System";
+                content = systemMessage.text();
+            } else {
+                role = message.getClass().getSimpleName();
+                content = message.toString();
+            }
+
+            sb.append("- ").append(role).append(": ").append(content).append("\n");
+        }
+
+        return sb.toString().stripTrailing();
     }
 }
