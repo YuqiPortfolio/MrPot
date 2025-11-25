@@ -197,7 +197,7 @@ Keep it concise.
 
             if (message instanceof UserMessage userMessage) {
                 role = "User";
-                content = userMessage.text();
+                content = userMessage.singleText();
             } else if (message instanceof AiMessage aiMessage) {
                 role = "Assistant";
                 content = aiMessage.text();
