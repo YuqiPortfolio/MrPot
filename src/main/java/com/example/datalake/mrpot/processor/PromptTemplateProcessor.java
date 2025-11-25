@@ -107,6 +107,11 @@ public class PromptTemplateProcessor implements TextProcessor {
       trySetString(ctx, "setSystemPrompt", "systemPrompt", newSystem);
       trySetString(ctx, "setUserPrompt", "userPrompt", newUser);
 
+      String note = "lang=" + lang
+              + ", intent=" + intent
+              + ", keywords=" + (keywords != null ? keywords.size() : 0);
+      ctx.addStep(name(), note);
+
       return ctx;
     });
   }

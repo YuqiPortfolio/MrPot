@@ -85,19 +85,25 @@ public class PromptPipeline {
       return Flux.error(ex);
     }
 
-    Flux<ProcessingContext> pipeline = Flux.just(ctx);
+    // Build a sequential chain while emitting the updated context after *each* processor
+    // completes. This ensures SSE consumers receive real-time step updates.
+    Mono<ProcessingContext> chain = Mono.just(ctx);
+    Flux<ProcessingContext> emissions = Flux.empty();
+
     for (TextProcessor processor : buildOrderedChain()) {
       final TextProcessor stage = processor;
-      pipeline = pipeline.concatMap(current -> {
+      chain = chain.flatMap(current -> {
         if (current.isCacheHit() && shouldBypassAfterCache(stage)) {
           return Mono.just(current.addStep(stage.name(), "bypass-cache"));
         }
         return stage.process(current);
       });
+
+      // Emit the context produced by this stage before moving to the next one
+      emissions = emissions.concatWith(chain);
     }
 
-    // Skip the initial seed context so subscribers only see post-processor updates.
-    return pipeline.skip(1);
+    return emissions;
   }
 
   private ProcessingContext initializeContext(PrepareRequest request) throws ValidationException {

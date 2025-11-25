@@ -65,6 +65,8 @@ public class ThinkingStepsMapper {
     return switch (name) {
       case "unified-clean-correct" -> normalizeDetail(ctx);
       case "intent-classifier" -> keywordsDetail(ctx);
+      case "common-response" -> commonResponseDetail(ctx, log);
+      case "langchain4j-rag" -> ragDetail(ctx, log);
       // you can add more here if needed:
       // case "language-translate"  -> translateDetail(ctx);
       // case "prompt-template"     -> templateDetail(ctx);
@@ -109,6 +111,30 @@ public class ThinkingStepsMapper {
     return "Intent = " + inText +
         "\nKeywords = " + kwText +
         "\nTags = " + tagText;
+  }
+
+  private String commonResponseDetail(ProcessingContext ctx, StepLog log) {
+    if (!ctx.isCommonResponse()) {
+      return "No common response matched";
+    }
+
+    String note = Optional.ofNullable(log.getNote()).orElse("");
+    String systemPrompt = Optional.ofNullable(ctx.getSystemPrompt()).orElse("(none)");
+    String userPrompt = Optional.ofNullable(ctx.getUserPrompt()).orElse("(none)");
+
+    return "Matched common response" + (note.isBlank() ? "" : ": " + note)
+        + "\nSystem prompt: " + systemPrompt
+        + "\nUser prompt: " + userPrompt;
+  }
+
+  private String ragDetail(ProcessingContext ctx, StepLog log) {
+    List<Long> docIds = Optional.ofNullable(ctx.getLlmDocIds()).orElse(List.of());
+    String docsText = docIds.isEmpty() ? "(none)" : docIds.toString();
+    String note = Optional.ofNullable(log.getNote()).orElse("");
+
+    return "Knowledge search" + (note.isBlank() ? "" : " => " + note)
+        + "\nDoc IDs: " + docsText
+        + "\nAnswer: " + Optional.ofNullable(ctx.getLlmAnswer()).orElse("(pending)");
   }
 
   @SafeVarargs
