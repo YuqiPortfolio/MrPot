@@ -7,10 +7,6 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.memory.chat.store.ChatMemoryStore;
-import dev.langchain4j.memory.chat.store.inmemory.InMemoryChatMemoryStore;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,20 +28,6 @@ public class Langchain4jConfig {
                 .modelName(props.getChatModel())
                 .temperature(props.getTemperature())
                 .maxTokens(props.getMaxOutputTokens())
-                .build();
-    }
-
-    @Bean
-    public ChatMemoryStore chatMemoryStore() {
-        return new InMemoryChatMemoryStore();
-    }
-
-    @Bean
-    public ChatMemoryProvider chatMemoryProvider(ChatMemoryStore chatMemoryStore) {
-        return (conversationId) -> MessageWindowChatMemory.builder()
-                .id(String.valueOf(conversationId))
-                .chatMemoryStore(chatMemoryStore)
-                .maxMessages(20)
                 .build();
     }
 

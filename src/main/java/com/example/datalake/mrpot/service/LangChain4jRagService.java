@@ -7,8 +7,6 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.memory.chat.ChatMemory;
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.model.chat.ChatModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +30,7 @@ public class LangChain4jRagService {
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
-    private final ChatMemoryProvider chatMemoryProvider;
+    private final ConversationMemoryService conversationMemoryService;
 
     public Mono<ProcessingContext> generate(ProcessingContext ctx) {
         // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
@@ -49,7 +47,7 @@ public class LangChain4jRagService {
         }
 
         String sessionId = ensureSessionId(ctx);
-        ChatMemory chatMemory = chatMemoryProvider.get(sessionId);
+        List<ChatMessage> chatHistory = conversationMemoryService.getMessages(sessionId);
 
         List<String> keywords = ctx.getKeywords();
         if (keywords == null) {
@@ -86,7 +84,7 @@ public class LangChain4jRagService {
         String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
 
         // 6) 拼装 chat history + 最终 prompt（单条 string，规模可控）
-        String chatHistoryBlock = renderChatHistory(chatMemory.messages());
+        String chatHistoryBlock = renderChatHistory(chatHistory);
         String finalPromptForLlm = """
 %s
 Previous conversation (most recent first):
@@ -111,8 +109,7 @@ Keep it concise.
         // 7) 调 LangChain4j（同步封装成 Mono）
         return Mono.fromCallable(() -> {
             String answer = chatModel.chat(promptForLlm);
-            chatMemory.add(UserMessage.from(userText));
-            chatMemory.add(AiMessage.from(answer));
+            conversationMemoryService.appendTurn(sessionId, userText, answer);
             ctxRef.setLlmAnswer(answer);
             return ctxRef.addStep("langchain4j-rag", stepInfo);
         });
