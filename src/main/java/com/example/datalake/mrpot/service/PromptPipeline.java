@@ -9,6 +9,7 @@ import com.example.datalake.mrpot.validation.ValidationException;
 import com.example.datalake.mrpot.validation.ValidationService;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
 
@@ -52,22 +53,12 @@ public class PromptPipeline {
   }
 
   public Mono<ProcessingContext> run(PrepareRequest request) {
-    ValidationContext validationContext;
+    ProcessingContext ctx;
     try {
-      validationContext = validationService.validate(request.getQuery(), PromptRenderUtils.baseSystemPrompt());
+      ctx = initializeContext(request);
     } catch (ValidationException ex) {
       return Mono.error(ex);
     }
-
-    ProcessingContext ctx = new ProcessingContext()
-        .setUserId(request.getUserId())
-        .setSessionId(request.getSessionId())
-        .setRawInput(validationContext.getProcessedInput())
-        .setSystemPrompt(validationContext.getSystemPrompt())
-        .setValidationNotices(new ArrayList<>(validationContext.getNotices()));
-
-    if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
-    if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
 
     Mono<ProcessingContext> pipeline = Mono.just(ctx);
     for (TextProcessor processor : buildOrderedChain()) {
@@ -80,6 +71,49 @@ public class PromptPipeline {
       });
     }
     return pipeline;
+  }
+
+  /**
+   * Stream the pipeline, emitting the {@link ProcessingContext} after each processor completes.
+   * This is used by the SSE endpoint to provide real-time progress updates.
+   */
+  public Flux<ProcessingContext> runStreaming(PrepareRequest request) {
+    ProcessingContext ctx;
+    try {
+      ctx = initializeContext(request);
+    } catch (ValidationException ex) {
+      return Flux.error(ex);
+    }
+
+    Flux<ProcessingContext> pipeline = Flux.just(ctx);
+    for (TextProcessor processor : buildOrderedChain()) {
+      final TextProcessor stage = processor;
+      pipeline = pipeline.concatMap(current -> {
+        if (current.isCacheHit() && shouldBypassAfterCache(stage)) {
+          return Mono.just(current.addStep(stage.name(), "bypass-cache"));
+        }
+        return stage.process(current);
+      });
+    }
+
+    // Skip the initial seed context so subscribers only see post-processor updates.
+    return pipeline.skip(1);
+  }
+
+  private ProcessingContext initializeContext(PrepareRequest request) throws ValidationException {
+    ValidationContext validationContext = validationService.validate(request.getQuery(), PromptRenderUtils.baseSystemPrompt());
+
+    ProcessingContext ctx = new ProcessingContext()
+        .setUserId(request.getUserId())
+        .setSessionId(request.getSessionId())
+        .setRawInput(validationContext.getProcessedInput())
+        .setSystemPrompt(validationContext.getSystemPrompt())
+        .setValidationNotices(new ArrayList<>(validationContext.getNotices()));
+
+    if (ctx.getEntities() == null) ctx.setEntities(new LinkedHashMap<>());
+    if (ctx.getOutline() == null) ctx.setOutline(new LinkedHashMap<>());
+
+    return ctx;
   }
 
   private List<TextProcessor> buildOrderedChain() {

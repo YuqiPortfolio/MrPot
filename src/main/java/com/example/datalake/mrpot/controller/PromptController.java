@@ -6,8 +6,11 @@ import com.example.datalake.mrpot.model.StepEvent;
 import com.example.datalake.mrpot.request.PrepareRequest;
 import com.example.datalake.mrpot.response.PrepareResponse;
 import com.example.datalake.mrpot.service.PromptPipeline;
+import com.example.datalake.mrpot.sse.ThinkingStep;
+import com.example.datalake.mrpot.sse.ThinkingStepsMapper;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
 import com.example.datalake.mrpot.validation.ValidationException;
+import dev.langchain4j.exception.RateLimitException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ import java.util.UUID;
 public class PromptController {
 
   private final PromptPipeline promptPipeline;
+  private final ThinkingStepsMapper thinkingStepsMapper;
 
   @PostMapping("/prepare")
   @Operation(summary = "Prepare a session using the processing pipeline",
@@ -40,6 +43,8 @@ public class PromptController {
   public Mono<ResponseEntity<PrepareResponse>> prepare(@RequestBody PrepareRequest req) {
     return promptPipeline.run(req)
         .map(ctx -> ResponseEntity.ok(toResponse(ctx)))
+        .onErrorResume(RateLimitException.class, ex ->
+            Mono.just(ResponseEntity.status(429).body(toRateLimitResponse(ex))))
         .onErrorResume(ValidationException.class, ex ->
             Mono.just(ResponseEntity.badRequest().body(toErrorResponse(ex))))
         .onErrorResume(ex -> {
@@ -76,19 +81,19 @@ public class PromptController {
     entities.put("query", ctx.getRawInput());
     entities.put("normalized", normalized);
 
-      return PrepareResponse.builder()
-              .systemPrompt(sysPrompt)
-              .userPrompt(userPrompt)
-              .finalPrompt(finalPrompt)
-              .language(langDisplay)
-              .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
-              .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
-              .entities(entities)
-              .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
-              .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
-              .errors(List.of())
-              .answer(ctx.getLlmAnswer())
-              .build();
+    return PrepareResponse.builder()
+        .systemPrompt(sysPrompt)
+        .userPrompt(userPrompt)
+        .finalPrompt(finalPrompt)
+        .language(langDisplay)
+        .intent(ctx.getIntent() == null ? null : ctx.getIntent().name())
+        .tags(ctx.getTags() == null ? List.of() : ctx.getTags().stream().toList())
+        .entities(entities)
+        .steps(ctx.getSteps() == null ? List.of() : List.copyOf(ctx.getSteps()))
+        .notices(ctx.getValidationNotices() == null ? List.of() : List.copyOf(ctx.getValidationNotices()))
+        .errors(List.of())
+        .answer(ctx.getLlmAnswer())
+        .build();
   }
 
   private PrepareResponse toErrorResponse(ValidationException ex) {
@@ -109,33 +114,90 @@ public class PromptController {
         .build();
   }
 
-  @Operation(summary = "Stream step events (dummy SSE)",
-      description = "Streams 5 dummy StepEvent items, 1 per second, as text/event-stream.")
+  private PrepareResponse toRateLimitResponse(RateLimitException ex) {
+    String detail = ex == null ? null : ex.getMessage();
+    String message = (detail == null || detail.isBlank())
+        ? "OpenAI rate limit or quota was exceeded. Please try again later."
+        : "OpenAI rate limit or quota was exceeded: " + detail;
+
+    return PrepareResponse.builder()
+        .notices(List.of())
+        .errors(List.of(message))
+        .build();
+  }
+
+  @Operation(summary = "Stream step events",
+      description = "Runs the full processing pipeline (same as /prepare) and streams step events plus the final response.")
   @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  public Flux<ServerSentEvent<StepEvent>> stream(@RequestParam("q") String query,
-                                                   @RequestParam(value = "userId", required = false) String userId,
-                                                   @RequestParam(value = "sessionId", required = false) String sessionId) {
-    List<String> steps = List.of(
-        "parse-query",
-        "detect-intent",
-        "extract-entities",
-        "plan-execution",
-        "finalize"
-    );
+  public Flux<ServerSentEvent<?>> stream(@RequestParam("q") String query,
+                                         @RequestParam(value = "userId", required = false) String userId,
+                                         @RequestParam(value = "sessionId", required = false) String sessionId) {
 
-    return Flux.interval(Duration.ofSeconds(1))
-        .take(steps.size())
-        .map(i -> {
-          StepEvent event = StepEvent.builder()
-              .step(steps.get(i.intValue()))
-              .note("Processed step " + (i + 1) + " for query '" + query + "'")
-              .build();
+    PrepareRequest req = PrepareRequest.builder()
+        .query(query)
+        .userId(userId)
+        .sessionId(sessionId)
+        .build();
 
-          return ServerSentEvent.<StepEvent>builder()
-              .id(String.valueOf(i))
-              .event("step-event")
-              .data(event)
-              .build();
+    return promptPipeline.runStreaming(req)
+        .transform(source -> {
+          var replayed = source.replay();
+
+          Flux<ServerSentEvent<?>> stepEvents = replayed.map(this::toStepEvent);
+
+          Mono<ServerSentEvent<?>> responseEvent = replayed.last()
+              .map(ctx -> ServerSentEvent.builder(toResponse(ctx))
+                  .event("prepare-response")
+                  .build());
+
+          replayed.connect();
+
+          return stepEvents
+              .concatWith(responseEvent)
+              .concatWith(Mono.just(ServerSentEvent.builder("done")
+                  .event("done")
+                  .build()));
+        })
+        .onErrorResume(RateLimitException.class, ex -> Flux.just(
+            ServerSentEvent.builder(toRateLimitResponse(ex))
+                .event("error")
+                .build(),
+            ServerSentEvent.builder("done")
+                .event("done")
+                .build()
+        ))
+        .onErrorResume(ValidationException.class, ex -> Flux.just(ServerSentEvent.builder(toErrorResponse(ex))
+            .event("error")
+            .build()))
+        .onErrorResume(ex -> {
+          log.error("Unexpected failure while streaming prompt", ex);
+          return Flux.just(ServerSentEvent.builder(toUnexpectedErrorResponse(ex))
+              .event("error")
+              .build(),
+              ServerSentEvent.builder("done")
+                  .event("done")
+                  .build());
         });
+  }
+
+  private ServerSentEvent<StepEvent> toStepEvent(ProcessingContext ctx) {
+    List<ThinkingStep> steps = thinkingStepsMapper.toThinkingSteps(ctx);
+    if (steps.isEmpty()) {
+      return ServerSentEvent.builder(StepEvent.builder()
+              .step("unknown")
+              .note("")
+              .build())
+          .event("step-event")
+          .build();
+    }
+
+    ThinkingStep latest = steps.get(steps.size() - 1);
+    return ServerSentEvent.builder(StepEvent.builder()
+            .step(latest.getProcessor())
+            .note(latest.getDetail())
+            .build())
+        .id(String.valueOf(latest.getIndex()))
+        .event("step-event")
+        .build();
   }
 }
