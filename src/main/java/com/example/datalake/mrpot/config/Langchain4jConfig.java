@@ -3,6 +3,7 @@ package com.example.datalake.mrpot.config;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
@@ -33,6 +34,11 @@ public class Langchain4jConfig {
 
     @Bean
     public EmbeddingModel embeddingModel(Langchain4jOpenAiProperties props) {
+        // Prefer an offline / local embedding model to avoid consuming OpenAI tokens
+        if (props.getApiKey() == null || props.getApiKey().isBlank()) {
+            return AllMiniLmL6V2EmbeddingModel.builder().build();
+        }
+
         return OpenAiEmbeddingModel.builder()
                 .apiKey(props.getApiKey())
                 .modelName(props.getEmbeddingModel())
