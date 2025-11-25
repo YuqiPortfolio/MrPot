@@ -25,6 +25,11 @@ public class LangChain4jRagProcessor implements TextProcessor {
         }
 
         // cacheHit 只是在 PromptCacheLookup 那个阶段起作用，LLM 还是要跑一次的
-        return ragService.generate(ctx);
+        return ragService.generate(ctx)
+                .map(updatedCtx -> {
+                    // note 建议写得稍微有点信息量，ThinkingStepsMapper.ragDetail 会用到
+                    String note = "done";   // 如果你之后能拿到 snippets 数量，可以写成 "snippets=3, docs=2"
+                    return updatedCtx.addStep(name(), note);
+                });
     }
 }

@@ -177,6 +177,12 @@
             <artifactId>google-cloud-translate</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-embeddings-bge-small-en</artifactId>
+            <version>1.8.0-beta15</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
