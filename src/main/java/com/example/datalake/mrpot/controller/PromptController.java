@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Tag(name = "Demo Streaming API", description = "Response answer and SSE ")
 @RequiredArgsConstructor
 public class PromptController {
+
+    private static final Duration SSE_DELAY = Duration.ofMillis(500);
 
     private final PromptPipeline promptPipeline;
     private final ThinkingStepsMapper thinkingStepsMapper;
@@ -226,7 +229,8 @@ public class PromptController {
                                     .event("done")
                                     .build()
                     );
-                });
+                })
+                .delayElements(SSE_DELAY);
     }
 
     // 把一个 ThinkingStep → StepEvent（SSE 数据）
