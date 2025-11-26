@@ -18,14 +18,14 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LangChain4jRagService {
 
-    static final int MAX_SNIPPETS = 2;
-    static final int MAX_KB_CONTEXT_CHARS = 600;
-    static final int MAX_USER_TEXT_CHARS = 320;
+    public static final int MAX_SNIPPETS = 2;
+    public static final int MAX_KB_CONTEXT_CHARS = 600;
+    public static final int MAX_USER_TEXT_CHARS = 320;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
-    static String selectUserText(ProcessingContext ctx) {
+    public static String selectUserText(ProcessingContext ctx) {
         String userText = ctx.getNormalized();
         if (userText == null || userText.isBlank()) {
             userText = ctx.getRawInput();
