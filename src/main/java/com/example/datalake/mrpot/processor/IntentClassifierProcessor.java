@@ -251,10 +251,8 @@ public class IntentClassifierProcessor implements TextProcessor {
             return;
         }
 
-        for (String token : tokenSet) {
-            for (String canonical : keywordsLexiconDao.findCanonicalsByToken(token)) {
-                tags.add(canonical.toLowerCase(Locale.ROOT));
-            }
+        for (String canonical : keywordsLexiconDao.findCanonicalsByTokens(tokenSet)) {
+            tags.add(canonical.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -334,11 +332,9 @@ public class IntentClassifierProcessor implements TextProcessor {
 
         // 1) 按 lexicon 检索：命中任一 token → 取 canonical
         if (keywordsLexiconDao != null) {
-            for (String token : tokenSet) {
-                for (String canonical : keywordsLexiconDao.findCanonicalsByToken(token)) {
-                    if (isGoodKeyword(canonical)) {
-                        candidates.add(canonical);
-                    }
+            for (String canonical : keywordsLexiconDao.findCanonicalsByTokens(tokenSet)) {
+                if (isGoodKeyword(canonical)) {
+                    candidates.add(canonical);
                 }
             }
         }
