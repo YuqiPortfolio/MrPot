@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Array;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,42 +42,50 @@ public class JdbcIntentRulesDao implements IntentRulesDao {
                 from public.keywords_lexicon
                 where is_active = true
                   and (
-                    canonical ilike ?
+                    canonical ilike any (?)
                     or exists(
-                        select 1 from unnest(synonyms) s where s ilike ?
+                        select 1 from unnest(synonyms) s where s ilike any (?)
                     )
                   )
                 """;
 
-        Map<String, IntentRuleEntry> entries = new LinkedHashMap<>();
+        Set<String> patterns = new LinkedHashSet<>();
         for (String token : uniqueTokens) {
-            String pattern = "%" + token + "%";
-            try {
-                jdbcTemplate.query(sql, rs -> {
-                    String canonical = rs.getString("canonical");
-                    if (canonical == null || canonical.isBlank()) {
-                        return;
-                    }
+            patterns.add("%" + token + "%");
+        }
 
-                    List<String> synonyms = new ArrayList<>();
-                    Array array = rs.getArray("synonyms");
-                    if (array != null) {
-                        Object raw = array.getArray();
-                        if (raw instanceof String[] values) {
-                            for (String value : values) {
-                                if (value != null && !value.isBlank()) {
-                                    synonyms.add(value.toLowerCase(Locale.ROOT));
+        Map<String, IntentRuleEntry> entries = new LinkedHashMap<>();
+        try {
+            jdbcTemplate.query(con -> {
+                        Array patternArray = con.createArrayOf("text", patterns.toArray());
+                        var ps = con.prepareStatement(sql);
+                        ps.setArray(1, patternArray);
+                        ps.setArray(2, patternArray);
+                        return ps;
+                    }, rs -> {
+                        String canonical = rs.getString("canonical");
+                        if (canonical == null || canonical.isBlank()) {
+                            return;
+                        }
+
+                        List<String> synonyms = new ArrayList<>();
+                        Array array = rs.getArray("synonyms");
+                        if (array != null) {
+                            Object raw = array.getArray();
+                            if (raw instanceof String[] values) {
+                                for (String value : values) {
+                                    if (value != null && !value.isBlank()) {
+                                        synonyms.add(value.toLowerCase(Locale.ROOT));
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    entries.putIfAbsent(canonical.toUpperCase(Locale.ROOT),
-                            new IntentRuleEntry(canonical.toUpperCase(Locale.ROOT), synonyms));
-                }, pattern, pattern);
-            } catch (DataAccessException e) {
-                log.warn("[intent-classifier] Failed to query intent rules – {}", e.getMessage());
-            }
+                        entries.putIfAbsent(canonical.toUpperCase(Locale.ROOT),
+                                new IntentRuleEntry(canonical.toUpperCase(Locale.ROOT), synonyms));
+                    });
+        } catch (DataAccessException e) {
+            log.warn("[intent-classifier] Failed to query intent rules – {}", e.getMessage());
         }
 
         return new ArrayList<>(entries.values());
