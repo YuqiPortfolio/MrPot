@@ -258,6 +258,20 @@
                 </configuration>
             </plugin>
 
+            <!-- Code formatting: mvn spotless:apply / spotless:check -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <!-- Use Google Java Format by default -->
+                        <googleJavaFormat/>
+                        <removeUnusedImports/>
+                    </java>
+                </configuration>
+            </plugin>
+
             <!-- Repackage as executable jar -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>

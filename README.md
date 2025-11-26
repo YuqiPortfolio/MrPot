@@ -22,6 +22,7 @@
 - **Knowledge-base snippet retrieval** that enforces total-character budgets and surfaces contributing document IDs for transparency.
 - **Prompt rendering utilities** to enforce system/user/final prompt presence and ensure combined prompts stay within character limits.
 - **Server-sent event demo** producing ordered `StepEvent` updates for UI consumption or testing SSE handling.
+- **Lightweight health check** at `GET /health` returning `{ "status": "up" }` with HTTP 200 when the service is running.
 
 ## Formatting
 
