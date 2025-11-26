@@ -18,15 +18,14 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class LangChain4jRagService {
 
-    private static final int MAX_SNIPPETS = 2;
-    private static final int MAX_KB_CONTEXT_CHARS = 600;
-    private static final int MAX_USER_TEXT_CHARS = 320;
+    static final int MAX_SNIPPETS = 2;
+    static final int MAX_KB_CONTEXT_CHARS = 600;
+    static final int MAX_USER_TEXT_CHARS = 320;
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
-    public Mono<ProcessingContext> generate(ProcessingContext ctx) {
-        // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
+    static String selectUserText(ProcessingContext ctx) {
         String userText = ctx.getNormalized();
         if (userText == null || userText.isBlank()) {
             userText = ctx.getRawInput();
@@ -34,7 +33,12 @@ public class LangChain4jRagService {
         if (userText == null || userText.isBlank()) {
             userText = ctx.getUserPrompt();
         }
-        userText = clipForModel(userText, MAX_USER_TEXT_CHARS);
+        return clipForModel(userText, MAX_USER_TEXT_CHARS);
+    }
+
+    public Mono<ProcessingContext> generate(ProcessingContext ctx) {
+        // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
+        String userText = selectUserText(ctx);
         if (userText == null || userText.isBlank()) {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
         }
@@ -44,13 +48,22 @@ public class LangChain4jRagService {
             keywords = Collections.emptyList();
         }
 
-        // 2) 调用「片段检索」而不是整篇文档
-        List<KbSnippet> snippets = kbSearchService.searchSnippets(
-                userText,
-                keywords,
-                MAX_SNIPPETS,
-                MAX_KB_CONTEXT_CHARS
-        );
+        List<KbSnippet> snippets = ctx.getKbSnippets();
+        if (snippets == null || snippets.isEmpty()) {
+            // 2) 调用「片段检索」而不是整篇文档
+            snippets = kbSearchService.searchSnippets(
+                    userText,
+                    keywords,
+                    MAX_SNIPPETS,
+                    MAX_KB_CONTEXT_CHARS
+            );
+            ctx.setKbSnippets(snippets);
+        }
+
+        if (snippets == null) {
+            snippets = Collections.emptyList();
+            ctx.setKbSnippets(snippets);
+        }
 
         if (snippets.isEmpty()) {
             log.debug("No kb snippets matched for text='{}'", userText);
@@ -66,8 +79,15 @@ public class LangChain4jRagService {
 
         // 4) 在全局预算内组装 KB 上下文
         String kbContext = buildKbContext(snippets, MAX_KB_CONTEXT_CHARS);
-        if (kbContext.isBlank()) {
-            kbContext = "(no relevant knowledge base content found)";
+        String onlineContext = normalizeWhitespace(safe(ctx.getOnlineReferences()));
+        String contextLabel = "KB";
+        String contextBlock = kbContext;
+        if (contextBlock.isBlank() && !onlineContext.isBlank()) {
+            contextLabel = "online references";
+            contextBlock = onlineContext;
+        }
+        if (contextBlock.isBlank()) {
+            contextBlock = "(no relevant knowledge base content found)";
         }
 
         // 5) 拿系统 prompt（由前面 Processor 链构建）
@@ -76,19 +96,18 @@ public class LangChain4jRagService {
         // 6) 拼装最终 prompt（单条 string，规模可控）
         String finalPromptForLlm = """
 %s
-Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
-KB:
+Context (%s):
 %s
-Question:
-%s
-Keep it concise.
-""".formatted(systemPrompt, kbContext, userText);
+Q: %s
+Answer concisely using the context. If unrelated, say "Sorry, I can only reply to Yuqi Guo's related content."
+""".formatted(systemPrompt, contextLabel, contextBlock, userText);
 
         log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
 
         final String stepInfo = "ok snippets=" + snippets.size()
                 + ", docs=" + docIds.size()
-                + ", kbChars=" + kbContext.length();
+                + ", contextChars=" + contextBlock.length()
+                + (onlineContext.isBlank() ? "" : ", online=1");
 
         final String promptForLlm = finalPromptForLlm;
         final ProcessingContext ctxRef = ctx;

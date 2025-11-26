@@ -45,6 +45,7 @@ public class ThinkingStepsMapper {
       case "common-response" -> "Match common greeting / FAQ";
       case "prompt-template" -> "Build system + user prompt";
       case "prompt-cache-lookup" -> "Check prompt cache";
+      case "online-search" -> "Search online references";
       case "langchain4j-rag" -> "Retrieve KB & call LLM";
       case "prompt-cache-record" -> "Record answer into cache";
       default -> "Processor: " + name;
@@ -66,6 +67,7 @@ public class ThinkingStepsMapper {
       case "unified-clean-correct" -> normalizeDetail(ctx);
       case "intent-classifier" -> keywordsDetail(ctx);
       case "common-response" -> commonResponseDetail(ctx, log);
+      case "online-search" -> onlineSearchDetail(ctx, log);
       case "langchain4j-rag" -> ragDetail(ctx, log);
       // you can add more here if needed:
       // case "language-translate"  -> translateDetail(ctx);
@@ -125,6 +127,22 @@ public class ThinkingStepsMapper {
     return "Matched common response" + (note.isBlank() ? "" : ": " + note)
         + "\nSystem prompt: " + systemPrompt
         + "\nUser prompt: " + userPrompt;
+  }
+
+  private String onlineSearchDetail(ProcessingContext ctx, StepLog log) {
+    String refs = Optional.ofNullable(ctx.getOnlineReferences()).orElse("").strip();
+    String note = Optional.ofNullable(log.getNote()).orElse("");
+
+    if (refs.isBlank()) {
+      return note.isBlank()
+          ? "KB search returned no snippets; no online references available"
+          : note;
+    }
+
+    if (refs.length() > 400) {
+      refs = refs.substring(0, 400) + "…";
+    }
+    return "Online references:\n" + refs;
   }
 
   private String ragDetail(ProcessingContext ctx, StepLog log) {

@@ -32,6 +32,7 @@ public class PromptPipeline {
           CommonResponseProcessor.class,
           PromptCacheLookupProcessor.class,
           PromptTemplateProcessor.class,
+          OnlineSearchProcessor.class,
           LangChain4jRagProcessor.class,
           PromptCacheRecordProcessor.class
   );

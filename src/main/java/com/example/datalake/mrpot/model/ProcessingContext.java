@@ -1,5 +1,4 @@
 package com.example.datalake.mrpot.model;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +30,10 @@ public class ProcessingContext {
 
   // derived features
   private List<String> keywords = new ArrayList<>();
+
+  // knowledge base search results
+  private List<KbSnippet> kbSnippets = new ArrayList<>();
+  private String onlineReferences;
 
   // Language
   private String indexText;
