@@ -54,7 +54,7 @@ public class PromptTemplateProcessor implements TextProcessor {
   // Default knobs
   private static final String DEFAULT_LANG = "en";
   private static final String DEFAULT_INTENT = "general";
-  private static final int    DEFAULT_TOP_K  = 8;
+  private static final int DEFAULT_TOP_K = 2;
 
   /**
    * Assemble a final RAG prompt that keeps the format consistent across call sites.
