@@ -4,20 +4,14 @@ import com.example.datalake.mrpot.model.Intent;
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.model.PromptTemplate;
 import com.example.datalake.mrpot.dao.KeywordsLexiconDao;
+import com.example.datalake.mrpot.dao.IntentRulesDao;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,22 +57,16 @@ public class IntentClassifierProcessor implements TextProcessor {
             "he", "she", "you", "i", "we", "they", "it", "me", "him", "her", "them", "us"
     );
 
-    private final ObjectMapper om = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-    // 关键字词典：canonical -> 所有同义词（含自己）
-    private final Map<String, Set<String>> expandedLexicon;
-
-    // 规则列表（可通过 json 扩展）
-    private final List<Rule> rules;
+    private final KeywordsLexiconDao keywordsLexiconDao;
+    private final IntentRulesDao intentRulesDao;
 
     // 模板查找器（这里给一个内存版 demo，将来可替换成 ES / DB 查询）
     private final TemplateFinder templateFinder = new InMemoryTemplateFinder();
 
-    public IntentClassifierProcessor(ResourceLoader resourceLoader,
-                                     KeywordsLexiconDao keywordsLexiconDao) {
-        this.expandedLexicon = loadLexicon(keywordsLexiconDao);
-        this.rules = loadRules(resourceLoader, "intent_rules.json");
+    public IntentClassifierProcessor(KeywordsLexiconDao keywordsLexiconDao,
+                                     IntentRulesDao intentRulesDao) {
+        this.keywordsLexiconDao = keywordsLexiconDao;
+        this.intentRulesDao = intentRulesDao;
     }
 
     @Override
@@ -107,16 +95,10 @@ public class IntentClassifierProcessor implements TextProcessor {
             log.debug("[{}] tokenSet is empty after tokenize, text='{}'", NAME, text);
         }
 
-        // 2）结合 keywords_map.json 做「规范化标签扩展」
-        //    如果任一同义词命中，就把 canonical term 加到 tags 中
+        // 2）结合词典动态查询做「规范化标签扩展」
         Set<String> tags = new LinkedHashSet<>(Optional.ofNullable(ctx.getTags())
                 .orElseGet(LinkedHashSet::new));
-
-        expandedLexicon.forEach((canonical, synonyms) -> {
-            if (synonyms.stream().anyMatch(tokenSet::contains)) {
-                tags.add(canonical);
-            }
-        });
+        addCanonicalTags(tokenSet, tags);
 
         // 2.1）基于 token + tags 生成 keywords 列表，给后面检索 / 模板查找用
         ctx.setKeywords(deriveKeywords(tokens, tags));
@@ -130,7 +112,8 @@ public class IntentClassifierProcessor implements TextProcessor {
         if (isGreetingText(text)) {
             predicted = Intent.GREETING;
             matchedRule = "builtin:greeting";
-        } else if (!rules.isEmpty()) {
+        } else {
+            List<Rule> rules = loadRules(tokenSet);
             for (Rule r : rules) {
                 int score = 0;
 
@@ -263,15 +246,20 @@ public class IntentClassifierProcessor implements TextProcessor {
         return tokens;
     }
 
-    private boolean hit(String kw, Set<String> tokenSet) {
-        if (tokenSet.contains(kw)) return true;
-        Set<String> syn = expandedLexicon.get(kw);
-        if (syn != null) {
-            for (String s : syn) {
-                if (tokenSet.contains(s)) return true;
+    private void addCanonicalTags(Set<String> tokenSet, Set<String> tags) {
+        if (keywordsLexiconDao == null) {
+            return;
+        }
+
+        for (String token : tokenSet) {
+            for (String canonical : keywordsLexiconDao.findCanonicalsByToken(token)) {
+                tags.add(canonical.toLowerCase(Locale.ROOT));
             }
         }
-        return false;
+    }
+
+    private boolean hit(String kw, Set<String> tokenSet) {
+        return tokenSet.contains(kw);
     }
 
     // 判断是否是简单的 greeting 文本
@@ -344,19 +332,14 @@ public class IntentClassifierProcessor implements TextProcessor {
 
         LinkedHashSet<String> candidates = new LinkedHashSet<>();
 
-        // 1) 按 lexicon 检索：命中任一同义词 → 取 canonical
-        for (Map.Entry<String, Set<String>> e : expandedLexicon.entrySet()) {
-            String canonical = e.getKey(); // 已经是 lowerCase
-            Set<String> syns = e.getValue();
-            boolean hit = false;
-            for (String s : syns) {
-                if (tokenSet.contains(s)) {
-                    hit = true;
-                    break;
+        // 1) 按 lexicon 检索：命中任一 token → 取 canonical
+        if (keywordsLexiconDao != null) {
+            for (String token : tokenSet) {
+                for (String canonical : keywordsLexiconDao.findCanonicalsByToken(token)) {
+                    if (isGoodKeyword(canonical)) {
+                        candidates.add(canonical);
+                    }
                 }
-            }
-            if (hit && isGoodKeyword(canonical)) {
-                candidates.add(canonical);
             }
         }
 
@@ -364,7 +347,7 @@ public class IntentClassifierProcessor implements TextProcessor {
         for (String tag : tags) {
             if (tag == null || tag.isBlank()) continue;
             String t = tag.toLowerCase(Locale.ROOT);
-            if (expandedLexicon.containsKey(t) && isGoodKeyword(t)) {
+            if (isGoodKeyword(t)) {
                 candidates.add(t);
             }
         }
@@ -393,85 +376,61 @@ public class IntentClassifierProcessor implements TextProcessor {
     // ----------------------------------------------------
     // 规则 & 词典加载
     // ----------------------------------------------------
-    private List<Rule> loadRules(ResourceLoader rl, String classpathName) {
-        try (InputStream in = openForRead(
-                rl,
-                classpathName,
-                "intent.rules",       // -Dintent.rules=...
-                "INTENT_RULES_PATH",  // env INTENT_RULES_PATH=...
-                "src/main/resources/" + classpathName
-        )) {
-            if (in == null) {
-                log.info("[{}] No intent rules found for {}", NAME, classpathName);
-                return Collections.emptyList();
-            }
-            RuleBundle rb = om.readValue(in, RuleBundle.class);
-            return toRules(rb);
-        } catch (Exception e) {
-            log.warn("[{}] Failed to load intent rules {} – {}", NAME, classpathName, e.toString());
+    private List<Rule> loadRules(Set<String> tokenSet) {
+        if (intentRulesDao == null || tokenSet.isEmpty()) {
             return Collections.emptyList();
         }
-    }
 
-    private Map<String, Set<String>> loadLexicon(KeywordsLexiconDao keywordsLexiconDao) {
-        if (keywordsLexiconDao == null) {
-            log.info("[{}] No keywords lexicon DAO provided; defaulting to empty lexicon", NAME);
-            return Collections.emptyMap();
-        }
-        Map<String, Set<String>> lexicon = keywordsLexiconDao.loadLexicon();
-        log.info("[{}] Loaded lexicon from database, terms={}", NAME, lexicon.size());
-        return lexicon;
-    }
-
-    /**
-     * 统一的资源打开逻辑，按顺序尝试：
-     * 1）Spring ResourceLoader classpath:
-     * 2）ClassLoader#getResourceAsStream
-     * 3）系统属性 -D{sysPropKey}
-     * 4）环境变量 {envKey}
-     * 5）最后兜底的文件路径（IDE 直接跑时有用）
-     */
-    private InputStream openForRead(ResourceLoader rl,
-                                    String classpathName,
-                                    String sysPropKey,
-                                    String envKey,
-                                    String lastResortPath) {
-        try {
-            Resource r = rl.getResource("classpath:" + classpathName);
-            if (r.exists()) return r.getInputStream();
-        } catch (Exception ignore) {
-        }
-
-        try {
-            InputStream in = IntentClassifierProcessor.class
-                    .getClassLoader()
-                    .getResourceAsStream(classpathName);
-            if (in != null) return in;
-        } catch (Exception ignore) {
-        }
-
-        try {
-            String external = Optional.ofNullable(System.getProperty(sysPropKey))
-                    .orElse(System.getenv(envKey));
-            if (external != null && !external.isBlank()) {
-                File f = new File(external);
-                if (f.exists() && f.isFile()) return new FileInputStream(f);
+        List<RuleJson> ruleJsons = new ArrayList<>();
+        for (IntentRulesDao.IntentRuleEntry entry : intentRulesDao.findActiveRulesByTokens(tokenSet)) {
+            if (entry == null) {
+                continue;
             }
-        } catch (Exception ignore) {
+
+            String canonical = Optional.ofNullable(entry.canonical())
+                    .map(s -> s.trim().toUpperCase(Locale.ROOT))
+                    .orElse(null);
+            if (canonical == null || canonical.isBlank()) {
+                continue;
+            }
+
+            List<String> any = new ArrayList<>();
+            addLower(any, canonical);
+            if (entry.synonyms() != null) {
+                for (String s : entry.synonyms()) {
+                    addLower(any, s);
+                }
+            }
+
+            if (any.isEmpty()) {
+                continue;
+            }
+
+            RuleJson rj = new RuleJson();
+            rj.intent = canonical;
+            rj.minScore = 1;
+            rj.any = any;
+            rj.all = List.of();
+            rj.none = List.of();
+            rj.tagsBoost = List.of();
+            rj.name = canonical.toLowerCase(Locale.ROOT);
+            ruleJsons.add(rj);
         }
 
-        try {
-            File f = new File(lastResortPath);
-            if (f.exists() && f.isFile()) return new FileInputStream(f);
-        } catch (Exception ignore) {
-        }
-
-        return null;
+        RuleBundle bundle = new RuleBundle();
+        bundle.rules = ruleJsons;
+        return toRules(bundle);
     }
 
     private static void addLower(Set<String> set, String s) {
         if (s != null && !s.isBlank()) {
             set.add(s.toLowerCase(Locale.ROOT));
+        }
+    }
+
+    private static void addLower(List<String> list, String value) {
+        if (value != null && !value.isBlank()) {
+            list.add(value.toLowerCase(Locale.ROOT));
         }
     }
 
