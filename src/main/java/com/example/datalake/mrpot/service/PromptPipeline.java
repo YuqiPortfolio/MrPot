@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import com.example.datalake.mrpot.util.PromptRenderUtils;
+import com.example.datalake.mrpot.processor.PromptTemplateProcessor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -37,10 +38,11 @@ public class PromptPipeline {
   );
 
 
-    private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
+  private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
   private final ValidationService validationService;
+  private final LangChain4jRagService ragService;
 
-  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService) {
+  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService, LangChain4jRagService ragService) {
     // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
     this.processorsByType = processors.stream()
         .collect(Collectors.toMap(
@@ -50,6 +52,7 @@ public class PromptPipeline {
             LinkedHashMap::new
         ));
     this.validationService = validationService;
+    this.ragService = ragService;
   }
 
   public Mono<ProcessingContext> run(PrepareRequest request) {
@@ -70,7 +73,7 @@ public class PromptPipeline {
         return stage.process(current);
       });
     }
-    return pipeline;
+    return pipeline.flatMap(this::finalizePromptAndCallLlm);
   }
 
   /**
@@ -103,7 +106,45 @@ public class PromptPipeline {
       emissions = emissions.concatWith(chain);
     }
 
-    return emissions;
+    Mono<ProcessingContext> finalChain = chain.flatMap(this::finalizePromptAndCallLlm);
+    return emissions.concatWith(finalChain);
+  }
+
+  private Mono<ProcessingContext> finalizePromptAndCallLlm(ProcessingContext ctx) {
+    if (ctx.isCommonResponse()) {
+      return Mono.just(ctx);
+    }
+
+    String existingFinal = safe(ctx.getFinalPrompt());
+    String kbContext = safe(ctx.getKbContext());
+    if (kbContext.isBlank()) kbContext = LangChain4jRagService.NO_KB_CONTEXT_PLACEHOLDER;
+
+    String question = safe(ctx.getLlmQuestion());
+    if (isBlank(question)) {
+      question = resolveUserText(ctx);
+    }
+
+    if (isBlank(existingFinal) && isBlank(question)) {
+      return Mono.just(ctx);
+    }
+
+    String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+
+    boolean shouldReuseFinal = ctx.isCacheHit() && !isBlank(existingFinal);
+    String finalPromptForLlm = shouldReuseFinal
+        ? existingFinal
+        : PromptTemplateProcessor.buildRagPrompt(systemPrompt, kbContext, question);
+
+    ctx.setFinalPrompt(finalPromptForLlm);
+
+    int snippetCount = ctx.getKbSnippetCount();
+    List<Long> docIds = ctx.getLlmDocIds() == null ? List.of() : ctx.getLlmDocIds();
+    String stepInfo = "ok snippets=" + snippetCount
+        + ", docs=" + docIds.size()
+        + ", kbChars=" + kbContext.length()
+        + (isBlank(existingFinal) ? "" : ", prompt=ctx");
+
+    return ragService.completeWithLlm(ctx, stepInfo);
   }
 
   private ProcessingContext initializeContext(PrepareRequest request) throws ValidationException {
@@ -156,5 +197,36 @@ public class PromptPipeline {
 
   private boolean shouldBypassAfterCache(TextProcessor processor) {
     return processor instanceof PromptTemplateProcessor;
+  }
+
+  private static String resolveUserText(ProcessingContext ctx) {
+    String userText = firstNonBlank(ctx.getUserPrompt(), ctx.getNormalized(), ctx.getRawInput());
+    return clipForModel(userText, 320);
+  }
+
+  private static String clipForModel(String text, int maxChars) {
+    if (text == null) return null;
+    String trimmed = text.strip();
+    if (trimmed.length() <= maxChars) {
+      return trimmed;
+    }
+    return trimmed.substring(0, maxChars) + "...";
+  }
+
+  private static String safe(String s) {
+    return s == null ? "" : s;
+  }
+
+  private static boolean isBlank(String s) {
+    return s == null || s.isBlank();
+  }
+
+  private static String firstNonBlank(String... ss) {
+    for (String s : ss) {
+      if (!isBlank(s)) {
+        return s;
+      }
+    }
+    return null;
   }
 }

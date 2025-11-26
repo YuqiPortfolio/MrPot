@@ -43,6 +43,9 @@ public class ProcessingContext {
 
   // assembled
   private String finalPrompt; // optional combined
+  private String kbContext;   // optional KB text assembled by RAG
+  private String llmQuestion; // resolved user text used for RAG / LLM
+  private int kbSnippetCount; // how many snippets were stitched into kbContext
   private int charLimit = 8000; // simple guard
   private Instant now = Instant.now();
 

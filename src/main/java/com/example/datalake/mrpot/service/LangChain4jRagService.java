@@ -21,30 +21,23 @@ public class LangChain4jRagService {
     private static final int MAX_SNIPPETS = 2;
     private static final int MAX_KB_CONTEXT_CHARS = 600;
     private static final int MAX_USER_TEXT_CHARS = 320;
+    static final String NO_KB_CONTEXT_PLACEHOLDER = "(no relevant knowledge base content found)";
 
     private final ChatModel chatModel;
     private final KbSearchService kbSearchService;
 
-    public Mono<ProcessingContext> generate(ProcessingContext ctx) {
-        // 1) 选一个用于检索的文本（建议用已经 English-normalized 的字段）
-        String userText = ctx.getNormalized();
-        if (userText == null || userText.isBlank()) {
-            userText = ctx.getRawInput();
-        }
-        if (userText == null || userText.isBlank()) {
-            userText = ctx.getUserPrompt();
-        }
-        userText = clipForModel(userText, MAX_USER_TEXT_CHARS);
-        if (userText == null || userText.isBlank()) {
+    public Mono<ProcessingContext> prepare(ProcessingContext ctx) {
+        String userText = resolveUserText(ctx);
+        if (isBlank(userText)) {
             return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-text"));
         }
 
-        List<String> keywords = ctx.getKeywords();
-        if (keywords == null) {
-            keywords = Collections.emptyList();
+        List<String> keywords = safeKeywords(ctx.getKeywords());
+        if (keywords.isEmpty()) {
+            return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-keywords"));
         }
 
-        // 2) 调用「片段检索」而不是整篇文档
+        // 1) 调用「片段检索」而不是整篇文档
         List<KbSnippet> snippets = kbSearchService.searchSnippets(
                 userText,
                 keywords,
@@ -56,44 +49,33 @@ public class LangChain4jRagService {
             log.debug("No kb snippets matched for text='{}'", userText);
         }
 
-        // 3) 记录涉及到的 docId（去重）
-        List<Long> docIds = snippets.stream()
-                .map(KbSnippet::getDocId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        // 2) 记录涉及到的 docId（去重）
+        List<Long> docIds = extractDocIds(snippets);
         ctx.setLlmDocIds(docIds);
 
-        // 4) 在全局预算内组装 KB 上下文
+        // 3) 在全局预算内组装 KB 上下文
         String kbContext = buildKbContext(snippets, MAX_KB_CONTEXT_CHARS);
         if (kbContext.isBlank()) {
-            kbContext = "(no relevant knowledge base content found)";
+            kbContext = NO_KB_CONTEXT_PLACEHOLDER;
         }
 
-        // 5) 拿系统 prompt（由前面 Processor 链构建）
-        String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+        ctx.setKbContext(kbContext);
+        ctx.setLlmQuestion(userText);
+        ctx.setKbSnippetCount(snippets.size());
 
-        // 6) 拼装最终 prompt（单条 string，规模可控）
-        String finalPromptForLlm = """
-%s
-Answer using the KB if it helps. If not relevant, say: "Sorry, I can only reply to Yuqi Guo's related content."
-KB:
-%s
-Question:
-%s
-Keep it concise.
-""".formatted(systemPrompt, kbContext, userText);
+        // 4) 拿系统 prompt（由前面 Processor 链构建）
+        PromptRenderUtils.ensureSystemPrompt(ctx);
 
-        log.debug("LangChain4jRagService: finalPrompt len={} chars", finalPromptForLlm.length());
+        return Mono.just(ctx);
+    }
 
-        final String stepInfo = "ok snippets=" + snippets.size()
-                + ", docs=" + docIds.size()
-                + ", kbChars=" + kbContext.length();
+    public Mono<ProcessingContext> completeWithLlm(ProcessingContext ctx, String stepInfo) {
+        final String promptForLlm = safe(ctx.getFinalPrompt());
+        if (isBlank(promptForLlm)) {
+            return Mono.just(ctx.addStep("langchain4j-rag", "skip-empty-final-prompt"));
+        }
 
-        final String promptForLlm = finalPromptForLlm;
         final ProcessingContext ctxRef = ctx;
-
-        // 7) 调 LangChain4j（同步封装成 Mono）
         return Mono.fromCallable(() -> {
             String answer = chatModel.chat(promptForLlm);
             ctxRef.setLlmAnswer(answer);
@@ -144,6 +126,23 @@ Keep it concise.
         return sb.toString();
     }
 
+    private static String resolveUserText(ProcessingContext ctx) {
+        String userText = firstNonBlank(ctx.getUserPrompt(), ctx.getNormalized(), ctx.getRawInput());
+        return clipForModel(userText, MAX_USER_TEXT_CHARS);
+    }
+
+    private static List<String> safeKeywords(List<String> keywords) {
+        return keywords == null ? Collections.emptyList() : keywords;
+    }
+
+    private static List<Long> extractDocIds(List<KbSnippet> snippets) {
+        return snippets.stream()
+                .map(KbSnippet::getDocId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+    }
+
     private static String clipForModel(String text, int maxChars) {
         if (text == null) return null;
         String trimmed = text.strip();
@@ -160,5 +159,18 @@ Keep it concise.
 
     private static String safe(String s) {
         return s == null ? "" : s;
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
+    }
+
+    private static String firstNonBlank(String... ss) {
+        for (String s : ss) {
+            if (!isBlank(s)) {
+                return s;
+            }
+        }
+        return null;
     }
 }

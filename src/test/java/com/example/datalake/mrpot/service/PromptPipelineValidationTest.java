@@ -2,6 +2,10 @@ package com.example.datalake.mrpot.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.request.PrepareRequest;
@@ -12,6 +16,7 @@ import com.example.datalake.mrpot.validation.ValidationException;
 import com.example.datalake.mrpot.validation.ValidationService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 
 class PromptPipelineValidationTest {
 
@@ -21,7 +26,13 @@ class PromptPipelineValidationTest {
             new NotBlankInputValidator(),
             new MaxCharsValidator(maxChars),
             new TemplatePlaceholderValidator()));
-    return new PromptPipeline(List.of(), validationService);
+
+    LangChain4jRagService ragService = mock(LangChain4jRagService.class);
+    when(ragService.completeWithLlm(any(), anyString())).thenAnswer(invocation ->
+        Mono.just((ProcessingContext) invocation.getArgument(0))
+    );
+
+    return new PromptPipeline(List.of(), validationService, ragService);
   }
 
   @Test
