@@ -1,6 +1,6 @@
 package com.example.datalake.mrpot.config;
 
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -8,15 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    private final WebMvcProperties webMvcProperties;
+    private final WebProperties webProperties;
 
-    public CorsConfig(WebMvcProperties webMvcProperties) {
-        this.webMvcProperties = webMvcProperties;
+    public CorsConfig(WebProperties webProperties) {
+        this.webProperties = webProperties;
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        var cors = webMvcProperties.getCors();
+        var cors = webProperties.getCors();
         if (cors == null) {
             return;
         }
