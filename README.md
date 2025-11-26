@@ -42,6 +42,21 @@ mvn clean install -DskipTests
 
 If Maven cannot download dependencies because the default Central repository is blocked, configure an accessible mirror or pre-populate the required artifacts in your local `~/.m2` cache before running the commands above.
 
+### Docker
+
+Build a runnable container image and start the service on port 8080:
+
+```bash
+docker build -t mrpot:latest .
+docker run --rm -p 8080:8080 mrpot:latest
+```
+
+Once the container is running, the lightweight health check should return HTTP 200:
+
+```bash
+curl http://localhost:8080/health
+```
+
 ## Test locally
 
 Run the full unit/integration test suite with the Maven wrapper (requires JDK 17+):
