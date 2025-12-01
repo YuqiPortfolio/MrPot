@@ -193,7 +193,8 @@ public class SupabaseKbSearchService implements KbSearchService {
      * 从整篇 content 中抽一个 snippet：
      * - 仅当至少有一个关键词在 content 中命中时才返回片段；
      * - 如果没有命中任何关键词（或 keywords 为空），直接返回 ""；
-     * - 命中时围绕第一个匹配位置截一段，并按句子边界做柔和截断。
+     * - 命中时优先返回包含关键词的完整句子，以减少 tokens 且保持语义准确；
+     * - 超预算时，按句子顺序累加，并对最后一句做柔和截断。
      */
     private String extractSnippetFromContent(String content,
                                              List<String> keywords,
@@ -208,43 +209,51 @@ public class SupabaseKbSearchService implements KbSearchService {
             return "";
         }
 
-        String lower = text.toLowerCase(Locale.ROOT);
-        int bestIdx = Integer.MAX_VALUE;
-        int bestLen = 0;
+        List<String> loweredKeywords = keywords.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(s -> s.toLowerCase(Locale.ROOT))
+                .toList();
 
-        // 找到最靠前、且更长的匹配关键词位置
-        for (String kw : keywords) {
-            if (kw == null || kw.isBlank()) continue;
-            String kwLower = kw.toLowerCase(Locale.ROOT).trim();
-            if (kwLower.isEmpty()) continue;
+        List<String> sentences = splitIntoSentences(text);
+        List<String> matched = new ArrayList<>();
 
-            int idx = lower.indexOf(kwLower);
-            if (idx >= 0 && (idx < bestIdx || (idx == bestIdx && kwLower.length() > bestLen))) {
-                bestIdx = idx;
-                bestLen = kwLower.length();
+        for (String sentence : sentences) {
+            if (sentence.isBlank()) continue;
+            String lower = sentence.toLowerCase(Locale.ROOT);
+            boolean hit = loweredKeywords.stream().anyMatch(lower::contains);
+            if (hit) {
+                matched.add(sentence.trim());
             }
         }
 
-        // 如果没有任何关键词命中：直接返回空字符串
-        if (bestIdx == Integer.MAX_VALUE) {
+        if (matched.isEmpty()) {
+            // 如果没有任何关键词命中：直接返回空字符串
             return "";
         }
 
-        // 以关键词为中心截取一段内容
-        int half = maxChars / 2;
-        int start = Math.max(0, bestIdx - half);
-        int end = Math.min(text.length(), start + maxChars);
-        if (end - start < maxChars && end == text.length()) {
-            start = Math.max(0, end - maxChars);
+        StringBuilder sb = new StringBuilder();
+        int remaining = maxChars;
+
+        for (int i = 0; i < matched.size() && remaining > 0; i++) {
+            String sentence = matched.get(i);
+            String prefix = sb.isEmpty() ? "" : " ";
+            int needed = prefix.length() + sentence.length();
+
+            if (needed <= remaining) {
+                sb.append(prefix).append(sentence);
+                remaining -= needed;
+                continue;
+            }
+
+            // 最后一句超预算，柔和截断以减少 token
+            String clipped = clipToSentenceBoundary(prefix + sentence, remaining);
+            sb.append(clipped);
+            remaining = 0;
         }
 
-        String rawSnippet = text.substring(start, end);
-        if (start > 0) rawSnippet = "..." + rawSnippet;
-        if (end < text.length()) rawSnippet = rawSnippet + "...";
-
-        // 再按句子边界柔和剪裁，保证不超过 maxChars 且读起来自然
-        String clipped = clipToSentenceBoundary(rawSnippet, maxChars);
-        return clipped;
+        return sb.toString();
     }
 
     /**
@@ -261,6 +270,27 @@ public class SupabaseKbSearchService implements KbSearchService {
             sub = sub.substring(0, cut);
         }
         return sub.strip() + "...";
+    }
+
+    /**
+     * 粗略按句子分段，避免额外的 tokenizer 调用。
+     */
+    private static List<String> splitIntoSentences(String text) {
+        if (text == null || text.isBlank()) {
+            return Collections.emptyList();
+        }
+        List<String> sentences = new ArrayList<>();
+        String[] parts = text.split("(?<=[。！？!?\.\n])");
+        for (String p : parts) {
+            String s = p.trim();
+            if (!s.isEmpty()) {
+                sentences.add(s);
+            }
+        }
+        if (sentences.isEmpty()) {
+            sentences.add(text.trim());
+        }
+        return sentences;
     }
 
     /**
