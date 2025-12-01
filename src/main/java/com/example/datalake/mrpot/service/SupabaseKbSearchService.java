@@ -280,7 +280,7 @@ public class SupabaseKbSearchService implements KbSearchService {
             return Collections.emptyList();
         }
         List<String> sentences = new ArrayList<>();
-        String[] parts = text.split("(?<=[。！？!?\.\n])");
+        String[] parts = text.split("(?<=[。！？!?\n.])");
         for (String p : parts) {
             String s = p.trim();
             if (!s.isEmpty()) {
