@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.text.BreakIterator;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Slf4j
@@ -105,25 +107,83 @@ public class LangChain4jRagService {
 
             if (snippet.isBlank()) continue;
 
-            String header = "[#" + (i + 1) + "]"
-                    + (title.isBlank() ? "" : " " + title)
-                    + (source.isBlank() ? "" : " " + source);
+            String header = compactHeader(i, title, source);
 
-            String block = header + "\n" + snippet;
+            int budgetForBlock = remaining;
             if (sb.length() > 0) {
-                block = "\n\n" + block;
+                budgetForBlock -= 2; // 预留 "\n\n" 间隔
             }
 
-            if (block.length() > remaining) {
-                // 超预算的话，最后一个片段也截一下
-                block = block.substring(0, remaining) + "...";
+            // 预留换行符开销后，为正文争取最大预算
+            int bodyBudget = budgetForBlock - header.length() - 1; // header + "\n"
+            if (bodyBudget <= 0) {
+                break;
             }
 
-            sb.append(block);
-            remaining -= block.length();
+            String clippedSnippet = shrinkToSentenceBudget(snippet, bodyBudget);
+            if (clippedSnippet.isBlank()) continue;
+
+            if (sb.length() > 0) {
+                sb.append("\n\n");
+            }
+
+            sb.append(header).append("\n").append(clippedSnippet);
+            remaining = maxTotalChars - sb.length();
         }
 
         return sb.toString();
+    }
+
+    private static String compactHeader(int index, String title, String source) {
+        String shortTitle = ellipsize(title, 42);
+        String shortSource = ellipsize(source, 36);
+        StringBuilder header = new StringBuilder("[#").append(index + 1).append("]");
+        if (!shortTitle.isBlank()) {
+            header.append(' ').append(shortTitle);
+        }
+        if (!shortSource.isBlank()) {
+            header.append(' ').append(shortSource);
+        }
+        return header.toString();
+    }
+
+    private static String shrinkToSentenceBudget(String snippet, int maxChars) {
+        String s = snippet.strip();
+        if (s.length() <= maxChars) return s;
+
+        BreakIterator it = BreakIterator.getSentenceInstance(Locale.ROOT);
+        it.setText(s);
+
+        StringBuilder out = new StringBuilder();
+        int start = it.first();
+        for (int end = it.next(); end != BreakIterator.DONE; start = end, end = it.next()) {
+            String sentence = s.substring(start, end).trim();
+            if (sentence.isEmpty()) continue;
+
+            if (out.length() + sentence.length() > maxChars) {
+                break;
+            }
+
+            if (out.length() > 0) out.append(' ');
+            out.append(sentence);
+        }
+
+        if (out.length() == 0) {
+            return s.substring(0, Math.min(maxChars, s.length())).trim() + "...";
+        }
+
+        if (out.length() < s.length()) {
+            out.append("...");
+        }
+
+        return out.toString();
+    }
+
+    private static String ellipsize(String value, int maxChars) {
+        String v = safe(value).strip();
+        if (v.length() <= maxChars) return v;
+        if (maxChars <= 3) return v.substring(0, maxChars);
+        return v.substring(0, maxChars - 3) + "...";
     }
 
     private static String resolveUserText(ProcessingContext ctx) {
