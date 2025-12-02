@@ -89,7 +89,7 @@ public class IntentClassifierProcessor implements TextProcessor {
 
         // 1）分词（中英文），并生成 tokenSet 便于规则匹配
         List<String> tokens = tokenize(text);
-        Set<String> tokenSet = new HashSet<>(tokens);
+        Set<String> tokenSet = buildTokenSet(tokens);
 
         if (tokenSet.isEmpty()) {
             log.debug("[{}] tokenSet is empty after tokenize, text='{}'", NAME, text);
@@ -101,7 +101,7 @@ public class IntentClassifierProcessor implements TextProcessor {
         addCanonicalTags(tokenSet, tags);
 
         // 2.1）基于 token + tags 生成 keywords 列表，给后面检索 / 模板查找用
-        ctx.setKeywords(deriveKeywords(tokens, tags));
+        ctx.setKeywords(deriveKeywords(tokenSet, tags));
 
         // 3）规则打分，选出最佳意图
         Intent predicted = Intent.UNKNOWN;
@@ -316,35 +316,35 @@ public class IntentClassifierProcessor implements TextProcessor {
     // 1) 只返回 lexicon 里的 canonical term
     // 2) 按长度降序排序
     // 3) 最多保留前 5 个
-    private List<String> deriveKeywords(List<String> tokens, Set<String> tags) {
-        if (tokens == null || tokens.isEmpty()) {
+    private List<String> deriveKeywords(Set<String> tokenSet, Set<String> tags) {
+        boolean hasTokens = tokenSet != null && !tokenSet.isEmpty();
+        boolean hasTags = tags != null && !tags.isEmpty();
+        if (!hasTokens && !hasTags) {
             return List.of();
-        }
-
-        Set<String> tokenSet = new HashSet<>();
-        for (String t : tokens) {
-            if (t != null && !t.isBlank()) {
-                tokenSet.add(t.toLowerCase(Locale.ROOT));
-            }
         }
 
         LinkedHashSet<String> candidates = new LinkedHashSet<>();
 
-        // 1) 按 lexicon 检索：命中任一 token → 取 canonical
-        if (keywordsLexiconDao != null) {
-            for (String canonical : keywordsLexiconDao.findCanonicalsByTokens(tokenSet)) {
-                if (isGoodKeyword(canonical)) {
-                    candidates.add(canonical);
+        // 1) 按 lexicon 检索：命中任一 token → 取 canonical，并保留触发的原始 token
+        if (hasTokens && keywordsLexiconDao != null) {
+            for (String token : tokenSet) {
+                for (String canonical : keywordsLexiconDao.findCanonicalsByToken(token)) {
+                    if (isGoodKeyword(canonical)) {
+                        candidates.add(canonical);
+                        candidates.add(token);
+                    }
                 }
             }
         }
 
         // 2) 从 tags 中补充：如果某个 tag 恰好就是 lexicon canonical，也可视作关键词
-        for (String tag : tags) {
-            if (tag == null || tag.isBlank()) continue;
-            String t = tag.toLowerCase(Locale.ROOT);
-            if (isGoodKeyword(t)) {
-                candidates.add(t);
+        if (hasTags) {
+            for (String tag : tags) {
+                if (tag == null || tag.isBlank()) continue;
+                String t = tag.toLowerCase(Locale.ROOT);
+                if (isGoodKeyword(t)) {
+                    candidates.add(t);
+                }
             }
         }
 
@@ -367,6 +367,114 @@ public class IntentClassifierProcessor implements TextProcessor {
         return sorted.stream()
                 .limit(5)
                 .toList();
+    }
+
+    private static final int MAX_TOKENS = 48;
+
+    private Set<String> buildTokenSet(List<String> tokens) {
+        if (tokens == null || tokens.isEmpty()) {
+            return Set.of();
+        }
+
+        Map<String, TokenStat> stats = new HashMap<>();
+        for (String token : tokens) {
+            if (token == null) {
+                continue;
+            }
+
+            String normalized = token.trim().toLowerCase(Locale.ROOT);
+            if (!isGoodKeyword(normalized)) {
+                continue;
+            }
+
+            TokenStat stat = stats.computeIfAbsent(normalized, k -> new TokenStat());
+            stat.freq += 1;
+            stat.length = normalized.length();
+            stat.hasHan = stat.hasHan || HAN_CHAR.matcher(normalized).find();
+        }
+
+        if (stats.isEmpty()) {
+            return Set.of();
+        }
+
+        Set<String> lexiconHits = new HashSet<>();
+        if (keywordsLexiconDao != null) {
+            for (String token : stats.keySet()) {
+                if (!keywordsLexiconDao.findCanonicalsByToken(token).isEmpty()) {
+                    lexiconHits.add(token);
+                }
+            }
+        }
+
+        List<TokenScore> scored = new ArrayList<>(stats.size());
+        for (Map.Entry<String, TokenStat> entry : stats.entrySet()) {
+            String token = entry.getKey();
+            TokenStat stat = entry.getValue();
+            boolean lexHit = lexiconHits.contains(token);
+            int score = stat.freq * 3;
+            score += Math.min(stat.length, 12);
+            if (stat.hasHan) score += 2;
+            if (lexHit) score += 6;
+            scored.add(new TokenScore(token, score, stat.freq, stat.length, lexHit));
+        }
+
+        scored.sort((a, b) -> {
+            int cmp = Integer.compare(b.score, a.score);
+            if (cmp != 0) return cmp;
+            cmp = Integer.compare(b.length, a.length);
+            if (cmp != 0) return cmp;
+            return a.token.compareTo(b.token);
+        });
+
+        LinkedHashSet<String> tokenSet = new LinkedHashSet<>(Math.min(scored.size(), MAX_TOKENS));
+
+        // 1) 保证命中词典的 token 优先保留
+        for (TokenScore ts : scored) {
+            if (ts.lexiconHit) {
+                tokenSet.add(ts.token);
+            }
+        }
+
+        // 2) 其余按得分排序，跳过明显弱信号（单次出现的 3 字符英文等）
+        for (TokenScore ts : scored) {
+            if (tokenSet.size() >= MAX_TOKENS) {
+                break;
+            }
+
+            boolean weak = ts.freq == 1 && ts.length <= 3 && !ts.lexiconHit;
+            if (weak) {
+                continue;
+            }
+
+            tokenSet.add(ts.token);
+            if (tokenSet.size() >= MAX_TOKENS) {
+                break;
+            }
+        }
+
+        return tokenSet;
+    }
+
+    private static class TokenStat {
+        int freq;
+        int length;
+        boolean hasHan;
+    }
+
+    private static class TokenScore {
+        final String token;
+        final int score;
+        final int freq;
+        final int length;
+        final boolean lexiconHit;
+
+        TokenScore(String token, int score, int freq, int length, boolean lexiconHit) {
+            this.token = token;
+            this.score = score;
+            this.freq = freq;
+            this.length = length;
+            this.lexiconHit = lexiconHit;
+        }
     }
 
     // ----------------------------------------------------

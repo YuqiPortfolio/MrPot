@@ -234,6 +234,7 @@ public class PromptController {
         return ServerSentEvent.builder(
                         StepEvent.builder()
                                 .step(step.getProcessor())   // internal name: e.g. "unified-clean-correct"
+                                .title(step.getTitle())      // human-readable title
                                 .note(step.getDetail())      // detail: normalized text / keywords / 搜索参考 等
                                 .build()
                 )
