@@ -41,8 +41,9 @@ public class PromptPipeline {
   private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
   private final ValidationService validationService;
   private final LangChain4jRagService ragService;
+  private final ProcessingLogService processingLogService;
 
-  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService, LangChain4jRagService ragService) {
+  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService, LangChain4jRagService ragService, ProcessingLogService processingLogService) {
     // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
     this.processorsByType = processors.stream()
         .collect(Collectors.toMap(
@@ -53,6 +54,7 @@ public class PromptPipeline {
         ));
     this.validationService = validationService;
     this.ragService = ragService;
+    this.processingLogService = processingLogService;
   }
 
   public Mono<ProcessingContext> run(PrepareRequest request) {
@@ -111,40 +113,43 @@ public class PromptPipeline {
   }
 
   private Mono<ProcessingContext> finalizePromptAndCallLlm(ProcessingContext ctx) {
+    Mono<ProcessingContext> result;
     if (ctx.isCommonResponse()) {
-      return Mono.just(ctx);
+      result = Mono.just(ctx);
+    } else {
+      String existingFinal = safe(ctx.getFinalPrompt());
+      String kbContext = safe(ctx.getKbContext());
+      if (kbContext.isBlank()) kbContext = LangChain4jRagService.NO_KB_CONTEXT_PLACEHOLDER;
+
+      String question = safe(ctx.getLlmQuestion());
+      if (isBlank(question)) {
+        question = resolveUserText(ctx);
+      }
+
+      if (isBlank(existingFinal) && isBlank(question)) {
+        result = Mono.just(ctx);
+      } else {
+        String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
+
+        boolean shouldReuseFinal = ctx.isCacheHit() && !isBlank(existingFinal);
+        String finalPromptForLlm = shouldReuseFinal
+            ? existingFinal
+            : PromptTemplateProcessor.buildRagPrompt(systemPrompt, kbContext, question);
+
+        ctx.setFinalPrompt(finalPromptForLlm);
+
+        int snippetCount = ctx.getKbSnippetCount();
+        List<Long> docIds = ctx.getLlmDocIds() == null ? List.of() : ctx.getLlmDocIds();
+        String stepInfo = "Thinking — snippets=" + snippetCount
+            + ", docs=" + docIds.size()
+            + ", kbChars=" + kbContext.length()
+            + (isBlank(existingFinal) ? "" : ", prompt=ctx");
+
+        result = ragService.completeWithLlm(ctx, stepInfo);
+      }
     }
 
-    String existingFinal = safe(ctx.getFinalPrompt());
-    String kbContext = safe(ctx.getKbContext());
-    if (kbContext.isBlank()) kbContext = LangChain4jRagService.NO_KB_CONTEXT_PLACEHOLDER;
-
-    String question = safe(ctx.getLlmQuestion());
-    if (isBlank(question)) {
-      question = resolveUserText(ctx);
-    }
-
-    if (isBlank(existingFinal) && isBlank(question)) {
-      return Mono.just(ctx);
-    }
-
-    String systemPrompt = PromptRenderUtils.ensureSystemPrompt(ctx);
-
-    boolean shouldReuseFinal = ctx.isCacheHit() && !isBlank(existingFinal);
-    String finalPromptForLlm = shouldReuseFinal
-        ? existingFinal
-        : PromptTemplateProcessor.buildRagPrompt(systemPrompt, kbContext, question);
-
-    ctx.setFinalPrompt(finalPromptForLlm);
-
-    int snippetCount = ctx.getKbSnippetCount();
-    List<Long> docIds = ctx.getLlmDocIds() == null ? List.of() : ctx.getLlmDocIds();
-    String stepInfo = "Thinking — snippets=" + snippetCount
-        + ", docs=" + docIds.size()
-        + ", kbChars=" + kbContext.length()
-        + (isBlank(existingFinal) ? "" : ", prompt=ctx");
-
-    return ragService.completeWithLlm(ctx, stepInfo);
+    return result.flatMap(processingLogService::persistContext);
   }
 
   private ProcessingContext initializeContext(PrepareRequest request) throws ValidationException {
