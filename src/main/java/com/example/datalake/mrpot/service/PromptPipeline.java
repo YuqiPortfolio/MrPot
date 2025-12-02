@@ -139,7 +139,7 @@ public class PromptPipeline {
 
     int snippetCount = ctx.getKbSnippetCount();
     List<Long> docIds = ctx.getLlmDocIds() == null ? List.of() : ctx.getLlmDocIds();
-    String stepInfo = "ok snippets=" + snippetCount
+    String stepInfo = "Thinking — snippets=" + snippetCount
         + ", docs=" + docIds.size()
         + ", kbChars=" + kbContext.length()
         + (isBlank(existingFinal) ? "" : ", prompt=ctx");

@@ -45,7 +45,7 @@ public class ThinkingStepsMapper {
       case "common-response" -> "Match common greeting / FAQ";
       case "prompt-template" -> "Build system + user prompt";
       case "prompt-cache-lookup" -> "Check prompt cache";
-      case "langchain4j-rag" -> "Retrieve KB & call LLM";
+      case "langchain4j-rag" -> "Thinking";
       case "prompt-cache-record" -> "Record answer into cache";
       default -> "Processor: " + name;
     };

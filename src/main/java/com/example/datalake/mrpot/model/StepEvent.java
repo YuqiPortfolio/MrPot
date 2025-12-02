@@ -10,5 +10,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true, fluent = false)
 public class StepEvent {
   private String step;
+  private String title;
   private String note;
 }
