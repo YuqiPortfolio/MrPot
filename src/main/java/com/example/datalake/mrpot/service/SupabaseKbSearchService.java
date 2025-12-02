@@ -26,6 +26,8 @@ public class SupabaseKbSearchService implements KbSearchService {
     // 每篇文档最多给多少字符的 snippet（局部预算）
     // 改小一点，让 [DOC n] 更精简
     private static final int MAX_SNIPPET_PER_DOC = 180;
+    private static final int MIN_KEYWORD_LEN = 2;
+    private static final int MAX_SENTENCES_PER_SNIPPET = 3;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -192,8 +194,8 @@ public class SupabaseKbSearchService implements KbSearchService {
     /**
      * 从整篇 content 中抽一个 snippet：
      * - 仅当至少有一个关键词在 content 中命中时才返回片段；
-     * - 如果没有命中任何关键词（或 keywords 为空），直接返回 ""；
-     * - 命中时围绕第一个匹配位置截一段，并按句子边界做柔和截断。
+     * - 句子级切分 + 评分，优先保留覆盖关键词的短句，最多取少量句子；
+     * - 超预算时再按句子边界柔和截断。
      */
     private String extractSnippetFromContent(String content,
                                              List<String> keywords,
@@ -203,47 +205,72 @@ public class SupabaseKbSearchService implements KbSearchService {
         if (text.isEmpty()) return "";
         if (maxChars <= 0) return "";
 
-        if (keywords == null || keywords.isEmpty()) {
+        List<String> normalizedKeywords = normalizeKeywordsForMatching(keywords);
+        if (normalizedKeywords.isEmpty()) {
             // 要求：如果没有 keywords，直接不返回 snippet
             return "";
         }
 
-        String lower = text.toLowerCase(Locale.ROOT);
-        int bestIdx = Integer.MAX_VALUE;
-        int bestLen = 0;
-
-        // 找到最靠前、且更长的匹配关键词位置
-        for (String kw : keywords) {
-            if (kw == null || kw.isBlank()) continue;
-            String kwLower = kw.toLowerCase(Locale.ROOT).trim();
-            if (kwLower.isEmpty()) continue;
-
-            int idx = lower.indexOf(kwLower);
-            if (idx >= 0 && (idx < bestIdx || (idx == bestIdx && kwLower.length() > bestLen))) {
-                bestIdx = idx;
-                bestLen = kwLower.length();
-            }
-        }
-
-        // 如果没有任何关键词命中：直接返回空字符串
-        if (bestIdx == Integer.MAX_VALUE) {
+        List<SentenceSpan> sentences = splitSentences(text);
+        if (sentences.isEmpty()) {
             return "";
         }
 
-        // 以关键词为中心截取一段内容
-        int half = maxChars / 2;
-        int start = Math.max(0, bestIdx - half);
-        int end = Math.min(text.length(), start + maxChars);
-        if (end - start < maxChars && end == text.length()) {
-            start = Math.max(0, end - maxChars);
+        List<ScoredSentence> scored = new ArrayList<>();
+        for (SentenceSpan s : sentences) {
+            ScoredSentence scoredSentence = scoreSentence(s, normalizedKeywords);
+            if (scoredSentence != null) {
+                scored.add(scoredSentence);
+            }
         }
 
-        String rawSnippet = text.substring(start, end);
-        if (start > 0) rawSnippet = "..." + rawSnippet;
-        if (end < text.length()) rawSnippet = rawSnippet + "...";
+        if (scored.isEmpty()) {
+            // 没有关键词命中的句子，直接放弃
+            return "";
+        }
 
-        // 再按句子边界柔和剪裁，保证不超过 maxChars 且读起来自然
-        String clipped = clipToSentenceBoundary(rawSnippet, maxChars);
+        // 高分句优先，分数一致时按原文位置排序
+        scored.sort((a, b) -> {
+            int cmp = Integer.compare(b.score, a.score);
+            if (cmp != 0) return cmp;
+            return Integer.compare(a.span.start, b.span.start);
+        });
+
+        StringBuilder snippet = new StringBuilder();
+        Set<String> coveredKeywords = new HashSet<>();
+        List<SentenceSpan> picked = new ArrayList<>(MAX_SENTENCES_PER_SNIPPET);
+
+        for (ScoredSentence candidate : scored) {
+            if (picked.size() >= MAX_SENTENCES_PER_SNIPPET) break;
+
+            boolean improvesCoverage = !coveredKeywords.containsAll(candidate.matchedKeywords);
+            boolean isTopSentence = picked.isEmpty();
+
+            if (isTopSentence || improvesCoverage) {
+                picked.add(candidate.span);
+                coveredKeywords.addAll(candidate.matchedKeywords);
+            }
+        }
+
+        if (picked.isEmpty()) {
+            return "";
+        }
+
+        // 保持原始顺序，便于阅读
+        picked.sort(Comparator.comparingInt(span -> span.start));
+
+        for (SentenceSpan span : picked) {
+            if (snippet.length() > 0) {
+                snippet.append(' ');
+            }
+            String clipped = clipToSentenceBoundary(span.text, maxChars - snippet.length());
+            snippet.append(clipped);
+            if (snippet.length() >= maxChars) {
+                break;
+            }
+        }
+
+        String clipped = clipToSentenceBoundary(snippet.toString(), maxChars);
         return clipped;
     }
 
@@ -280,6 +307,82 @@ public class SupabaseKbSearchService implements KbSearchService {
     private static String normalizeWhitespace(String s) {
         if (s == null) return "";
         return s.replaceAll("[\\s\\u00A0]+", " ").trim();
+    }
+
+    private static List<String> normalizeKeywordsForMatching(List<String> keywords) {
+        if (keywords == null || keywords.isEmpty()) {
+            return List.of();
+        }
+
+        LinkedHashSet<String> unique = new LinkedHashSet<>();
+        for (String kw : keywords) {
+            if (kw == null) continue;
+            String trimmed = kw.trim().toLowerCase(Locale.ROOT);
+            if (trimmed.length() < MIN_KEYWORD_LEN) continue;
+            unique.add(trimmed);
+        }
+        return new ArrayList<>(unique);
+    }
+
+    private static List<SentenceSpan> splitSentences(String text) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+
+        List<SentenceSpan> spans = new ArrayList<>();
+        int start = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '.' || c == '!' || c == '?' || c == '。' || c == '！' || c == '？' || c == '\n') {
+                int end = i + 1;
+                addSentenceSpan(text, spans, start, end);
+                start = end;
+            }
+        }
+        addSentenceSpan(text, spans, start, text.length());
+        return spans;
+    }
+
+    private static void addSentenceSpan(String text, List<SentenceSpan> spans, int start, int end) {
+        if (start >= end) {
+            return;
+        }
+        String piece = text.substring(start, end).trim();
+        if (piece.isEmpty()) {
+            return;
+        }
+        spans.add(new SentenceSpan(piece, start));
+    }
+
+    private static ScoredSentence scoreSentence(SentenceSpan span, List<String> keywords) {
+        String lower = span.text.toLowerCase(Locale.ROOT);
+        int hitCount = 0;
+        Set<String> matched = new HashSet<>();
+
+        for (String kw : keywords) {
+            if (kw.isEmpty()) continue;
+            int idx = lower.indexOf(kw);
+            if (idx >= 0) {
+                matched.add(kw);
+                // 统计命中次数，避免过度循环，这里简单计一次
+                hitCount += 1;
+            }
+        }
+
+        if (matched.isEmpty()) {
+            return null;
+        }
+
+        // 短句 + 关键词覆盖度越高，得分越高
+        int lengthPenalty = Math.max(0, (span.text.length() - 120) / 40);
+        int score = matched.size() * 6 + hitCount * 2 - lengthPenalty;
+        return new ScoredSentence(span, score, matched);
+    }
+
+    private record SentenceSpan(String text, int start) {
+    }
+
+    private record ScoredSentence(SentenceSpan span, int score, Set<String> matchedKeywords) {
     }
 
     private static String shortTitle(KbDocument doc) {
