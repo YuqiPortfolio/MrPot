@@ -1,21 +1,20 @@
-# Multi-stage build to create a lightweight runtime image
-FROM maven:3.9.9-eclipse-temurin-17 AS builder
-WORKDIR /app
-
-# Leverage cached layers for dependency download
-COPY pom.xml mvnw mvnw.cmd .
-COPY .mvn .mvn
-RUN chmod +x mvnw
-RUN ./mvnw -B -DskipTests dependency:go-offline
-
-# Copy sources and build the application
-COPY src src
-RUN ./mvnw -B -DskipTests package
-
-# Runtime image
+# Use a maintained JDK image instead of openjdk:17-jdk
 FROM eclipse-temurin:17-jre
-WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
 
+LABEL authors="yuqi.guo17@gmail.com"
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the jar file to the container
+# 确保本地先 mvn package，把这个 jar 打出来
+COPY target/MrPot-0.0.1-SNAPSHOT.jar /app/app.jar
+
+# Copy the application-docker.properties file to the container
+COPY src/main/resources/application-docker.properties /app/application-docker.properties
+
+# Make port 8080 available to the world outside this container
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Run the jar file
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

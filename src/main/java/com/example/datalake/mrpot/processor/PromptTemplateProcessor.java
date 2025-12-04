@@ -81,7 +81,7 @@ public class PromptTemplateProcessor implements TextProcessor {
     }
 
     if (sb.length() > 0) sb.append("\n\n");
-    sb.append("Keep it concise.");
+    sb.append("Keep it concise. Return in html format");
 
     return sb.toString().trim();
   }
