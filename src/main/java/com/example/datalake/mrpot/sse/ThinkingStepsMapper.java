@@ -84,9 +84,7 @@ public class ThinkingStepsMapper {
       return "(no text)";
     }
 
-    if (base.length() > 300) {
-      base = base.substring(0, 300) + "…";
-    }
+    base = ellipsize(base, 160);
 
     double ratio = ctx.getChangeRatio();
     String ratioText = (Double.isNaN(ratio) || Double.isInfinite(ratio))
@@ -104,13 +102,13 @@ public class ThinkingStepsMapper {
     Set<String> tags = Optional.ofNullable(ctx.getTags())
         .orElse(Set.of());
 
-    String kwText = keywords.isEmpty() ? "(none)" : String.join(", ", keywords);
-    String tagText = tags.isEmpty() ? "(none)" : String.join(", ", tags);
+    String kwText = summarizeList(keywords, 5, "keyword");
+    String tagText = summarizeList(tags.stream().toList(), 5, "tag");
     String inText = (intent == null) ? "UNKNOWN" : intent.name();
 
-    return "Intent = " + inText +
-        "\nKeywords = " + kwText +
-        "\nTags = " + tagText;
+    return "Intent: " + inText +
+        "\nKeywords: " + kwText +
+        "\nTags: " + tagText;
   }
 
   private String commonResponseDetail(ProcessingContext ctx, StepLog log) {
@@ -118,23 +116,40 @@ public class ThinkingStepsMapper {
       return "No common response matched";
     }
 
-    String note = Optional.ofNullable(log.getNote()).orElse("");
-    String systemPrompt = Optional.ofNullable(ctx.getSystemPrompt()).orElse("(none)");
-    String userPrompt = Optional.ofNullable(ctx.getUserPrompt()).orElse("(none)");
+    String note = ellipsize(Optional.ofNullable(log.getNote()).orElse(""), 120);
 
-    return "Matched common response" + (note.isBlank() ? "" : ": " + note)
-        + "\nSystem prompt: " + systemPrompt
-        + "\nUser prompt: " + userPrompt;
+    return note.isBlank()
+        ? "Matched common response"
+        : "Matched common response: " + note;
   }
 
   private String ragDetail(ProcessingContext ctx, StepLog log) {
     List<Long> docIds = Optional.ofNullable(ctx.getLlmDocIds()).orElse(List.of());
     String docsText = docIds.isEmpty() ? "(none)" : docIds.toString();
-    String note = Optional.ofNullable(log.getNote()).orElse("");
+    String note = ellipsize(Optional.ofNullable(log.getNote()).orElse(""), 120);
+    String answer = ellipsize(Optional.ofNullable(ctx.getLlmAnswer()).orElse("(pending)"), 160);
 
-    return "Knowledge search" + (note.isBlank() ? "" : " => " + note)
-        + "\nDoc IDs: " + docsText
-        + "\nAnswer: " + Optional.ofNullable(ctx.getLlmAnswer()).orElse("(pending)");
+    return "Search: " + (note.isBlank() ? "(none)" : note)
+        + "\nDocs: " + docsText
+        + "\nAnswer: " + answer;
+  }
+
+  private String summarizeList(List<String> items, int maxItems, String label) {
+    if (items == null || items.isEmpty()) {
+      return "(none)";
+    }
+
+    int total = items.size();
+    List<String> head = items.subList(0, Math.min(total, maxItems));
+    String joined = String.join(", ", head);
+
+    return total > maxItems ? joined + " … (+" + (total - maxItems) + " more " + label + (total - maxItems == 1 ? "" : "s") + ")" : joined;
+  }
+
+  private String ellipsize(String text, int maxLen) {
+    if (text == null) return null;
+    if (text.length() <= maxLen) return text;
+    return text.substring(0, maxLen) + "…";
   }
 
   @SafeVarargs

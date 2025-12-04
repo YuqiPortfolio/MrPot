@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class PromptPipeline {
@@ -88,26 +89,26 @@ public class PromptPipeline {
       return Flux.error(ex);
     }
 
-    // Build a sequential chain while emitting the updated context after *each* processor
-    // completes. This ensures SSE consumers receive real-time step updates.
-    Mono<ProcessingContext> chain = Mono.just(ctx);
-    Flux<ProcessingContext> emissions = Flux.empty();
+    // Emit after each processor completes so SSE consumers receive real-time updates
+    AtomicReference<ProcessingContext> ref = new AtomicReference<>(ctx);
 
-    for (TextProcessor processor : buildOrderedChain()) {
-      final TextProcessor stage = processor;
-      chain = chain.flatMap(current -> {
-        if (current.isCacheHit() && shouldBypassAfterCache(stage)) {
-          return Mono.just(current.addStep(stage.name(), "bypass-cache"));
-        }
-        return stage.process(current);
-      });
+    Flux<ProcessingContext> stageFlux = Flux.fromIterable(buildOrderedChain())
+        .concatMap(stage -> Mono.defer(() -> {
+          ProcessingContext current = ref.get();
+          Mono<ProcessingContext> next;
 
-      // Emit the context produced by this stage before moving to the next one
-      emissions = emissions.concatWith(chain);
-    }
+          if (current.isCacheHit() && shouldBypassAfterCache(stage)) {
+            next = Mono.just(current.addStep(stage.name(), "bypass-cache"));
+          } else {
+            next = stage.process(current);
+          }
 
-    Mono<ProcessingContext> finalChain = chain.flatMap(this::finalizePromptAndCallLlm);
-    return emissions.concatWith(finalChain);
+          return next.doOnNext(ref::set);
+        }));
+
+    Mono<ProcessingContext> finalChain = Mono.defer(() -> finalizePromptAndCallLlm(ref.get()));
+
+    return stageFlux.concatWith(finalChain);
   }
 
   private Mono<ProcessingContext> finalizePromptAndCallLlm(ProcessingContext ctx) {
