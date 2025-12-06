@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.datalake.mrpot.model.ProcessingContext;
 import com.example.datalake.mrpot.request.PrepareRequest;
+import com.example.datalake.mrpot.processor.TextProcessor;
 import com.example.datalake.mrpot.validation.MaxCharsValidator;
 import com.example.datalake.mrpot.validation.NotBlankInputValidator;
 import com.example.datalake.mrpot.validation.TemplatePlaceholderValidator;
@@ -32,7 +33,13 @@ class PromptPipelineValidationTest {
         Mono.just((ProcessingContext) invocation.getArgument(0))
     );
 
-    return new PromptPipeline(List.of(), validationService, ragService);
+    ReferencePersistenceService referencePersistenceService = mock(ReferencePersistenceService.class);
+    when(referencePersistenceService.persistAnswerAndKeywords(any())).thenAnswer(invocation ->
+        Mono.just((ProcessingContext) invocation.getArgument(0))
+    );
+
+    List<TextProcessor> processors = List.of();
+    return new PromptPipeline(processors, validationService, ragService, referencePersistenceService);
   }
 
   @Test
