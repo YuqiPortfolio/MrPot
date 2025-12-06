@@ -41,8 +41,10 @@ public class PromptPipeline {
   private final Map<Class<? extends TextProcessor>, TextProcessor> processorsByType;
   private final ValidationService validationService;
   private final LangChain4jRagService ragService;
+  private final ReferencePersistenceService referencePersistenceService;
 
-  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService, LangChain4jRagService ragService) {
+  public PromptPipeline(List<TextProcessor> processors, ValidationService validationService,
+                       LangChain4jRagService ragService, ReferencePersistenceService referencePersistenceService) {
     // Use AopUtils.getTargetClass to handle Spring proxies (CGLIB/JDK)
     this.processorsByType = processors.stream()
         .collect(Collectors.toMap(
@@ -53,6 +55,7 @@ public class PromptPipeline {
         ));
     this.validationService = validationService;
     this.ragService = ragService;
+    this.referencePersistenceService = referencePersistenceService;
   }
 
   public Mono<ProcessingContext> run(PrepareRequest request) {
@@ -144,7 +147,8 @@ public class PromptPipeline {
         + ", kbChars=" + kbContext.length()
         + (isBlank(existingFinal) ? "" : ", prompt=ctx");
 
-    return ragService.completeWithLlm(ctx, stepInfo);
+    return ragService.completeWithLlm(ctx, stepInfo)
+            .flatMap(referencePersistenceService::persistAnswerAndKeywords);
   }
 
   private ProcessingContext initializeContext(PrepareRequest request) throws ValidationException {
