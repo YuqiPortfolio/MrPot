@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
@@ -35,6 +36,11 @@ public class ReferencePersistenceService {
     private final KeywordsLexiconRepository keywordsLexiconRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Persist the generated answer as a kb_documents row and upsert normalized keywords into
+     * keywords_lexicon in a single transaction so both changes succeed or fail together.
+     */
+    @Transactional
     public Mono<ProcessingContext> persistAnswerAndKeywords(ProcessingContext ctx) {
         return Mono.fromCallable(() -> {
             if (ctx == null) {
