@@ -59,29 +59,29 @@ public class PromptTemplateProcessor implements TextProcessor {
   /**
    * Assemble a final RAG prompt that keeps the format consistent across call sites.
    */
-  public static String buildRagPrompt(String systemPrompt, String kbContext, String userQuestion) {
-    String sys = safeTrim(systemPrompt);
-    String kb = safeTrim(kbContext);
-    String question = safeTrim(userQuestion);
+    public static String buildRagPrompt(String systemPrompt, String kbContext, String userQuestion) {
+      String sys = safeTrim(systemPrompt);
+      String kb = safeTrim(kbContext);
+      String question = safeTrim(userQuestion);
 
     StringBuilder sb = new StringBuilder();
     if (!sys.isEmpty()) {
       sb.append(sys);
-    }
+      }
 
-    if (!kb.isEmpty()) {
+      if (!kb.isEmpty()) {
+        if (sb.length() > 0) sb.append("\n\n");
+        sb.append("Use KB context when it clearly helps; otherwise say the info is not available.");
+        sb.append("\nKB:\n").append(kb);
+      }
+
+      if (!question.isEmpty()) {
+        if (sb.length() > 0) sb.append("\n\n");
+        sb.append("Question:\n").append(question);
+      }
+
       if (sb.length() > 0) sb.append("\n\n");
-      sb.append("Answer using the KB if it helps. If not relevant, say: \"Sorry, I can only reply to Yuqi Guo's related content.\"");
-      sb.append("\nKB:\n").append(kb);
-    }
-
-    if (!question.isEmpty()) {
-      if (sb.length() > 0) sb.append("\n\n");
-      sb.append("Question:\n").append(question);
-    }
-
-    if (sb.length() > 0) sb.append("\n\n");
-    sb.append("Keep it concise. Return in html format");
+      sb.append("Reply concisely in HTML");
 
     return sb.toString().trim();
   }

@@ -25,7 +25,10 @@ public class SupabaseKbSearchService implements KbSearchService {
 
     // 每篇文档最多给多少字符的 snippet（局部预算）
     // 改小一点，让 [DOC n] 更精简
-    private static final int MAX_SNIPPET_PER_DOC = 180;
+    private static final int MAX_SNIPPET_PER_DOC = 160;
+    private static final int MIN_SNIPPET_WINDOW = 80;
+    private static final int KEYWORD_WINDOW_PADDING = 45;
+    private static final int MAX_WINDOW_PER_SENTENCE = 140;
     private static final int MIN_KEYWORD_LEN = 2;
     private static final int MAX_SENTENCES_PER_SNIPPET = 3;
 
@@ -260,18 +263,88 @@ public class SupabaseKbSearchService implements KbSearchService {
         picked.sort(Comparator.comparingInt(span -> span.start));
 
         for (SentenceSpan span : picked) {
+            int remainingChars = maxChars - snippet.length();
+            if (remainingChars <= 0) {
+                break;
+            }
+
+            String clipped = extractKeywordWindow(span.text, normalizedKeywords, remainingChars);
+            if (clipped.isBlank()) {
+                continue;
+            }
+
             if (snippet.length() > 0) {
                 snippet.append(' ');
             }
-            String clipped = clipToSentenceBoundary(span.text, maxChars - snippet.length());
             snippet.append(clipped);
+
             if (snippet.length() >= maxChars) {
                 break;
             }
         }
 
-        String clipped = clipToSentenceBoundary(snippet.toString(), maxChars);
-        return clipped;
+        return clipToSentenceBoundary(snippet.toString(), maxChars);
+    }
+
+    private static String extractKeywordWindow(String sentence, List<String> keywords, int budget) {
+        if (budget <= 0) return "";
+        String text = normalizeWhitespace(sentence);
+        if (text.isEmpty()) return "";
+
+        int effectiveMin = Math.min(MIN_SNIPPET_WINDOW, budget);
+        int maxLen = Math.min(budget, MAX_WINDOW_PER_SENTENCE);
+        String lower = text.toLowerCase(Locale.ROOT);
+
+        int bestStart = -1;
+        int bestEnd = -1;
+
+        for (String kw : keywords) {
+            if (kw == null || kw.isBlank()) continue;
+
+            int idx = lower.indexOf(kw);
+            if (idx < 0) continue;
+
+            int start = Math.max(0, idx - KEYWORD_WINDOW_PADDING);
+            int end = Math.min(text.length(), idx + kw.length() + KEYWORD_WINDOW_PADDING);
+
+            int desiredLen = Math.max(effectiveMin, end - start);
+            desiredLen = Math.min(desiredLen, maxLen);
+
+            if (end - start < desiredLen) {
+                int deficit = desiredLen - (end - start);
+                int leftExtra = Math.min(start, deficit / 2);
+                start -= leftExtra;
+                int rightExtra = Math.min(text.length() - end, deficit - leftExtra);
+                end += rightExtra;
+
+                int remainingGap = desiredLen - (end - start);
+                if (remainingGap > 0 && start > 0) {
+                    int shiftLeft = Math.min(start, remainingGap);
+                    start -= shiftLeft;
+                }
+                if (end - start < desiredLen && end < text.length()) {
+                    end = Math.min(text.length(), start + desiredLen);
+                }
+            }
+
+            if (end - start > maxLen) {
+                int center = start + (end - start) / 2;
+                start = Math.max(0, center - maxLen / 2);
+                end = Math.min(text.length(), start + maxLen);
+            }
+
+            if (bestStart == -1 || start < bestStart) {
+                bestStart = start;
+                bestEnd = end;
+            }
+        }
+
+        if (bestStart == -1) {
+            int end = Math.min(text.length(), Math.max(effectiveMin, Math.min(maxLen, text.length())));
+            return clipWithEllipsis(text, 0, end, text.length());
+        }
+
+        return clipWithEllipsis(text, bestStart, bestEnd, text.length());
     }
 
     /**
@@ -288,6 +361,28 @@ public class SupabaseKbSearchService implements KbSearchService {
             sub = sub.substring(0, cut);
         }
         return sub.strip() + "...";
+    }
+
+    private static String clipWithEllipsis(String text, int start, int end, int totalLength) {
+        if (start < 0) start = 0;
+        if (end > totalLength) end = totalLength;
+        if (start >= end) return "";
+
+        boolean clippedLeft = start > 0;
+        boolean clippedRight = end < totalLength;
+
+        String window = text.substring(start, end).strip();
+        if (window.isEmpty()) {
+            return "";
+        }
+
+        if (clippedLeft) {
+            window = "..." + window;
+        }
+        if (clippedRight) {
+            window = window + "...";
+        }
+        return window;
     }
 
     /**
