@@ -19,8 +19,8 @@ import java.util.Objects;
 public class LangChain4jRagService {
 
     private static final int MAX_SNIPPETS = 2;
-    private static final int MAX_KB_CONTEXT_CHARS = 600;
-    private static final int MAX_USER_TEXT_CHARS = 320;
+    private static final int MAX_KB_CONTEXT_CHARS = 480;
+    private static final int MAX_USER_TEXT_CHARS = 260;
     static final String NO_KB_CONTEXT_PLACEHOLDER = "(no relevant knowledge base content found)";
 
     private final ChatModel chatModel;
