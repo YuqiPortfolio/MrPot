@@ -2,6 +2,8 @@ package com.example.datalake.mrpot.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "kb_documents", schema = "public")
@@ -23,5 +25,6 @@ public class KbDocument {
      * 以后你想用 JsonNode / Map 再改 Convertor 就行。
      */
     @Column(name = "metadata", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
 }
