@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -18,10 +19,15 @@ public class ThinkingStepsMapper {
 
   public List<ThinkingStep> toThinkingSteps(ProcessingContext ctx) {
     List<StepLog> logs = Optional.ofNullable(ctx.getSteps()).orElse(List.of());
+    Set<String> kept = new LinkedHashSet<>();
     List<ThinkingStep> out = new ArrayList<>(logs.size());
 
     int i = 1;
     for (StepLog log : logs) {
+      if (!isKeyStep(log, kept)) {
+        continue;
+      }
+
       ThinkingStep step = new ThinkingStep();
       step.setIndex(i++);
       step.setProcessor(log.getName());
@@ -34,6 +40,29 @@ public class ThinkingStepsMapper {
       out.add(step);
     }
     return out;
+  }
+
+  private boolean isKeyStep(StepLog log, Set<String> kept) {
+    String name = log.getName();
+    if (name == null) {
+      return true;
+    }
+
+    if ("bypass-cache".equalsIgnoreCase(log.getNote())) {
+      return false;
+    }
+
+    boolean important = switch (name) {
+      case "unified-clean-correct", "intent-classifier", "common-response", "langchain4j-rag" -> true;
+      default -> false;
+    };
+
+    if (!important) {
+      return false;
+    }
+
+    // Only keep the first occurrence of each step type to avoid noisy duplicates.
+    return kept.add(name);
   }
 
   private String humanTitleFor(String name) {
